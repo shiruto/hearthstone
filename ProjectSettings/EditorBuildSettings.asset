@@ -6,6 +6,18 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
-    path: Assets/Scenes/SampleScene.unity
+    path: Assets/Scenes/ScnStart.unity
     guid: 2cda990e2423bbf4892e6590ba056729
+  - enabled: 1
+    path: Assets/Scenes/ModeSelect.unity
+    guid: 8fd2ea1916e5bb546b1ae22254049885
+  - enabled: 1
+    path: Assets/Scenes/ScnDeckBuillder.unity
+    guid: 208609abfb880594e8a2ed2e835c51ea
+  - enabled: 1
+    path: Assets/Scenes/ScnDeckSelect.unity
+    guid: bb75603d39239cb4680d04d28e5027cb
+  - enabled: 1
+    path: Assets/Scenes/ScnBattle.unity
+    guid: 30f7dc27acf089e47974f48518d21d50
   m_configObjects: {}

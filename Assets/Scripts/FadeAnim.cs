@@ -4,7 +4,7 @@ using UnityEngine;
 using TMPro;
 using Unity.VisualScripting;
 
-public class FadeAni: MonoBehaviour {
+public class FadeAnim: MonoBehaviour {
 	// Start is called before the first frame update
 
 	TextMeshProUGUI text;
