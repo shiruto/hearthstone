@@ -1,0 +1,38 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e1d59bd7dee34ab4488bef2c4d6fbbbd, type: 3}
+  m_Name: Preparation
+  m_EditorClassIdentifier: 
+  Description: The next spell you cast this turn costs 3 less.
+  CardImage: {fileID: 0}
+  ManaCost: 0
+  OrgManaCost: 0
+  rarity: 3
+  ClassType: 7
+  MaxHealth: 0
+  CurHealth: 0
+  Attack: 0
+  CurAttack: 0
+  AttacksChances: 1
+  SpellDamage: 0
+  specialCreatureAmount: 0
+  isTaunt: 0
+  isCharge: 0
+  isRush: 0
+  isDivienShield: 0
+  isStealth: 0
+  isImmune: 0
+  CreatureScriptName: 
+  SpellScriptName: 
+  specialSpellAmount: 0
+  isSecret: 0
+  Targets: 0
