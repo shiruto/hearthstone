@@ -258,7 +258,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 606203b3dfde4da499275d31c01f3c04, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  tarScene: ScnBattle
+  TargetScene: ScnBattle
 --- !u!1 &98412487
 GameObject:
   m_ObjectHideFlags: 0
@@ -967,6 +967,7 @@ GameObject:
   - component: {fileID: 730622315}
   - component: {fileID: 730622314}
   - component: {fileID: 730622313}
+  - component: {fileID: 730622316}
   m_Layer: 5
   m_Name: BtnToDeckBuilder
   m_TagString: Untagged
@@ -1077,6 +1078,19 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 730622311}
   m_CullTransparentMesh: 1
+--- !u!114 &730622316
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 730622311}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 606203b3dfde4da499275d31c01f3c04, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  TargetScene: ScnDeckBuilder
 --- !u!1 &836308924
 GameObject:
   m_ObjectHideFlags: 0
@@ -1453,6 +1467,7 @@ GameObject:
   - component: {fileID: 1265832115}
   - component: {fileID: 1265832114}
   - component: {fileID: 1265832113}
+  - component: {fileID: 1265832116}
   m_Layer: 5
   m_Name: BtnReturn
   m_TagString: Untagged
@@ -1563,6 +1578,19 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1265832111}
   m_CullTransparentMesh: 1
+--- !u!114 &1265832116
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1265832111}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 606203b3dfde4da499275d31c01f3c04, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  TargetScene: 
 --- !u!1 &1355585779
 GameObject:
   m_ObjectHideFlags: 0

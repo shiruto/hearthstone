@@ -34,13 +34,13 @@ public class FadeAnim: MonoBehaviour {
 		curTime = Time.time;
 		if (curTime - startTime - delay > 0.01f) {
 			if(isWorking) {
-				text.color = changeTransparency(text.color);
+				text.color = ChangeTransparency(text.color);
 			}
 		}
 		//Debug.Log("outside of func: \ntext color: " + text.color.a + "\ttemp color: " + tempColor.a);
 	}
 
-	private Color changeTransparency(Color color) {
+	private Color ChangeTransparency(Color color) {
 		if(isIncresing) {
 			color.a += fadeSpeed * Time.deltaTime;
 			if(color.a >= Mathf.Max(TransparencyChange.x, TransparencyChange.y)) {

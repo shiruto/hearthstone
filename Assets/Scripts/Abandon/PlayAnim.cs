@@ -14,10 +14,6 @@ public class PlayAnim: MonoBehaviour {
 		Btn = GameObject.Find("Button");
 		
 	}
-	void Start() {
-		
-	}
-
 	// Update is called once per frame
 	void Update() {
 		if(isDetecting) {

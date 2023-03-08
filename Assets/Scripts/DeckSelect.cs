@@ -11,27 +11,17 @@ public class DeckSelect: MonoBehaviour {
 		GetComponent<Button>().onClick.AddListener(SelectDeck);
 	}
 
-	void Start() {
-		Application.targetFrameRate = 60;
-
-	}
-
-	// Update is called once per frame
-	void Update() {
-
-	}
-
 	void SelectDeck() {
 		//Debug.Log("find = " + GameObject.Find("PicDeckBoarder"));
 		Image DeckPrev = GameObject.Find("PicDeckBoarder").transform.GetChild(0).GetComponent<Image>();
-		if (replaceGameObject != null) {
+		if(replaceGameObject != null) {
 			Transform pic = GameObject.Find(replaceGameObject.name).transform.GetChild(0).GetChild(0);
-		//Debug.Log("getchild result = " + pic.name + "\tDeckPrev = " + DeckPrev);
-		pic.GetComponent<Image>().sprite = DeckPrev.sprite;
-		pic.localPosition = new Vector3(41, -1, 0);
-		pic.localScale = new Vector3(0.18f, 0.18f, 0.18f);
+			//Debug.Log("getchild result = " + pic.name + "\tDeckPrev = " + DeckPrev);
+			pic.GetComponent<Image>().sprite = DeckPrev.sprite;
+			pic.localPosition = new Vector3(41, -1, 0);
+			pic.localScale = new Vector3(0.18f, 0.18f, 0.18f);
 		}
-		
+
 	}
 
 }

@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e1d59bd7dee34ab4488bef2c4d6fbbbd, type: 3}
   m_Name: Abusive Sergeant
   m_EditorClassIdentifier: 
-  Description: 'Battle: Give a minion +2 Attack this turn.'
+  Description: 'Battlecry: Give a minion +2 Attack this turn.'
   CardImage: {fileID: 0}
   ManaCost: 1
   OrgManaCost: 1
@@ -34,6 +34,7 @@ MonoBehaviour:
   isStealth: 0
   isImmune: 0
   isFrozen: 0
+  isPoison: 0
   CreatureScriptName: 
   MinionType: 0
   SpellScriptName: 

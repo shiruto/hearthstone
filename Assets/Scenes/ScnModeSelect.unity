@@ -678,7 +678,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 606203b3dfde4da499275d31c01f3c04, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  tarScene: ScnDeckBuilder
+  TargetScene: ScnDeckBuilder
 --- !u!1 &1399153483
 GameObject:
   m_ObjectHideFlags: 0
@@ -814,7 +814,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 606203b3dfde4da499275d31c01f3c04, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  tarScene: ScnDeckSelect
+  TargetScene: ScnDeckSelect
 --- !u!1 &1509361991
 GameObject:
   m_ObjectHideFlags: 0

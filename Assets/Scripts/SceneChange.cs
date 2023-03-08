@@ -1,22 +1,21 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class SceneChange: MonoBehaviour {
-	// Start is called before the first frame update
-	public string tarScene;
+	public string TargetScene;
 	void Start() {
-		GetComponent<Button>().onClick.AddListener(changeScene);
+		GetComponent<Button>().onClick.AddListener(ChangeScene);
 	}
 
-	// Update is called once per frame
-	void Update() {
-
-	}
-
-	void changeScene() {
-		SceneManager.LoadScene(tarScene);
+	void ChangeScene() {
+		if(TargetScene == null) {
+			Debug.Log("Empty Scene Name!");
+			return;
+		}
+		SceneManager.LoadScene(TargetScene);
 	}
 }

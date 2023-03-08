@@ -134,10 +134,11 @@ GameObject:
   - component: {fileID: 266152131}
   - component: {fileID: 266152130}
   - component: {fileID: 266152129}
-  - component: {fileID: 266152128}
+  - component: {fileID: 266152133}
   - component: {fileID: 266152132}
+  - component: {fileID: 266152128}
   m_Layer: 5
-  m_Name: Button
+  m_Name: BtnChangeScene
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -254,10 +255,22 @@ MonoBehaviour:
   m_GameObject: {fileID: 266152127}
   m_Enabled: 1
   m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c2c7b06e8146baf4eb552fcce201f28f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &266152133
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 266152127}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 606203b3dfde4da499275d31c01f3c04, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  tarScene: ScnModeSelect
+  TargetScene: ScnModeSelect
 --- !u!1 &508496764
 GameObject:
   m_ObjectHideFlags: 0
@@ -458,6 +471,7 @@ GameObject:
   - component: {fileID: 896643986}
   - component: {fileID: 896643985}
   - component: {fileID: 896643987}
+  - component: {fileID: 896643988}
   m_Layer: 5
   m_Name: TxtStart
   m_TagString: Untagged
@@ -602,6 +616,18 @@ Animator:
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
+--- !u!114 &896643988
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 896643983}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 68ff3bff22ee94e4ba796747287d835e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1145842407
 GameObject:
   m_ObjectHideFlags: 0
@@ -938,7 +964,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 1912547236}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5e67e41a3ec77a042806aece126791d1, type: 3}
+  m_Script: {fileID: 11500000, guid: 0d1774a88680e2146b4fd3909ebb8b14, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!1 &1966180501

@@ -14,7 +14,7 @@ public class CardManager: MonoBehaviour {
 	public TextMeshProUGUI HealthText; // 卡牌生命值文本
 	public TextMeshProUGUI AttackText; // 卡牌攻击文本
 	[Header("GameObject References")]
-	
+
 	public GameObject HealthIcon;
 	public GameObject AttackIcon;
 	[Header("Image References")]
@@ -26,7 +26,7 @@ public class CardManager: MonoBehaviour {
 	void Awake() {
 		if(cardAsset != null)
 			ReadCardFromAsset();
-}
+	}
 
 	private bool canBePlayedNow = false;
 	public bool CanBePlayedNow {
@@ -47,7 +47,7 @@ public class CardManager: MonoBehaviour {
 		HealthIcon.SetActive(false);
 		AttackIcon.SetActive(false);
 		CardElementImage.sprite = cardAsset.CardImage;
-		
+
 		// 2) 添加卡牌名字
 		NameText.text = cardAsset.name;
 		// 3) 添加卡牌消耗
