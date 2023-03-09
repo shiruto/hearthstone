@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 793903120601311274}
   - component: {fileID: 6807606613849639716}
+  - component: {fileID: 5942202574890797874}
   m_Layer: 5
   m_Name: PfbCard
   m_TagString: Untagged
@@ -70,6 +71,19 @@ MonoBehaviour:
   CardFaceGlowImage: {fileID: 0}
   CardBackGlowImage: {fileID: 0}
   CardElementImage: {fileID: 6152867114681907444}
+--- !u!65 &5942202574890797874
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 793903120601311278}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 114, y: 176, z: 1}
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &793903121629796436
 GameObject:
   m_ObjectHideFlags: 0

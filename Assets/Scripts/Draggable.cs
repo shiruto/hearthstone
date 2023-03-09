@@ -1,10 +1,5 @@
 using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using Unity.VisualScripting;
 using UnityEngine;
-using UnityEngine.EventSystems;
 
 public class Draggable: MonoBehaviour {
 	// 当前是否拖动该卡牌的标志
@@ -20,7 +15,7 @@ public class Draggable: MonoBehaviour {
 	// 移动速度
 	private float Speed;
 	// 使用卡牌委托
-	public event Action<CardAsset> OnUse;
+	public static event Action<Transform> OnUse;
 	private void Start() {
 		startPos = transform.position;
 	}
@@ -31,13 +26,13 @@ public class Draggable: MonoBehaviour {
 		pointerDistance = GetMousePosition() - startPos;
 	}
 	void Update() {
-		if(Input.GetMouseButtonDown(0) && RectTransformUtility.RectangleContainsScreenPoint(GetComponent<RectTransform>(), Input.mousePosition)) {
+		RaycastHit[] a = Physics.RaycastAll(Camera.main.ScreenPointToRay(Input.mousePosition));
+		if(Input.GetMouseButtonDown(0) && a[0].collider.transform.gameObject.name == this.name) {
 			OnMouseDown();
 		}
 		if(isDragging) {
 			var mousePos = GetMousePosition();
-			var newtransform = new Vector3(mousePos.x - pointerDistance.x, mousePos.y - pointerDistance.y, 0);
-			transform.position = newtransform;
+			transform.position = new Vector3(mousePos.x - pointerDistance.x, mousePos.y - pointerDistance.y, 0);
 		}
 		if(Input.GetMouseButtonUp(0)) {
 			OnMouseUp();
@@ -48,17 +43,19 @@ public class Draggable: MonoBehaviour {
 			transform.position = transform.position + Speed * Time.deltaTime * Vector3.Normalize(startPos - transform.position);
 			if(dif < 5) {
 				transform.position = startPos;
+				isReturning = false;
 			}
 		}
 	}
 	void OnMouseUp() {
+		if(isDragging && RectTransformUtility.RectangleContainsScreenPoint(GameObject.Find("PnlUseCard").GetComponent<RectTransform>(), Input.mousePosition)) {
+			OnUse?.Invoke(GetComponent<Transform>());
+			isReturning = false;
+		}
 		if(isDragging) {
 			isDragging = false;
 		}
-		if(RectTransformUtility.RectangleContainsScreenPoint(GameObject.Find("PnlUseCard").GetComponent<RectTransform>(), Input.mousePosition)) {
-			OnUse?.Invoke(GetComponent<CardManager>().cardAsset);
-			isReturning = false;
-		}
+		
 		else {
 			isReturning = true;
 		}
