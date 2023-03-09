@@ -2,7 +2,7 @@ using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 
-public enum TargetingOptions { // ¿¨ÅÆÄ¿±êÑ¡Ïî 
+public enum TargetingOptions { // ï¿½ï¿½ï¿½ï¿½Ä¿ï¿½ï¿½Ñ¡ï¿½ï¿½ 
 	NoTarget,
 	AllMinions,
 	EnemyMinions,
@@ -20,43 +20,44 @@ public enum ClassType { None, DemonHunter, Druid, Hunter, Mage, Paladin, Priest,
 
 public class CardAsset: ScriptableObject {
 	//[Header("General info")]
-	//public CharacterAsset characterAsset;  // ¿¨ÅÆËùÊô½ÇÉ«
+	//public CharacterAsset characterAsset;  // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½É«
 	[TextArea(2, 3)]
-	public string Description; // ¿¨ÅÆÃèÊö
-	public Sprite CardImage; // ¿¨ÅÆÍ¼Ïñ
-	public int ManaCost; // ¿¨ÅÆÏûºÄ
-	public int OrgManaCost; // Ô­¿¨ÅÆÏûºÄ
-	public Rarity rarity; // Ï¡ÓĞ¶È
-	public ClassType ClassType; // ¿¨ÅÆËùÊôÖ°Òµ
-	public bool isTriggered; // ÊÇ·ñ±»´¥·¢
+	public string Description; // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+	public Sprite CardImage; // ï¿½ï¿½ï¿½ï¿½Í¼ï¿½ï¿½
+	public int ManaCost; // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+	public int OrgManaCost; // Ô­ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+	public Rarity rarity; // Ï¡ï¿½Ğ¶ï¿½
+	public ClassType ClassType; // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö°Òµ
+	public bool isTriggered; // ï¿½Ç·ñ±»´ï¿½ï¿½ï¿½
+	public CardManager Script;
 
-	[Header("Creature Info")] // ×÷ÎªÉúÎï¿¨ÅÆµÄĞÅÏ¢
-	public int Attack; // ¹¥»÷Á¦
-	public int CurAttack; // ÏÖ¹¥»÷
-	public int MaxHealth; // ×î´óÉúÃüÖµ
-	public int CurHealth; // ÏÖÉúÃü
-	public int AttacksChances = 1; // Ò»»ØºÏÄÚ¹¥»÷´ÎÊı
-	public int SpellDamage = 0; // ·¨ÊõÉËº¦
-	public int specialCreatureAmount; // ¼¼ÄÜÊıÖµ
-	public bool isWeapon; // ÊÇ·ñÊÇÎäÆ÷
-	public bool isTaunt; // ÊÇ·ñ³°·í
-	public bool isCharge; // ÊÇ·ñ³å·æ£¬¼´¸ÕÈë³¡µÄ»ØºÏÊÇ·ñ¿ÉÒÔÁ¢¼´¹¥»÷
-	public bool isRush; // ÊÇ·ñÍ»Ï®
-	public bool isDivineShield; // ÊÇ·ñÊ¥¶Ü
-	public bool isStealth;  // ÊÇ·ñÇ±ĞĞ
-	public bool isImmune; // ÊÇ·ñÃâÒß
-	public bool isFrozen; // ÊÇ·ñ±»¶³½á
-	public bool isPoison; // ÊÇ·ñ¾ç¶¾
-	public string CreatureScriptName; // ÉúÎï½Å±¾Ãû
-	public MinionType MinionType; // Ëæ´ÓÀàĞÍ
+	[Header("Creature Info")] // ï¿½ï¿½Îªï¿½ï¿½ï¿½ï¿¨ï¿½Æµï¿½ï¿½ï¿½Ï¢
+	public int Attack; // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+	public int CurAttack; // ï¿½Ö¹ï¿½ï¿½ï¿½
+	public int MaxHealth; // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Öµ
+	public int CurHealth; // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+	public int AttacksChances = 1; // Ò»ï¿½Øºï¿½ï¿½Ú¹ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+	public int SpellDamage = 0; // ï¿½ï¿½ï¿½ï¿½ï¿½Ëºï¿½
+	public int specialCreatureAmount; // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Öµ
+	public bool isWeapon; // ï¿½Ç·ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+	public bool isTaunt; // ï¿½Ç·ñ³°·ï¿½
+	public bool isCharge; // ï¿½Ç·ï¿½ï¿½æ£¬ï¿½ï¿½ï¿½ï¿½ï¿½ë³¡ï¿½Ä»Øºï¿½ï¿½Ç·ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+	public bool isRush; // ï¿½Ç·ï¿½Í»Ï®
+	public bool isDivineShield; // ï¿½Ç·ï¿½Ê¥ï¿½ï¿½
+	public bool isStealth;  // ï¿½Ç·ï¿½Ç±ï¿½ï¿½
+	public bool isImmune; // ï¿½Ç·ï¿½ï¿½ï¿½ï¿½ï¿½
+	public bool isFrozen; // ï¿½Ç·ñ±»¶ï¿½ï¿½ï¿½
+	public bool isPoison; // ï¿½Ç·ï¿½ç¶¾
+	public string CreatureScriptName; // ï¿½ï¿½ï¿½ï¿½Å±ï¿½ï¿½ï¿½
+	public MinionType MinionType; // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 
 	[Header("SpellInfo")]
-	public string SpellScriptName; // ¼¼ÄÜ½Å±¾Ãû
-	public int specialSpellAmount; // ¼¼ÄÜÊıÖµ
-	public bool isSecret; // ÊÇ·ñÎª°ÂÃØ
-	public TargetingOptions TargetsType; // ¼¼ÄÜ¶ÔÏóÑ¡Ôñ
-	public MinionType TargetMinionType; // Ëæ´ÓÀàĞÍÑ¡Ôñ
-	public Harm TargetsHarm; // Ëæ´ÓÊÇ·ñÊÜÉËÑ¡Ôñ
-	public SpellSchool SpellSchool; // ·¨ÊõÅÉÏµ
+	public string SpellScriptName; // ï¿½ï¿½ï¿½Ü½Å±ï¿½ï¿½ï¿½
+	public int specialSpellAmount; // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Öµ
+	public bool isSecret; // ï¿½Ç·ï¿½Îªï¿½ï¿½ï¿½ï¿½
+	public TargetingOptions TargetsType; // ï¿½ï¿½ï¿½Ü¶ï¿½ï¿½ï¿½Ñ¡ï¿½ï¿½
+	public MinionType TargetMinionType; // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ñ¡ï¿½ï¿½
+	public Harm TargetsHarm; // ï¿½ï¿½ï¿½ï¿½Ç·ï¿½ï¿½ï¿½ï¿½ï¿½Ñ¡ï¿½ï¿½
+	public SpellSchool SpellSchool; // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ïµ
 
 }
