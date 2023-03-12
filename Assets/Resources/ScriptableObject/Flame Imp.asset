@@ -1,0 +1,47 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e1d59bd7dee34ab4488bef2c4d6fbbbd, type: 3}
+  m_Name: Flame Imp
+  m_EditorClassIdentifier: 
+  Description: 'Battlecry: Deal 3 damage to your hero.'
+  CardImage: {fileID: 0}
+  ManaCost: 1
+  OrgManaCost: 1
+  rarity: 1
+  ClassType: 8
+  isTriggered: 0
+  Script: {fileID: 0}
+  Attack: 3
+  CurAttack: 3
+  MaxHealth: 2
+  CurHealth: 2
+  AttacksChances: 1
+  SpellDamage: 0
+  specialCreatureAmount: 3
+  isWeapon: 0
+  isTaunt: 0
+  isCharge: 0
+  isRush: 0
+  isDivineShield: 0
+  isStealth: 0
+  isImmune: 0
+  isFrozen: 0
+  isPoison: 0
+  CreatureScriptName: 
+  MinionType: 2
+  SpellScriptName: 
+  specialSpellAmount: 0
+  isSecret: 0
+  TargetsType: 0
+  TargetMinionType: 0
+  TargetsHarm: 0
+  SpellSchool: 0

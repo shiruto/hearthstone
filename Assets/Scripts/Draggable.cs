@@ -34,30 +34,29 @@ public class Draggable: MonoBehaviour {
 			var mousePos = GetMousePosition();
 			transform.position = new Vector3(mousePos.x - pointerDistance.x, mousePos.y - pointerDistance.y, 0);
 		}
-		if(Input.GetMouseButtonUp(0)) {
+		if(isDragging && Input.GetMouseButtonUp(0)) {
 			OnMouseUp();
 		}
 		if(isReturning) {
 			var dif = Vector3.Magnitude(transform.position - startPos);
 			Speed = GetSpeed(dif);
 			transform.position = transform.position + Speed * Time.deltaTime * Vector3.Normalize(startPos - transform.position);
-			if(dif < 5) {
+			if(dif < 10) {
 				transform.position = startPos;
 				isReturning = false;
 			}
 		}
 	}
 	void OnMouseUp() {
-		if(isDragging && RectTransformUtility.RectangleContainsScreenPoint(GameObject.Find("PnlUseCard").GetComponent<RectTransform>(), Input.mousePosition)) {
+		if(RectTransformUtility.RectangleContainsScreenPoint(GameObject.Find("PnlUseCard").GetComponent<RectTransform>(), Input.mousePosition)) {
 			OnUse?.Invoke(GetComponent<Transform>());
 			isReturning = false;
 		}
-		if(isDragging) {
-			isDragging = false;
-		}
-		
 		else {
 			isReturning = true;
+		}
+		if(isDragging) {
+			isDragging = false;
 		}
 	}
 	// 返回鼠标的世界坐标

@@ -6,21 +6,22 @@ using UnityEngine;
 
 public class HandControl: MonoBehaviour {
 	List<Transform> CardTrans = new();
-	public static event Action<Transform> OnUse;
+	//public static event Action<Transform> OnUse;
 	private Vector3 pivot;
 	private readonly int gap = -14;
-
 	void Start() {
 		foreach(Transform child in transform) {
 			CardTrans.Add(child);
 		}
 		Draggable.OnUse += OnUseHandler;
+		DeckControl.OnDraw += OnDrawHandler;
 		pivot = Vector3.zero;
 		Align();
 	}
 
 	private void OnDisable() {
 		Draggable.OnUse -= OnUseHandler;
+		DeckControl.OnDraw -= OnDrawHandler;
 	}
 
 	private void OnUseHandler(Transform CardTransform) { // 手牌区改变
@@ -29,6 +30,11 @@ public class HandControl: MonoBehaviour {
 		Debug.Log("OnUseHandler: " + " index = " + index);
 		DiscardCrad(index);
 		//OnUse?.Invoke(CardTransform); // 卡牌效果生效
+	}
+
+	private void OnDrawHandler(CardAsset Card) {
+		Transform CardTrans = (GameObject.Instantiate(Resources.Load("Prefabs/PfbCrad"))as GameObject).transform;
+		GetCard(CardTrans);
 	}
 
 	public void GetCard(Transform newCard) {

@@ -1,6 +1,4 @@
 using UnityEngine;
-using System.Collections;
-using System.Collections.Generic;
 
 public enum TargetingOptions { // ����Ŀ��ѡ�� 
 	NoTarget,
@@ -16,7 +14,7 @@ public enum Harm { None, Unharmed, Harmed }
 public enum MinionType { None, Murloc, Demon, Mech, Elemental, Beast, Totem, Pirate, Dragon, Quilboar, Naga, Undead, All }
 public enum SpellSchool { None, Arcane, Fire, Frost, Nature, Holy, Shadow, Fel }
 public enum Rarity { Free, Normal, Rare, Epic, Legendary }
-public enum ClassType { None, DemonHunter, Druid, Hunter, Mage, Paladin, Priest, Rouge, Shaman, Warloc, Warrior }
+public enum ClassType { DemonHunter, Druid, Hunter, Mage, Paladin, Priest, Rouge, Shaman, Warloc, Warrior, None }
 
 public class CardAsset: ScriptableObject {
 	//[Header("General info")]

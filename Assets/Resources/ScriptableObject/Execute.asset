@@ -1,0 +1,47 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e1d59bd7dee34ab4488bef2c4d6fbbbd, type: 3}
+  m_Name: Execute
+  m_EditorClassIdentifier: 
+  Description: Destroy a damaged enemy minion.
+  CardImage: {fileID: 0}
+  ManaCost: 1
+  OrgManaCost: 1
+  rarity: 0
+  ClassType: 9
+  isTriggered: 0
+  Script: {fileID: 0}
+  Attack: 0
+  CurAttack: 0
+  MaxHealth: 0
+  CurHealth: 0
+  AttacksChances: 0
+  SpellDamage: 0
+  specialCreatureAmount: 0
+  isWeapon: 0
+  isTaunt: 0
+  isCharge: 0
+  isRush: 0
+  isDivineShield: 0
+  isStealth: 0
+  isImmune: 0
+  isFrozen: 0
+  isPoison: 0
+  CreatureScriptName: 
+  MinionType: 0
+  SpellScriptName: 
+  specialSpellAmount: 0
+  isSecret: 0
+  TargetsType: 2
+  TargetMinionType: 0
+  TargetsHarm: 2
+  SpellSchool: 0

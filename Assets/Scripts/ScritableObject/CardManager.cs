@@ -1,5 +1,4 @@
 using UnityEngine;
-using System.Collections;
 using UnityEngine.UI;
 using TMPro;
 
@@ -58,6 +57,8 @@ public class CardManager: MonoBehaviour {
 		CardGraphicImage.sprite = cardAsset.CardImage;
 
 		if(cardAsset.MaxHealth != 0) {
+			HealthIcon.SetActive(true);
+			AttackIcon.SetActive(true);
 			// 这是一个生物
 			AttackText.text = cardAsset.Attack.ToString();
 			HealthText.text = cardAsset.MaxHealth.ToString();
