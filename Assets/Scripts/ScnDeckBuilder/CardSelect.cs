@@ -9,6 +9,7 @@ public class CardSelect: MonoBehaviour {
 	private List<Transform> CardTrans = new();
 	public static List<CardAsset> CardLibrary;
 	private List<CardAsset> TempCards = new();
+	private List<Transform> BtnTransList;
 
 	private int ShownCards = 0;
 	private int CurrentCardNum = 0;
@@ -37,10 +38,15 @@ public class CardSelect: MonoBehaviour {
 		BtnNextPage = GameObject.Find("BtnNextPage").transform;
 		TempCards.AddRange(CardLibrary);
 		Initialize(TempCards);
+	}
+
+	private void OnEnable() {
 		DeckBuilderControl.OnBtnClick += OnBtnClickHandler;
+		DeckList.OnClassSelected += OnClassSelected;
 	}
 
 	private void Initialize(List<CardAsset> TargetCards) {
+		ShownCards = 0;
 		for(int i = 0; i < TargetCards.Count; i++) {
 			if(CurrentCardNum == 8) {
 				PageSize[PageNum++] = CurrentCardNum;
@@ -118,6 +124,12 @@ public class CardSelect: MonoBehaviour {
 			TempCards.AddRange(CardLibrary);
 			LastClassFilter = "";
 		}
+		Initialize(TempCards);
+	}
+
+	private void OnClassSelected(string ClassName) {
+		TempCards = CardLibrary.FindAll(card => card.ClassType.ToString("G") == ClassName);
+
 		Initialize(TempCards);
 	}
 
