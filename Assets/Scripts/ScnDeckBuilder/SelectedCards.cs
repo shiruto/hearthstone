@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using TMPro;
 using UnityEditor;
 using UnityEngine;
@@ -8,6 +9,7 @@ public class SelectedCards: MonoBehaviour {
 	public GameObject PfbCardPrev;
 
 	public event Action<int> OnCardOverLoad;
+	public static event Action<string> OnDeckDelete;
 
 	private SortedDictionary<CardAsset, int> CardDictionary = new(new DicCom()); // 卡组 键值对 卡牌种类:数量
 	private List<Transform> CardTransList = new();
@@ -153,6 +155,7 @@ public class SelectedCards: MonoBehaviour {
 			Debug.Log("can't find the asset");
 			SODeck = ScriptableObject.CreateInstance<DeckAsset>();
 			AssetDatabase.CreateAsset(SODeck, "Assets/Resources/ScriptableObject/Deck/" + DeckName + ".asset");
+			SODeck.Order = DeckList.DeckNum;
 		}
 		SODeck.myCardNums = new List<int>();
 		SODeck.myCardAssets = new List<CardAsset>();
@@ -162,12 +165,14 @@ public class SelectedCards: MonoBehaviour {
 		}
 		AssetDatabase.SaveAssets();
 		AssetDatabase.Refresh();
-		DeckList.DeckNum++;
 	}
 
 	public void OnDeleteHandler() {
-
+		Debug.Log("Delete Button Down");
+		File.Delete("Assets/Resources/ScriptableObject/Deck/" + DeckName + ".asset");
+		OnDeckDelete?.Invoke(DeckName);
 		PnlDeckList.gameObject.SetActive(true);
+		
 		transform.parent.parent.gameObject.SetActive(false);
 	}
 

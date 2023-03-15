@@ -20,7 +20,7 @@ public class CardSelect: MonoBehaviour {
 	private string LastClassFilter = "";
 
 	private void Awake() {
-		CardLibrary = new List<CardAsset>(Resources.LoadAll<CardAsset>("ScriptableObject"));
+		CardLibrary = new List<CardAsset>(Resources.LoadAll<CardAsset>("ScriptableObject/Card"));
 		CardLibrary.Sort((CardAsset a, CardAsset b) => {
 			if(a.ClassType != b.ClassType) {
 				return a.ClassType.CompareTo(b.ClassType);
@@ -41,7 +41,7 @@ public class CardSelect: MonoBehaviour {
 	}
 
 	private void OnEnable() {
-		DeckBuilderControl.OnBtnClick += OnBtnClickHandler;
+		DeckBuilderControl.OnClassFilter += OnBtnClickHandler;
 		DeckList.OnClassSelected += OnClassSelected;
 	}
 
@@ -108,7 +108,7 @@ public class CardSelect: MonoBehaviour {
 	}
 
 	private void OnDisable() {
-		DeckBuilderControl.OnBtnClick -= OnBtnClickHandler;
+		DeckBuilderControl.OnClassFilter -= OnBtnClickHandler;
 	}
 
 	private void OnBtnClickHandler(Transform BtnTrans) {
@@ -116,6 +116,7 @@ public class CardSelect: MonoBehaviour {
 		PageNum = 0;
 		ShownCards = 0;
 		string ClassName = BtnTrans.GetChild(0).GetComponent<TextMeshProUGUI>().text;
+
 		if(LastClassFilter != ClassName) {
 			TempCards = CardLibrary.FindAll(card => card.ClassType.ToString("G") == ClassName);
 			LastClassFilter = ClassName;

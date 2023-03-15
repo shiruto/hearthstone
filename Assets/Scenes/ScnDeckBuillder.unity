@@ -9703,6 +9703,8 @@ GameObject:
   - component: {fileID: 4602366564022870545}
   - component: {fileID: 8190952284656640652}
   - component: {fileID: 3776024457087401066}
+  - component: {fileID: 8190952284656640654}
+  - component: {fileID: 8190952284656640653}
   m_Layer: 5
   m_Name: SelectedDeck
   m_TagString: Untagged
@@ -9860,6 +9862,31 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
+--- !u!65 &8190952284656640653
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5291354051809343802}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 270, y: 110, z: 1}
+  m_Center: {x: -10, y: 10, z: 0}
+--- !u!114 &8190952284656640654
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5291354051809343802}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: eddb4deae51ae1940a21efb593a1a8f3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!222 &8326296328290197610
 CanvasRenderer:
   m_ObjectHideFlags: 0

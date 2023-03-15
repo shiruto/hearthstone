@@ -46,6 +46,8 @@
 
 ## To-Do
 
+系统学习AssetDatebase 和 File类 了解Unity中的文件管理
+
 卡牌预览
 
 卡牌拖拽效果
