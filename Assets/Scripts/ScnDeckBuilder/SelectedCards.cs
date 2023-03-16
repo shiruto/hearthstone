@@ -6,110 +6,84 @@ using UnityEditor;
 using UnityEngine;
 
 public class SelectedCards: MonoBehaviour {
-	public GameObject PfbCardPrev;
+	public event Action OnCardOverLoad;
 
-	public event Action<int> OnCardOverLoad;
-	public static event Action<string> OnDeckDelete;
-
-	private SortedDictionary<CardAsset, int> CardDictionary = new(new DicCom()); // ¿¨×é ¼üÖµ¶Ô ¿¨ÅÆÖÖÀà:ÊıÁ¿
-	private List<Transform> CardTransList = new();
 	private Transform TxtCardNum;
 	private Transform PnlDeckList;
-	private Transform TxtSelectedDeckName;
+	private Transform SelectedDeckTrans;
+	private SortedDictionary<CardAsset, int> CardDictionary = new(new DicCom()); // è‡ªå®šä¹‰çš„æ’åºæ–¹å¼
+	private List<Transform> CardTransList = new();
 	public static string DeckName;
 	private readonly int MaxCardType = 21;
-	private readonly int StartPosY = 820;
+	private readonly int StartPosY = 800;
 	private readonly int CardPrevHeight = 40;
 	private int SelectedCardNum = 0;
 	private int MaxCardNum = 30;
-	private int EndPos;
+	public static DeckAsset EditingDeck;
 
 	private void Awake() {
 		TxtCardNum = GameObject.Find("TxtCardNum").transform;
 		PnlDeckList = GameObject.Find("PnlDeckList").transform;
+		SelectedDeckTrans = GameObject.Find("SelectedDeck").transform;
+
+		foreach(Transform Child in transform) {
+			Child.localPosition = new(0, -CardTransList.Count * CardPrevHeight + StartPosY - CardPrevHeight / 2, 0);
+			CardTransList.Add(Child);
+		}
 	}
 	private void OnEnable() {
 		DeckBuilderControl.OnCardClick += OnCardClickHandler;
 		DeckBuilderControl.OnCardPrevClick += OnCardPrevClickHandler;
 		DeckBuilderControl.OnExitEditing += OnExitEditingHandler;
-		Initialize(DeckName);
+		Initialize();
 	}
 
 	private void Start() {
-		
-	}
-	private void Initialize(string newDeckName) { // ¶ÁÈ¡¿¨×éÊı¾İ ²¢´´½¨ÎïÌå ÕıÈ·¹ÒÔØ¿¨ÅÆ×ÊÔ´
-		Debug.Log("On initializing deck name = " + newDeckName);
-		DeckAsset SO_Deck = Resources.Load<DeckAsset>("ScriptableObject/Deck/" + newDeckName);
-		GameObject.Find("TxtSelectedDeckName").GetComponent<TMP_InputField>().text = newDeckName; // ¿¨×éÃû³Æ¸³Öµ
 
-		if(SO_Deck == null) {
-			Debug.Log("Deck Don't Exist");
-			return;
-		}
-
-		for(int i = 0; i < SO_Deck.myCardNums.Count; i++) {
-			CardDictionary.Add(SO_Deck.myCardAssets[i], SO_Deck.myCardNums[i]);
-			Transform newCardTrans = Instantiate(PfbCardPrev, transform).transform;
-			CardTransList.Add(newCardTrans);
-			newCardTrans.localPosition = new Vector3(0, -CardTransList.Count * CardPrevHeight + StartPosY, 0);
-			CardTransList[i].GetComponent<CardPrevManager>().cardAsset = SO_Deck.myCardAssets[i];
-			CardTransList[i].GetComponent<CardPrevManager>().CardNum.text = "" + SO_Deck.myCardNums[i];
-			SelectedCardNum += SO_Deck.myCardNums[i];
-			CardTransList[i].GetComponent<CardPrevManager>().ReadCardFromAsset();
-		}
-
-		if(CardTransList.Count > MaxCardType) { // Èç¹û¿¨ÅÆÖÖÀà³¬¹ıÏÔÊ¾ÉÏÏŞ ¼ÓÔØ¹ö¶¯Ìõ
-			OnCardOverLoad?.Invoke(SelectedCardNum);
-		}
-		TxtCardNum.GetComponent<TextMeshProUGUI>().text = SelectedCardNum + "/" + MaxCardNum;
 	}
 
-	private void Load() { // ½«¿¨ÅÆ¼ÓÔØµ½¶ÔÓ¦ÎïÌåÉÏ
+	private void Initialize() { // åˆå§‹åŒ–å¯¹åº”å¡ç»„ å¹¶æ·»åŠ åˆ°æœ‰åºé”®å€¼å¯¹ä¸­
+		Debug.Log("On initializing deck name = " + EditingDeck.name);
+		DeckName = EditingDeck.name;
+		SelectedDeckTrans.GetComponent<DeckPrevManager>().DA = EditingDeck;
+		SelectedDeckTrans.GetComponent<DeckPrevManager>().ReadFromAsset();
+		for(int i = 0; i < EditingDeck.myCardNums.Count; i++) {
+			CardDictionary.Add(EditingDeck.myCardAssets[i], EditingDeck.myCardNums[i]);
+		}
+		Load();
+	}
+
+	private void Load() { // å°†å¡ç»„ä¸­çš„å¡ç‰ŒåŠ è½½åˆ°ç‰©ä½“ä¸Š
 		int index = 0;
-		foreach(var card in CardDictionary) {
-			CardTransList[index].GetComponent<CardPrevManager>().cardAsset = card.Key;
-			CardTransList[index].GetComponent<CardPrevManager>().CardNum.text = "" + card.Value;
-			CardTransList[index].GetComponent<CardPrevManager>().ReadCardFromAsset();
-			index++;
+		foreach(var Card in CardDictionary) {
+			CardTransList[index].GetComponent<CardPrevManager>().cardAsset = Card.Key;
+			CardTransList[index].GetComponent<CardPrevManager>().CardNum.text = "" + Card.Value;
 		}
-		TxtCardNum.GetComponent<TextMeshProUGUI>().text = SelectedCardNum + "/" + MaxCardNum;
+		if(CardDictionary.Count > MaxCardType) {
+			OnCardOverLoad?.Invoke();
+		}
+		TxtCardNum.GetComponent<TextMeshProUGUI>().text = CardDictionary.Count + "/" + MaxCardNum;
 		//Debug.Log("Trans num " + CardTransList.Count + "  Card Dic" + CardDictionary.Count);
 	}
 
 	private void OnCardClickHandler(Transform CardTrans) {
-		CardAsset CA = CardTrans.GetComponent<CardManager>().cardAsset;
-		if(SelectedCardNum < MaxCardNum) {
-			if(!CardDictionary.ContainsKey(CA)) { // ¿¨×éÖĞÃ»ÓĞÕâÕÅ¿¨
-				CardDictionary.Add(CA, 1); // ÔÚ×ÖµäÖĞ´´½¨ÕâÕÅ¿¨ÅÆ ²¢½«ÊıÁ¿ÖÃÎªÒ»
-				Transform newCardTrans = Instantiate(PfbCardPrev, transform).transform;
-				CardTransList.Add(newCardTrans);
-				newCardTrans.localPosition = new Vector3(0, -CardDictionary.Count * CardPrevHeight + StartPosY, 0);
+		CardAsset newCA = CardTrans.GetComponent<CardManager>().cardAsset;
+		if(CardDictionary.Count < MaxCardNum) { // å¡ç»„ä¸­çš„å¡ç‰Œå°äºæœ€å¤§å¡ç‰Œæ•°
+			if(!CardDictionary.ContainsKey(newCA)) { // å¡ç»„ä¸­ä¸å­˜åœ¨è¿™å¼ å¡
+				CardDictionary.Add(newCA, 1); // æ·»åŠ è¿™å¼ å¡ æ•°é‡ä¸ºä¸€
 				SelectedCardNum++;
-				if(CardTransList.Count > MaxCardType) { // Èç¹û¿¨ÅÆÖÖÀà³¬¹ıÏÔÊ¾ÉÏÏŞ ¼ÓÔØ¹ö¶¯Ìõ
-					OnCardOverLoad?.Invoke(SelectedCardNum);
+				if(CardTransList.Count > MaxCardType) { // å¦‚æœå¡ç‰Œæ•°é‡è¶…å‡ºæ˜¾ç¤ºèŒƒå›´
+					OnCardOverLoad?.Invoke();
 				}
-				Load(); // ½«¿¨ÅÆÖØĞÂÅÅĞò²¢¼ÓÔØµ½ÎïÌå
-				TxtCardNum.GetComponent<TextMeshProUGUI>().text = SelectedCardNum + "/" + MaxCardNum;
-				EndPos = CardDictionary.Count * CardPrevHeight;
+				Load();
 			}
-			else { // ¿¨×éÖĞÒÑ¾­ÓĞÁË
-				if(CA.rarity.ToString("G") == "Legendary") { // Èç¹ûÒÑ¾­ÓĞÍ¬Ãû´«Ëµ¿¨ ÔòÎŞ·¨¼ÌĞøÌí¼Ó
-					return;
-				}
-				else if(CardDictionary[CA] >= 2) { // Èç¹ûÒÑ¾­ÓĞ³¬¹ıÁ½ÕÅ·Ç´«Ëµ¿¨ ÔòÎŞ·¨¼ÌĞøÌí¼Ó
-					return;
-				}
-				else { // ¿¨ÅÆÊıÁ¿¼ÓÒ»
-					CardDictionary[CA]++;
-					SelectedCardNum++;
-					Load();
-					TxtCardNum.GetComponent<TextMeshProUGUI>().text = SelectedCardNum + "/" + MaxCardNum;
-					EndPos = CardDictionary.Count * CardPrevHeight;
-				}
+			else if(newCA.rarity.ToString("G") != "Legendary" && CardDictionary[newCA] == 1) { // å¦‚æœä¸æ˜¯ä¼ è¯´å¡ ä¸”åªæœ‰ä¸€å¼ 
+				CardDictionary[newCA]++;
+				SelectedCardNum++;
+				Load();
 			}
 		}
-		else {
+		else { // è¶…å‡ºä¸Šé™
 			Debug.Log("Too Many Cards");
 		}
 	}
@@ -118,10 +92,7 @@ public class SelectedCards: MonoBehaviour {
 		CardAsset CA = CardPrevTrans.GetComponent<CardPrevManager>().cardAsset;
 		if(CardDictionary[CA] == 1) {
 			CardDictionary.Remove(CA);
-			Destroy(CardTransList[^1].gameObject);
-			CardTransList.RemoveAt(CardTransList.Count - 1);
 			SelectedCardNum--;
-			EndPos = CardDictionary.Count * CardPrevHeight;
 			Load();
 		}
 		else if(CardDictionary[CA] >= 2) {
@@ -132,7 +103,7 @@ public class SelectedCards: MonoBehaviour {
 	}
 
 	public void OnSrlBarValueChangeHandler(float value) {
-		transform.localPosition = new Vector3(0, -370 + (EndPos - 860) * value, 0);
+		transform.localPosition = new(0, -370 + (CardDictionary.Count * CardPrevHeight - 860) * value, 0);
 	}
 
 	public void OnInputEnd(string Name) {
@@ -146,22 +117,11 @@ public class SelectedCards: MonoBehaviour {
 	}
 
 	private void SaveDeck() {
-		if(DeckName == "") {
-			DeckName = "New Deck";
-		}
-		Debug.Log("On saving Deck Name = " + DeckName);
-		DeckAsset SODeck = Resources.Load<DeckAsset>("ScriptableObject/Deck/" + DeckName);
-		if(!SODeck) {
-			Debug.Log("can't find the asset");
-			SODeck = ScriptableObject.CreateInstance<DeckAsset>();
-			AssetDatabase.CreateAsset(SODeck, "Assets/Resources/ScriptableObject/Deck/" + DeckName + ".asset");
-			SODeck.Order = DeckList.DeckNum;
-		}
-		SODeck.myCardNums = new List<int>();
-		SODeck.myCardAssets = new List<CardAsset>();
+		EditingDeck.myCardNums = new List<int>();
+		EditingDeck.myCardAssets = new List<CardAsset>();
 		foreach(var card in CardDictionary) {
-			SODeck.myCardAssets.Add(card.Key);
-			SODeck.myCardNums.Add(card.Value);
+			EditingDeck.myCardAssets.Add(card.Key);
+			EditingDeck.myCardNums.Add(card.Value);
 		}
 		AssetDatabase.SaveAssets();
 		AssetDatabase.Refresh();
@@ -169,10 +129,8 @@ public class SelectedCards: MonoBehaviour {
 
 	public void OnDeleteHandler() {
 		Debug.Log("Delete Button Down");
-		File.Delete("Assets/Resources/ScriptableObject/Deck/" + DeckName + ".asset");
-		OnDeckDelete?.Invoke(DeckName);
+		File.Delete("Assets/Resources/ScriptableObject/Deck/" + EditingDeck.name + ".asset");
 		PnlDeckList.gameObject.SetActive(true);
-		
 		transform.parent.parent.gameObject.SetActive(false);
 	}
 
@@ -196,7 +154,8 @@ public class SelectedCards: MonoBehaviour {
 			else if(a.ManaCost == b.ManaCost) {
 				return a.name.CompareTo(b.name);
 			}
-			else return 0;
+			else
+				return 0;
 		}
 	}
 }

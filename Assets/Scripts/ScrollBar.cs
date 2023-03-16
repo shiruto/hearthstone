@@ -13,7 +13,7 @@ public class ScrollBar: MonoBehaviour {
 		transform.gameObject.SetActive(false);
 	}
 
-	private void OnCardOverLoadHandler(int CardNum) {
+	private void OnCardOverLoadHandler() {
 		transform.gameObject.SetActive(true);
 	}
 }

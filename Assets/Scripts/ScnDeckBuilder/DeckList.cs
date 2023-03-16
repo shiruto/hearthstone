@@ -6,7 +6,6 @@ using UnityEngine;
 
 public class DeckList: MonoBehaviour {
 	public static event Action<string> OnClassSelected;
-	public static int DeckNum = 0; // ÒÑ´´½¨ÎïÌåµÄ¿¨×éÊı
 
 	public GameObject PfbDeckPrev;
 	private Transform SrlBar;
@@ -14,30 +13,32 @@ public class DeckList: MonoBehaviour {
 	private Transform PnlDeckList;
 	private Transform PnlClassSelect;
 	private Transform BtnNewDeck;
-	private List<Transform> DeckListTrans = new();
+	private List<Transform> DeckTransList = new();
 	public static List<DeckAsset> DeckAssetList;
-	
-	private readonly int MaxDeckNum = 27;
-	private readonly int MaxDeckContain = 9; // ÎŞ¹ö¶¯Ìõ×î´ó¿¨×éÊıÁ¿
-	private readonly int StartPosY = 1215;
-	private readonly int DeckPrevHeight = 90;
-	private int EndPos;
+
+	private readonly int MaxDeckNum = 27; // æœ€å¤§å¡ç»„æ•°
+	private readonly int MaxDeckContain = 9; // æ²¡æœ‰æ»‘åŠ¨æ¡æ—¶çš„æœ€å¤§å®¹çº³æ•°é‡
+	private readonly int StartPosY = -770; // PnlDeckList ä¸€å¼€å§‹çš„ä¸­å¿ƒç‚¹ Y å€¼
+	private readonly int DeckPrevHeight = 90; // å¡ç»„ Prev çš„é«˜åº¦
 
 	private void Awake() {
 		DeckBuilderControl.OnDeckPrevClick += OnDeckPrevClickHandler;
 		DeckBuilderControl.OnClassSelect += OnClassSelectHandler;
-		SelectedCards.OnDeckDelete += OnDeckDeleteHandler;
+
 
 		SrlBar = GameObject.Find("DeckSrlBar").transform;
 		PnlCardList = GameObject.Find("PnlCardList").transform;
 		PnlDeckList = GameObject.Find("MaskDeckList/PnlDeckList").transform;
 		PnlClassSelect = GameObject.Find("PnlClassSelect").transform;
 		BtnNewDeck = GameObject.Find("BgNewDeck").transform;
+		foreach(Transform Child in PnlDeckList) {
+			DeckTransList.Add(Child);
+		}
 	}
 
 	private void OnEnable() {
 		LoadDeck();
-		if(DeckNum > MaxDeckContain) {
+		if(DeckAssetList.Count > MaxDeckContain) {
 			SrlBar.gameObject.SetActive(true);
 		}
 	}
@@ -46,38 +47,41 @@ public class DeckList: MonoBehaviour {
 		AssetDatabase.Refresh();
 		DeckAssetList = new List<DeckAsset>(Resources.LoadAll<DeckAsset>("ScriptableObject/Deck"));
 		DeckAssetList.Sort((DeckAsset a, DeckAsset b) => a.Order.CompareTo(b.Order));
-		Debug.Log("ÎÄ¼şÖĞ¿¨×é×ÜÊı: " + DeckAssetList.Count + "ÒÑ¼ÓÔØµÄ¿¨×éÊı: " + DeckNum);
-		if(DeckListTrans.Count > 0 ) {
-			DeckListTrans.Remove(BtnNewDeck);
-		}
-		for(int i = 0; i < DeckAssetList.Count; i++) {
-			if(i >= DeckNum) { // Èç¹ûÕıÔÚ¸üĞÂµÄ¿¨ÅÆÊÇĞÂÔö¿¨ÅÆ ÔòÔö¼ÓĞÂÎïÌå²¢¸üĞÂÃû×Ö Èç¹û²»ÊÇ ÔòÖ»¸üĞÂÃû×Ö
-				Debug.Log("i = " + i + " ĞÂÔöÎïÌå");
-				Transform newDeckTrans;
-				newDeckTrans = Instantiate(PfbDeckPrev, PnlDeckList).transform;
-				newDeckTrans.name = "Deck" + i;
-				newDeckTrans.localPosition = new Vector3(0, StartPosY - DeckPrevHeight / 2 - DeckPrevHeight * i, 0);
-				newDeckTrans.Find("TxtDeckName").GetComponent<TextMeshProUGUI>().text = DeckAssetList[i].name;
-				 // Ğè´¦ÀíNEWDeck°´Å¥µÄÎ»ÖÃ
-				DeckListTrans.Add(newDeckTrans);
+		for(int i = 0; i < DeckTransList.Count; i++) {
+			if(i < DeckAssetList.Count) {
+				DeckTransList[i].gameObject.SetActive(true);
+				DeckTransList[i].GetComponent<DeckPrevManager>().DA = DeckAssetList[i];
+				DeckTransList[i].GetComponent<DeckPrevManager>().ReadFromAsset();
+				DeckAssetList[i].Order = i;
 			}
-			Debug.Log("ÎïÌåÊı: " + DeckListTrans.Count);
-			Debug.Log($"number {i + 1} Deck, Deck Trans Name = {DeckListTrans[i].Find("TxtDeckName").GetComponent<TextMeshProUGUI>().text}");
-			DeckListTrans[i].Find("TxtDeckName").GetComponent<TextMeshProUGUI>().text = DeckAssetList[i].name;
+			else {
+				DeckTransList[i].gameObject.SetActive(false);
+			}
 		}
-		DeckNum = DeckAssetList.Count;
-		if(DeckNum < MaxDeckNum) {
-			BtnNewDeck.localPosition = new Vector3(0, StartPosY - DeckPrevHeight / 2 - DeckPrevHeight * DeckNum, 0);
-			DeckListTrans.Add(BtnNewDeck);
+		if(DeckAssetList.Count < MaxDeckNum) {
+			DeckTransList[DeckAssetList.Count].gameObject.SetActive(true);
+			DeckTransList[DeckAssetList.Count] = BtnNewDeck;
 		}
-		if(DeckNum > MaxDeckContain) {
+		if(DeckAssetList.Count > MaxDeckContain) {
 			SrlBar.gameObject.SetActive(true);
 		}
-		EndPos = DeckNum * DeckPrevHeight;
 	}
 
-	public void OnBtnNewDeckHandler() { // ÏìÓ¦"ĞÂ½¨Ì×ÅÆ"°´Å¥µã»÷ÊÂ¼ş
-		SelectedCards.DeckName = "";
+	public void OnBtnNewDeckHandler() { // BtnNewDeck æŒ‰é’®è¢«æŒ‰ä¸‹åè§¦å‘
+		DeckAsset newDA = ScriptableObject.CreateInstance<DeckAsset>();
+		string newName = "New Deck";
+		for(int i = 0; i < DeckAssetList.Count; i++) {
+			if(newName == DeckAssetList[i].name) {
+				newName = "New Deck" + (i + 1);
+				i = 0;
+			}
+		}
+		newDA.Order = DeckAssetList.Count;
+		AssetDatabase.CreateAsset(newDA, "Assets/Resources/ScriptableObject/Deck/" + newName + ".asset");
+		AssetDatabase.SaveAssets();
+		AssetDatabase.Refresh();
+		SelectedCards.EditingDeck = newDA;
+		SelectedCards.DeckName = newName;
 		DeckBuilderControl.isSelectingClass = true;
 		PnlClassSelect.gameObject.SetActive(true);
 	}
@@ -87,36 +91,17 @@ public class DeckList: MonoBehaviour {
 		OnClassSelected?.Invoke(CLassName);
 		PnlClassSelect.gameObject.SetActive(false);
 		DeckBuilderControl.isEditing = true;
+		DeckBuilderControl.isSelectingClass = false;
 		gameObject.SetActive(false);
 	}
 
-	public void OnSrlBarValueChangeHandler(float value) { // ÏìÓ¦»¬¶¯Ìõ»¬¶¯ÊÂ¼ş
-		transform.localPosition = new Vector3(0, -770 + (EndPos - 890) * value, 0);
+	public void OnSrlBarValueChangeHandler(float value) {
+		transform.localPosition = new(0, StartPosY + ((DeckAssetList.Count + 1) * DeckPrevHeight - 890) * value, 0);
 	}
 
 	private void OnDeckPrevClickHandler(Transform DeckTrans) {
-		SelectedCards.DeckName = DeckTrans.Find("TxtDeckName").GetComponent<TextMeshProUGUI>().text;
-		Debug.Log("DeckTrans name = " + DeckTrans.Find("TxtDeckName").GetComponent<TextMeshProUGUI>().text);
+		OnClassSelected?.Invoke(DeckTrans.GetComponent<DeckPrevManager>().DA.DeckClass.ToString("G"));
 		PnlCardList.gameObject.SetActive(true);
 		gameObject.SetActive(false);
-	}
-
-	private void OnDeckDeleteHandler(string DeleteDeckName) {
-		bool Deleted = false;
-		DeckNum--;
-		for(int i = 0; i < DeckListTrans.Count - 1; i++) { // ÖØĞÂÅÅĞò
-			if(i >= DeckAssetList.Count) {
-				Debug.Log("É¾³ı" + DeckListTrans[i].Find("TxtDeckName").GetComponent<TextMeshProUGUI>().text);
-				Destroy(DeckListTrans[i].gameObject);
-				Deleted = true;
-			}                   
-			else if(!Deleted && DeckAssetList[i].Order != i) {
-				Debug.Log("É¾³ı" + DeckListTrans[i].Find("TxtDeckName").GetComponent<TextMeshProUGUI>().text);
-				Destroy(DeckListTrans[i].gameObject);
-				Deleted = true;
-			}
-			DeckAssetList[i].Order = i;
-		}
-		AssetDatabase.Refresh();
 	}
 }

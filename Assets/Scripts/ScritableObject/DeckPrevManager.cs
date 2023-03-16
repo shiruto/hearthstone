@@ -1,18 +1,23 @@
-using System.Collections;
-using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
-public class DeckPrevManager : MonoBehaviour
-{
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
+public class DeckPrevManager: MonoBehaviour {
+	public DeckAsset DA;
+	public TextMeshProUGUI DeckName;
+	public Image DeckImage;
+	public ClassType DeckClass;
+	public int Order;
 
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
+	void Awake() {
+		if(DA != null) {
+			ReadFromAsset();
+		}
+	}
+
+	public void ReadFromAsset() {
+		DeckName.text = DA.name;
+		DeckClass = DA.DeckClass;
+		Order = DA.Order;
+	}
 }

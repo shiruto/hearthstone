@@ -7,19 +7,17 @@ public class CardSelect: MonoBehaviour {
 	private Transform BtnLastPage;
 	private Transform BtnNextPage;
 	private List<Transform> CardTrans = new();
-	public static List<CardAsset> CardLibrary;
+	public static List<CardAsset> CardLibrary; // 卡牌资源库
 	private List<CardAsset> TempCards = new();
-	private List<Transform> BtnTransList;
 
-	private int ShownCards = 0;
-	private int CurrentCardNum = 0;
 	private int PageNum = 0;
-	private int MaxPageNum;
 	private readonly int MaxPageSize = 8;
-	private int[] PageSize = new int[25];
+	private List<int> PageSize = new();
 	private string LastClassFilter = "";
+	private Dictionary<string, int> ClassIndex = new();
 
 	private void Awake() {
+		ClassIndexInitialize();
 		CardLibrary = new List<CardAsset>(Resources.LoadAll<CardAsset>("ScriptableObject/Card"));
 		CardLibrary.Sort((CardAsset a, CardAsset b) => {
 			if(a.ClassType != b.ClassType) {
@@ -41,97 +39,101 @@ public class CardSelect: MonoBehaviour {
 	}
 
 	private void OnEnable() {
-		DeckBuilderControl.OnClassFilter += OnBtnClickHandler;
-		DeckList.OnClassSelected += OnClassSelected;
+		DeckBuilderControl.OnClassFilter += OnClassFilterHandler;
+		DeckList.OnClassSelected += OnClassSelectedHandler;
 	}
 
 	private void Initialize(List<CardAsset> TargetCards) {
-		ShownCards = 0;
-		for(int i = 0; i < TargetCards.Count; i++) {
-			if(CurrentCardNum == 8) {
-				PageSize[PageNum++] = CurrentCardNum;
-				CurrentCardNum = 0;
+		PageSize.Clear();
+		for(int i = 0, j = 0; i < TargetCards.Count; i++) { // i 为卡牌 j 为当前页的卡牌
+			if(j == 8) { // 本页卡牌到达上限
+				PageSize.Add(j + ((PageSize.Count == 0) ? 0 : PageSize[^1]));
+				j = 0;
 				i--;
 			}
-			else if((CurrentCardNum != 0) && TargetCards[i - 1].ClassType != TargetCards[i].ClassType) {
-				PageSize[PageNum++] = CurrentCardNum;
-				CurrentCardNum = 0;
+			else if((j != 0) && TargetCards[i - 1].ClassType != TargetCards[i].ClassType) { // 某一职业卡牌全部加载完毕
+				PageSize.Add(j + ((PageSize.Count == 0) ? 0 : PageSize[^1]));
+				ClassIndex[TargetCards[i].ClassType.ToString("G")] = PageNum; // 记下每个职业对应的开始页码
+				j = 0;
 				i--;
 			}
 			else {
-				CurrentCardNum++;
+				j++;
+			}
+			if(i == TargetCards.Count - 1) { // Last Page
+				PageSize.Add(j + ((PageSize.Count == 0) ? 0 : PageSize[^1]));
 			}
 		}
-		PageSize[PageNum] = CurrentCardNum; // ���һҳ
-		CurrentCardNum = 0;
-		MaxPageNum = PageNum;
-		PageNum = 0;
-		Load(TargetCards);
+		TempCards.Clear();
+		TempCards = new(TargetCards);
+		Load(0);
 	}
-	private void Load(List<CardAsset> TargetCards) {
-		for(int i = 0; i < MaxPageSize; i++) {
+
+	private void Load(int PageIndex) {
+		if(PageIndex > PageSize.Count) {
+			Debug.Log("Page Index Out of Range");
+			return;
+		}
+		for(int i = 0, j = (PageNum == 0) ? 0 : PageSize[PageNum] - PageSize[PageNum - 1]; i < MaxPageSize; i++, j++) {
 			if(i < PageSize[PageNum]) {
 				CardTrans[i].gameObject.SetActive(true);
 				CardManager cm = CardTrans[i].GetComponent<CardManager>();
-				cm.cardAsset = TargetCards[ShownCards];
+				cm.cardAsset = TempCards[j];
 				cm.ReadCardFromAsset();
-				ShownCards++;
 			}
 			else {
 				CardTrans[i].gameObject.SetActive(false);
 			}
 		}
 		//Debug.Log("Current Card Number = " + CurrentCardNum + "  ShownCard = " + ShownCards + "  Page number = " + PageNum + "  Last Page = " + PageSize[PageNum - 1 > 0 ? PageNum - 1 : 0]);
-		if(PageNum == 0) {
-			BtnLastPage.gameObject.SetActive(false);
-		}
-		else {
-			BtnLastPage.gameObject.SetActive(true);
-		}
-		if(PageNum == MaxPageNum) {
-			BtnNextPage.gameObject.SetActive(false);
-		}
-		else {
-			BtnNextPage.gameObject.SetActive(true);
-		}
+		BtnLastPage.gameObject.SetActive(PageNum != 0);
+		BtnNextPage.gameObject.SetActive(PageNum != PageSize.Count);
 	}
 
 	public void LastPage() {
-		ShownCards = ShownCards - PageSize[PageNum - 1] - PageSize[PageNum];
 		PageNum--;
-		Load(TempCards);
+		Load(PageNum);
 	}
 
 	public void NextPage() {
 		PageNum++;
-		Load(TempCards);
+		Load(PageNum);
 	}
 
 	private void OnDisable() {
-		DeckBuilderControl.OnClassFilter -= OnBtnClickHandler;
+		DeckBuilderControl.OnClassFilter -= OnClassFilterHandler;
 	}
 
-	private void OnBtnClickHandler(Transform BtnTrans) {
-		TempCards.Clear();
-		PageNum = 0;
-		ShownCards = 0;
-		string ClassName = BtnTrans.GetChild(0).GetComponent<TextMeshProUGUI>().text;
-
-		if(LastClassFilter != ClassName) {
-			TempCards = CardLibrary.FindAll(card => card.ClassType.ToString("G") == ClassName);
-			LastClassFilter = ClassName;
-		}
-		else {
-			TempCards.AddRange(CardLibrary);
+	private void OnClassFilterHandler(string ClassName) {
+		if(LastClassFilter == ClassName) {
+			Load(0);
 			LastClassFilter = "";
 		}
-		Initialize(TempCards);
+		else {
+			Load(ClassIndex[ClassName]);
+			LastClassFilter = ClassName;
+		}
 	}
 
-	private void OnClassSelected(string ClassName) {
+	private void OnClassSelectedHandler(string ClassName) {
 		TempCards = CardLibrary.FindAll(card => card.ClassType.ToString("G") == ClassName);
-
+		TempCards.AddRange(CardLibrary.FindAll(card => card.ClassType.ToString("G") == "Neutral"));
 		Initialize(TempCards);
+		Load(0);
+	}
+
+	private void ClassIndexInitialize() {
+		ClassIndex.Add("DemonHunter", 0);
+		ClassIndex.Add("Druid", 0);
+		ClassIndex.Add("Hunter", 0);
+		ClassIndex.Add("Mage", 0);
+		ClassIndex.Add("Paladin", 0);
+		ClassIndex.Add("Priest", 0);
+		ClassIndex.Add("Rouge", 0);
+		ClassIndex.Add("Shaman", 0);
+		ClassIndex.Add("Warloc", 0);
+		ClassIndex.Add("Warrior", 0);
+		ClassIndex.Add("Neutral", 0);
 	}
 
 }
