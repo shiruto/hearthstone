@@ -1,35 +1,19 @@
 ﻿<Properties StartupConfiguration="{7B488E68-279B-1021-E98B-18BF5DF06874}|">
-  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
-  <MonoDevelop.Ide.ItemProperties.Assembly-CSharp PreferredExecutionTarget="9517b15e-c997-4634-a720-cdeccf5d0f34" />
+  <MonoDevelop.Ide.DebuggingService.PinnedWatches />
+  <MonoDevelop.Ide.ItemProperties.Assembly-CSharp PreferredExecutionTarget="db8552fd-25a7-48dd-a69a-3b7344706a0f" />
+  <MultiItemStartupConfigurations />
   <MonoDevelop.Ide.Workbench ActiveDocument="Assets/Scripts/ScnDeckBuilder/DeckList.cs">
     <Files>
-      <File FileName="Assets/Scripts/ScnDeckBuilder/DeckList.cs" Line="103" Column="8" />
-      <File FileName="Assets/Scripts/ScnDeckBuilder/SelectedCards.cs" Line="47" Column="31" />
-      <File FileName="Assets/Scripts/ScnDeckBuilder/DeckBuilderControl.cs" Line="24" Column="1" />
-      <File FileName="Assets/Scripts/ScnDeckBuilder/CardSelect.cs" Line="80" Column="63" />
-      <File FileName="Assets/Scripts/ScritableObject/CardPrevManager.cs" Line="11" Column="28" />
-      <File FileName="Assets/Scripts/ScrollBar.cs" Line="16" Column="37" />
+      <File FileName="Assets/Scripts/ScnDeckBuilder/DeckList.cs" Line="1" Column="1" />
+      <File FileName="Assets/Scripts/ScnDeckBuilder/SelectedCards.cs" />
+      <File FileName="Assets/Scripts/ScnDeckBuilder/DeckBuilderControl.cs" />
+      <File FileName="Assets/Scripts/ScnDeckBuilder/CardSelect.cs" Line="83" Column="1" />
+      <File FileName="Assets/Scripts/ScritableObject/CardPrevManager.cs" />
+      <File FileName="Assets/Scripts/ScrollBar.cs" />
     </Files>
-    <Pads>
-      <Pad Id="ProjectPad">
-        <State name="__root__">
-          <Node name="hearthstone" expanded="True">
-            <Node name="Assets" expanded="True">
-              <Node name="Scripts" expanded="True">
-                <Node name="ScnDeckBuilder" expanded="True">
-                  <Node name="DeckList.cs" selected="True" />
-                </Node>
-                <Node name="ScritableObject" expanded="True" />
-              </Node>
-            </Node>
-          </Node>
-        </State>
-      </Pad>
-    </Pads>
   </MonoDevelop.Ide.Workbench>
-  <MonoDevelop.Ide.DebuggingService.PinnedWatches />
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
     <BreakpointStore />
   </MonoDevelop.Ide.DebuggingService.Breakpoints>
-  <MultiItemStartupConfigurations />
 </Properties>

@@ -1,0 +1,24 @@
+{
+    "search.searchEditor.reusePriorSearchConfiguration": false,
+    "markdown.extension.completion.respectVscodeSearchExclude": false,
+    "files.exclude": {
+        "**/.git": true,
+        "**/.DS_Store": true,
+        "**/*.meta": true,
+        "**/*.*.meta": true,
+        "**/*.unity": true,
+        "**/*.unityproj": true,
+        "**/*.mat": true,
+        "**/*.fbx": true,
+        "**/*.FBX": true,
+        "**/*.tga": true,
+        "**/*.cubemap": true,
+        "**/*.prefab": true,
+        "**/Library": true,
+        "**/ProjectSettings": true,
+        "**/Temp": true
+    },
+    "omnisharp.sdkPath": "/usr/local/share/dotnet/sdk/6.0.407",
+    "omnisharp.useEditorFormattingSettings": false,
+    "editor.codeActionsOnSave": {}
+}
