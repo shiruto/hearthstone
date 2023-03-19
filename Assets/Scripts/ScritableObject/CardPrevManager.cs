@@ -1,26 +1,53 @@
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-using TMPro;
 
-public class CardPrevManager: MonoBehaviour {
+public class CardPrevManager : MonoBehaviour {
 
-	public CardAsset cardAsset;
-	[Header("Text Component References")]
-	public TextMeshProUGUI NameText;
-	public TextMeshProUGUI ManaCostText;
-	public TextMeshProUGUI CardNum;
+    public CardAsset cardAsset;
+    [Header("Text Component References")]
+    public TextMeshProUGUI NameText;
+    public TextMeshProUGUI ManaCostText;
+    public TextMeshProUGUI CardNum;
+    public bool canPreview;
 
-	[Header("Image References")]
-	public Image CardGraphicImage;
+    [Header("Image References")]
+    public Image CardGraphicImage;
 
-	void Awake() {
-		if(cardAsset != null) {
-			ReadFromAsset();
-		}
-	}
+    public GameObject PfbCard;
+    private GameObject CardPreview;
 
-	public void ReadFromAsset() {
-		NameText.text = cardAsset.name;
-		ManaCostText.text = cardAsset.ManaCost.ToString();
-	}
+    void Awake() {
+        if (cardAsset != null) {
+            ReadFromAsset();
+        }
+    }
+
+    public void ReadFromAsset() {
+        NameText.text = cardAsset.name;
+        ManaCostText.text = cardAsset.ManaCost.ToString();
+    }
+
+    private void OnMouseEnter() {
+        if (canPreview) {
+            float DiffY = transform.position.y - 610;
+            CardPreview = Instantiate(PfbCard, transform.parent.parent.parent);
+            CardPreview.GetComponent<CardManager>().cardAsset = cardAsset;
+            if (DiffY > 380) {
+                DiffY = 380;
+            }
+            else if (DiffY < -380) {
+                DiffY = -380;
+            }
+            CardPreview.transform.localPosition = new(-220, DiffY, 0);
+            CardPreview.transform.localScale = new(1.5f, 1.5f, 1.5f);
+            CardPreview.GetComponent<CardManager>().ReadFromAsset();
+        }
+    }
+
+    private void OnMouseExit() {
+        if (canPreview) {
+            Destroy(CardPreview);
+        }
+    }
 }

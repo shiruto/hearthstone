@@ -13,6 +13,11 @@ public class DeckBuilderControl : MonoBehaviour {
     public static event Action<Transform> OnDeckPrevClick;
     public static event Action OnExitEditing;
     public static event Action<string> OnClassSelect;
+    public static event Action OnNewDeckCancel;
+    public static event Action<CardAsset, Vector3> OnHoverAboveCard;
+    public static event Action<CardAsset> OnCardSearch;
+    private Transform PnlClassSelect;
+    private string SelectedClass = "";
 
     RaycastHit hit = new();
     Ray ray;
@@ -21,8 +26,8 @@ public class DeckBuilderControl : MonoBehaviour {
     }
 
     private void Start() {
-        // GameObject.Find("PnlCardList").SetActive(false);
-        GameObject.Find("PnlClassSelect").SetActive(false);
+        PnlClassSelect = GameObject.Find("PnlClassSelect").transform;
+        PnlClassSelect.gameObject.SetActive(false);
         GameObject.Find("DeckSrlBar").SetActive(false);
     }
     private void Update() {
@@ -40,11 +45,22 @@ public class DeckBuilderControl : MonoBehaviour {
                             isEditing = false;
                             OnExitEditing?.Invoke();
                         }
+                        else if (isSelectingClass) {
+                            isSelectingClass = false;
+                            isEditing = false;
+                            OnNewDeckCancel?.Invoke();
+                        }
                         else {
                             SceneManager.LoadScene("ScnModeSelect");
                         }
                     }
+                    if (go.name == "BtnConfirm" && isSelectingClass) {
+                        isEditing = true;
+                        OnClassSelect?.Invoke(SelectedClass);
+                        isSelectingClass = false;
+                    }
                     else if (Enum.IsDefined(typeof(GameDataAsset.ClassType), go.transform.GetChild(0).GetComponent<TextMeshProUGUI>().text)) {
+                        // Class Filter On
                         OnClassFilter?.Invoke(go.transform.GetChild(0).GetComponent<TextMeshProUGUI>().text);
                     }
                 }
@@ -61,10 +77,17 @@ public class DeckBuilderControl : MonoBehaviour {
                     isEditing = true;
                     OnDeckPrevClick?.Invoke(go.transform);
                 }
-                else if (isSelectingClass) {
+                else if (isSelectingClass && Enum.IsDefined(typeof(GameDataAsset.ClassType), go.name)) {
                     Debug.Log("Selecting class");
-                    OnClassSelect?.Invoke(go.name);
+                    PnlClassSelect.Find("Selected").GetComponent<Image>().sprite = go.GetComponent<Image>().sprite;
+                    SelectedClass = go.name;
                 }
+            }
+            if (go.GetComponent<CardPrevManager>()) {
+                OnHoverAboveCard?.Invoke(go.GetComponent<CardPrevManager>().cardAsset, go.transform.position);
+            }
+            if (Input.GetMouseButtonDown(1) && isEditing && go.GetComponent<CardPrevManager>()) {
+                OnCardSearch?.Invoke(go.GetComponent<CardPrevManager>().cardAsset);
             }
         }
 

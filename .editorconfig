@@ -4,10 +4,8 @@
 root = true
 
 [*]
-
 end_of_line = lf
 charset = utf-8
 insert_final_newline = false
-# csharp_new_line_before_open_brace = none
-ignore_before = *if|*for|*while|*with
+csharp_new_line_before_open_brace = none
 trim_trailing_whitespace = true

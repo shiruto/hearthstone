@@ -1,8 +1,8 @@
+using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using TMPro;
+using UnityEditor;
 using UnityEngine;
-using Debug = UnityEngine.Debug;
 
 public class CardSelect : MonoBehaviour {
     private Transform PnlCards;
@@ -12,12 +12,14 @@ public class CardSelect : MonoBehaviour {
     public static List<CardAsset> CardLibrary; // 卡牌资源库
     private List<CardAsset> AvailableCards = new();
     private List<Transform> BtnClassFilter = new();
-
     private int PageNum = 0;
     private readonly int MaxPageSize = 8;
     private List<int> PageSize = new();
     private string LastClassFilter = "";
     private Dictionary<string, int> ClassIndex = new();
+    private Transform TxtPage;
+    public static event Func<CardAsset, int> SelectedNum;
+    public GameObject PfbCardFrame;
 
     private void Awake() {
         ClassIndexInitialize();
@@ -40,28 +42,31 @@ public class CardSelect : MonoBehaviour {
         }
         BtnLastPage = GameObject.Find("BtnLastPage").transform;
         BtnNextPage = GameObject.Find("BtnNextPage").transform;
+        TxtPage = GameObject.Find("TxtPage").transform;
         AvailableCards.AddRange(CardLibrary);
         Initialize();
     }
 
     private void OnEnable() {
         DeckBuilderControl.OnClassFilter += OnClassFilterHandler;
-        DeckList.OnClassSelected += OnClassSelectedHandler;
-        SelectedCards.OnClassFilterOff += OnClassSelectedHandler;
+        DeckBuilderControl.OnCardSearch += FindCardPage;
+        DeckList.OnDeckSelect += OnDeckSelectHandler;
+        SelectedCards.OnClassFilterOff += OnChangeClass;
+        SelectedCards.OnSelectedCardChange += OnSelectedCardChangeHandler;
     }
 
     private void Initialize() {
         PageSize.Clear();
-        Debug.Log("cards sum = " + AvailableCards.Count);
-        for (int i = 0, j = 0; i < AvailableCards.Count; i++) { // i 为卡牌 j 为当前页的卡牌
+        PageSize.Add(0);
+        for (int i = 0, j = 0; i < AvailableCards.Count; i++) { // i 为卡牌 j 为当前页的卡牌 初始化所有页的卡牌数
             if (j == MaxPageSize) { // 本页卡牌到达上限
-                PageSize.Add(j + ((PageSize.Count == 0) ? 0 : PageSize[^1]));
+                PageSize.Add(j + PageSize[^1]);
                 j = 0;
                 i--;
             }
             else if ((j != 0) && AvailableCards[i - 1].ClassType != AvailableCards[i].ClassType) { // 某一职业卡牌全部加载完毕
-                PageSize.Add(j + ((PageSize.Count == 0) ? 0 : PageSize[^1]));
-                ClassIndex[AvailableCards[i].ClassType.ToString("G")] = PageSize.Count; // 记下每个职业对应的开始页码
+                PageSize.Add(j + PageSize[^1]);
+                ClassIndex[AvailableCards[i].ClassType.ToString("G")] = PageSize.Count - 1; // 记下每个职业对应的开始页码
                 j = 0;
                 i--;
             }
@@ -69,33 +74,40 @@ public class CardSelect : MonoBehaviour {
                 j++;
             }
             if (i == AvailableCards.Count - 1) { // Last Page
-                PageSize.Add(j + ((PageSize.Count == 0) ? 0 : PageSize[^1]));
+                PageSize.Add(j + PageSize[^1]);
             }
         }
         Load(0);
     }
 
     private void Load(int PageIndex) {
-        if (PageIndex > PageSize.Count) {
+        if (PageIndex > PageSize.Count - 1) {
             Debug.Log("Page Index Out of Range");
             return;
         }
-        for (int i = 0, j = (PageIndex == 0) ? 0 : PageSize[PageIndex] - PageSize[PageIndex - 1]; i < MaxPageSize; i++, j++) {
-            if (i < PageSize[PageIndex]) {
+        for (int i = 0, j = PageSize[PageIndex]; i < MaxPageSize; i++, j++) {
+            if (i < PageSize[PageIndex + 1] - PageSize[PageIndex]) {
                 CardTrans[i].gameObject.SetActive(true);
                 CardManager cm = CardTrans[i].GetComponent<CardManager>();
-                // Debug.Log("j = " + j);
                 cm.cardAsset = AvailableCards[j];
-                cm.ReadCardFromAsset();
+                CardTrans[i].Find("PfbSeletedFrame").gameObject.SetActive(false);
+                if (DeckBuilderControl.isEditing) {
+                    int tempNum = SelectedNum(cm.cardAsset);
+                    CardTrans[i].Find("PfbSeletedFrame").gameObject.SetActive(tempNum > 0);
+                    if (tempNum > 0) {
+                        CardTrans[i].Find("PfbSeletedFrame").GetComponent<CardFrameManager>().AddCardNum(tempNum);
+                    }
+                }
+                cm.ReadFromAsset();
             }
             else {
                 CardTrans[i].gameObject.SetActive(false);
             }
         }
-        //Debug.Log("Current Card Number = " + CurrentCardNum + "  ShownCard = " + ShownCards + "  Page number = " + PageNum + "  Last Page = " + PageSize[PageNum - 1 > 0 ? PageNum - 1 : 0]);
         BtnLastPage.gameObject.SetActive(PageIndex != 0);
-        BtnNextPage.gameObject.SetActive(PageIndex != PageSize.Count);
+        BtnNextPage.gameObject.SetActive(PageIndex != PageSize.Count - 1);
         PageNum = PageIndex;
+        TxtPage.GetComponent<TextMeshProUGUI>().text = PageNum + 1 + "/" + (PageSize.Count - 1);
     }
 
     public void LastPage() {
@@ -110,7 +122,6 @@ public class CardSelect : MonoBehaviour {
 
     private void OnDisable() {
         DeckBuilderControl.OnClassFilter -= OnClassFilterHandler;
-        DeckList.OnClassSelected -= OnClassSelectedHandler;
         SelectedCards.OnClassFilterOff -= OnClassFilterHandler;
     }
 
@@ -125,7 +136,7 @@ public class CardSelect : MonoBehaviour {
         }
     }
 
-    private void OnClassSelectedHandler(string ClassFilter) {
+    private void OnChangeClass(string ClassFilter) {
         if (ClassFilter == "None") {
             foreach (Transform Btn in BtnClassFilter) {
                 Btn.gameObject.SetActive(true);
@@ -140,6 +151,27 @@ public class CardSelect : MonoBehaviour {
             }
         }
         Initialize();
+    }
+
+    private void OnDeckSelectHandler(string DeckName) {
+        DeckAsset DA = AssetDatabase.LoadAssetAtPath<DeckAsset>("Assets/Resources/ScriptableObject/Deck/" + DeckName + ".asset") as DeckAsset;
+        Debug.Log("deck click class = " + DA.DeckClass.ToString("G"));
+        OnChangeClass(DA.DeckClass.ToString("G"));
+    }
+
+    private void FindCardPage(CardAsset CA) {
+        int index = AvailableCards.FindIndex((CardAsset a) => a.Equals(CA));
+        for (int i = 0; i < PageSize.Count; i++) {
+            if (index < PageSize[i]) {
+                Load(i - 1);
+                return;
+            }
+        }
+        Debug.Log("can't find this card");
+    }
+
+    private void OnSelectedCardChangeHandler() {
+        Load(PageNum);
     }
 
     private void ClassIndexInitialize() {

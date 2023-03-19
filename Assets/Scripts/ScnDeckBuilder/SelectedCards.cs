@@ -4,7 +4,6 @@ using System.IO;
 using TMPro;
 using UnityEditor;
 using UnityEngine;
-using Debug = UnityEngine.Debug;
 
 public class SelectedCards : MonoBehaviour {
     public event Action OnCardOverLoad;
@@ -16,13 +15,14 @@ public class SelectedCards : MonoBehaviour {
     private Transform TxtSelectedDeckName;
     private SortedDictionary<CardAsset, int> CardDictionary = new(new DicCom()); // 自定义的排序方式
     private List<Transform> CardTransList = new();
-    public static string DeckName;
+    private static string DeckName;
     private readonly int MaxCardType = 21;
     private readonly int StartPosY = 800;
     private readonly int CardPrevHeight = 40;
     private int SelectedCardNum = 0;
     private int MaxCardNum = 30;
-    public static DeckAsset EditingDeck;
+    private static DeckAsset EditingDeck;
+    public static event Action OnSelectedCardChange;
 
     private void Awake() {
         TxtCardNum = GameObject.Find("TxtCardNum").transform;
@@ -39,8 +39,8 @@ public class SelectedCards : MonoBehaviour {
         DeckBuilderControl.OnCardClick += OnCardClickHandler;
         DeckBuilderControl.OnCardPrevClick += OnCardPrevClickHandler;
         DeckBuilderControl.OnExitEditing += OnExitEditingHandler;
-        DeckList.OnClassSelected += OnClassSelectedHandler;
-        Initialize();
+        DeckList.OnDeckSelect += OnDeckSelectHandler;
+        CardSelect.SelectedNum += SelectedNumber;
     }
 
     private void Start() {
@@ -91,6 +91,7 @@ public class SelectedCards : MonoBehaviour {
                 SelectedCardNum++;
                 Load();
             }
+            OnSelectedCardChange?.Invoke();
         }
         else { // 超出上限
             Debug.Log("Too Many Cards");
@@ -99,6 +100,7 @@ public class SelectedCards : MonoBehaviour {
 
     private void OnCardPrevClickHandler(Transform CardPrevTrans) {
         CardAsset CA = CardPrevTrans.GetComponent<CardPrevManager>().cardAsset;
+        Destroy(GameObject.Find("PfbCard(Clone)"));
         if (CardDictionary[CA] == 1) {
             CardDictionary.Remove(CA);
             SelectedCardNum--;
@@ -109,6 +111,7 @@ public class SelectedCards : MonoBehaviour {
             SelectedCardNum--;
             Load();
         }
+        OnSelectedCardChange?.Invoke();
     }
 
     public void OnSrlBarValueChangeHandler(float value) {
@@ -118,11 +121,17 @@ public class SelectedCards : MonoBehaviour {
     public void OnInputEnd(string Name) {
         // check if the name is already existed
         AssetDatabase.SaveAssets();
-        AssetDatabase.RenameAsset("Assets/Resources/ScriptableObject/Deck/" + DeckName + ".asset", Name);
+        AssetDatabase.Refresh();
+        if (Name != DeckName) {
+            AssetDatabase.RenameAsset("Assets/Resources/ScriptableObject/Deck/" + DeckName + ".asset", Name);
+        }
+        AssetDatabase.SaveAssets();
+        AssetDatabase.Refresh();
         DeckName = Name;
     }
 
     private void OnExitEditingHandler() {
+        Debug.Log("Exit Editing");
         SaveDeck();
         OnClassFilterOff?.Invoke("None");
         PnlDeckList.gameObject.SetActive(true);
@@ -136,21 +145,33 @@ public class SelectedCards : MonoBehaviour {
             EditingDeck.myCardAssets.Add(card.Key);
             EditingDeck.myCardNums.Add(card.Value);
         }
-
+        Debug.Log(EditingDeck.DeckClass);
         AssetDatabase.SaveAssets();
         AssetDatabase.Refresh();
     }
 
     public void OnDeleteHandler() {
         Debug.Log("Delete Button Down");
-        File.Delete("Assets/Resources/ScriptableObject/Deck/" + EditingDeck.name + ".asset");
+        AssetDatabase.DeleteAsset("Assets/Resources/ScriptableObject/Deck/" + EditingDeck.name + ".asset");
         DeckBuilderControl.isEditing = false;
+        OnClassFilterOff?.Invoke("None");
         PnlDeckList.gameObject.SetActive(true);
         transform.parent.parent.gameObject.SetActive(false);
     }
 
-    private void OnClassSelectedHandler(string ClassName) {
-        EditingDeck.DeckClass = (GameDataAsset.ClassType)Enum.Parse(typeof(GameDataAsset.ClassType), ClassName);
+    private void OnDeckSelectHandler(string DAname) {
+        EditingDeck = AssetDatabase.LoadAssetAtPath<DeckAsset>($"Assets/Resources/ScriptableObject/Deck/{DAname}.asset") as DeckAsset;
+        Debug.Log(EditingDeck);
+        Debug.Log("on deck select deck name = " + EditingDeck.name);
+        Initialize();
+    }
+
+    private int SelectedNumber(CardAsset CA) {
+        int num = 0;
+        if (CardDictionary.TryGetValue(CA, out num)) {
+            return num;
+        }
+        else return 0;
     }
 
     private void OnDisable() {
@@ -159,6 +180,7 @@ public class SelectedCards : MonoBehaviour {
         DeckBuilderControl.OnCardClick -= OnCardClickHandler;
         DeckBuilderControl.OnCardPrevClick -= OnCardPrevClickHandler;
         DeckBuilderControl.OnExitEditing -= OnExitEditingHandler;
+        DeckList.OnDeckSelect -= OnDeckSelectHandler;
     }
 
     class DicCom : IComparer<CardAsset> {

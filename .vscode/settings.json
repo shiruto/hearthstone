@@ -18,7 +18,11 @@
         "**/ProjectSettings": true,
         "**/Temp": true
     },
-    "omnisharp.sdkPath": "/usr/local/share/dotnet/sdk/6.0.407",
+    "omnisharp.sdkPath": "/usr/local/share/dotnet/sdk/7.0.202",
     "omnisharp.useEditorFormattingSettings": false,
-    "editor.codeActionsOnSave": {}
+    "editor.codeActionsOnSave": {},
+    "omnisharp.dotnetPath": "/usr/local/share/dotnet/sdk/7.0.202",
+    "omnisharp.sdkVersion": "7.0.202",
+    "omnisharp.enableImportCompletion": true,
+    "omnisharp.useModernNet": false
 }

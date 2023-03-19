@@ -5,8 +5,7 @@ using UnityEditor;
 using UnityEngine;
 
 public class DeckList : MonoBehaviour {
-    public static event Action<string> OnClassSelected;
-
+    public static event Action<string> OnDeckSelect;
     public GameObject PfbDeckPrev;
     private Transform TxtCardNum;
     private Transform SrlBar;
@@ -25,6 +24,7 @@ public class DeckList : MonoBehaviour {
     private void Awake() {
         DeckBuilderControl.OnDeckPrevClick += OnDeckPrevClickHandler;
         DeckBuilderControl.OnClassSelect += OnClassSelectHandler;
+        DeckBuilderControl.OnNewDeckCancel += OnNewDeckCancelHandler;
 
         TxtCardNum = GameObject.Find("TxtCardNum").transform;
         SrlBar = GameObject.Find("DeckSrlBar").transform;
@@ -69,32 +69,33 @@ public class DeckList : MonoBehaviour {
     }
 
     public void OnBtnNewDeckHandler() { // BtnNewDeck 按钮被按下后触发
+        DeckBuilderControl.isSelectingClass = true;
+        PnlClassSelect.gameObject.SetActive(true);
+    }
+
+    private void OnClassSelectHandler(string ClassName) {
+        Debug.Log("On class select class = " + ClassName);
+
         DeckAsset newDA = ScriptableObject.CreateInstance<DeckAsset>();
         string newName = "New Deck";
-        for (int i = 0; i < DeckAssetList.Count; i++) {
+        int PostFix = 1;
+        for (int i = 0; i < DeckAssetList.Count; i++) { // 解决名称冲突
             if (newName == DeckAssetList[i].name) {
-                newName = "New Deck" + (i + 1);
+                newName = "New Deck" + PostFix++;
                 i = 0;
             }
         }
         newDA.myCardAssets = new List<CardAsset>();
         newDA.myCardNums = new List<int>();
         newDA.Order = DeckAssetList.Count;
+        newDA.DeckClass = (GameDataAsset.ClassType)Enum.Parse(typeof(GameDataAsset.ClassType), ClassName);
         AssetDatabase.CreateAsset(newDA, "Assets/Resources/ScriptableObject/Deck/" + newName + ".asset");
         AssetDatabase.SaveAssets();
         AssetDatabase.Refresh();
-        SelectedCards.EditingDeck = newDA;
-        SelectedCards.DeckName = newName;
-        DeckBuilderControl.isSelectingClass = true;
-        PnlClassSelect.gameObject.SetActive(true);
-    }
 
-    private void OnClassSelectHandler(string CLassName) {
         PnlCardList.gameObject.SetActive(true);
-        OnClassSelected?.Invoke(CLassName);
+        OnDeckSelect?.Invoke(newName);
         PnlClassSelect.gameObject.SetActive(false);
-        DeckBuilderControl.isEditing = true;
-        DeckBuilderControl.isSelectingClass = false;
         gameObject.SetActive(false);
     }
 
@@ -103,9 +104,13 @@ public class DeckList : MonoBehaviour {
     }
 
     private void OnDeckPrevClickHandler(Transform DeckTrans) {
-        SelectedCards.EditingDeck = DeckTrans.GetComponent<DeckPrevManager>().DA;
-        OnClassSelected?.Invoke(DeckTrans.GetComponent<DeckPrevManager>().DA.DeckClass.ToString("G"));
         PnlCardList.gameObject.SetActive(true);
+        OnDeckSelect?.Invoke(DeckTrans.GetComponent<DeckPrevManager>().DA.name);
         gameObject.SetActive(false);
     }
+
+    private void OnNewDeckCancelHandler() {
+        PnlClassSelect.gameObject.SetActive(false);
+    }
+
 }

@@ -1,74 +1,80 @@
+using TMPro;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
-using TMPro;
 
-public class CardManager: MonoBehaviour {
+public class CardManager : MonoBehaviour {
 
-	public CardAsset cardAsset; // ¿¨ÅÆSO asset
-	public CardManager PreviewManager; // ¿¨ÅÆÔ¤ÀÀ
-	[Header("Text Component References")]
-	public TextMeshProUGUI NameText; // ¿¨ÅÆÃûÎÄ±¾
-	public TextMeshProUGUI ManaCostText; // ¿¨ÅÆ·ÑÓÃÎÄ±¾
-	public TextMeshProUGUI DescriptionText; // ¿¨ÅÆÃèÊöÎÄ±¾
-	public TextMeshProUGUI HealthText; // ¿¨ÅÆÉúÃüÖµÎÄ±¾
-	public TextMeshProUGUI AttackText; // ¿¨ÅÆ¹¥»÷ÎÄ±¾
-	[Header("GameObject References")]
+    public CardAsset cardAsset; // å¡ç‰ŒSO asset
+    public CardManager PreviewManager; // å¡ç‰Œé¢„è§ˆ
+    [Header("Text Component References")]
+    public TextMeshProUGUI NameText; // å¡ç‰Œåæ–‡æœ¬
+    public TextMeshProUGUI ManaCostText; // å¡ç‰Œè´¹ç”¨æ–‡æœ¬
+    public TextMeshProUGUI DescriptionText; // å¡ç‰Œæè¿°æ–‡æœ¬
+    public TextMeshProUGUI HealthText; // å¡ç‰Œç”Ÿå‘½å€¼æ–‡æœ¬
+    public TextMeshProUGUI AttackText; // å¡ç‰Œæ”»å‡»æ–‡æœ¬
+    [Header("GameObject References")]
 
-	public GameObject HealthIcon;
-	public GameObject AttackIcon;
-	[Header("Image References")]
-	public Image CardGraphicImage; // ¿¨ÅÆÍ¼Ïñ
-	public Image CardFaceFrameImage; // ¿¨ÅÆ¿òÍ¼Ïñ£¬ÓÃÓÚÇø·Ö¿¨ÅÆÏ¡ÓĞ¶È
-	public Image CardFaceGlowImage; // ¿¨ÅÆÕıÃæ¹âĞ§
-	public Image CardBackGlowImage; // ¿¨ÅÆ±³Ãæ¹âĞ§
-	public Image CardElementImage; // ¿¨ÅÆÔªËØÍ¼Ïñ
-	void Awake() {
-		if(cardAsset != null)
-			ReadCardFromAsset();
-	}
+    public GameObject HealthIcon;
+    public GameObject AttackIcon;
+    [Header("Image References")]
+    public Image CardGraphicImage; // å¡ç‰Œå›¾åƒ
+    public Image CardFaceFrameImage; // å¡ç‰Œæ¡†å›¾åƒï¼Œç”¨äºåŒºåˆ†å¡ç‰Œç¨€æœ‰åº¦
+    public Image CardFaceGlowImage; // å¡ç‰Œæ­£é¢å…‰æ•ˆ
+    public Image CardBackGlowImage; // å¡ç‰ŒèƒŒé¢å…‰æ•ˆ
+    public Image CardElementImage; // å¡ç‰Œå…ƒç´ å›¾åƒ
+    private bool canBePlayedNow = false;
+    public bool canPreview;
+    private GameObject CardPreview;
+    public GameObject PfbCard;
+    void Awake() {
+        if (cardAsset != null)
+            ReadFromAsset();
+    }
 
-	private bool canBePlayedNow = false;
-	public bool CanBePlayedNow {
-		get {
-			return canBePlayedNow;
-		}
 
-		set {
-			canBePlayedNow = value;
+    public bool CanBePlayedNow {
+        get {
+            return canBePlayedNow;
+        }
 
-			CardFaceGlowImage.enabled = value;
-		}
-	}
+        set {
+            canBePlayedNow = value;
 
-	public void ReadCardFromAsset() {
-		// 1) ¸üĞÂ¿¨ÅÆĞÅÏ¢
-		//		CardFaceFrameImage.sprite = cardAsset.CardRarityImage;
-		HealthIcon.SetActive(false);
-		AttackIcon.SetActive(false);
-		CardElementImage.sprite = cardAsset.CardImage;
+            CardFaceGlowImage.enabled = value;
+        }
+    }
 
-		// 2) Ìí¼Ó¿¨ÅÆÃû×Ö
-		NameText.text = cardAsset.name;
-		// 3) Ìí¼Ó¿¨ÅÆÏûºÄ
-		ManaCostText.text = cardAsset.ManaCost.ToString();
-		// 4) Ìí¼ÓÃèÊö
-		DescriptionText.text = cardAsset.Description;
-		// 5) ¸ü»»¿¨ÅÆÍ¼Æ¬
-		CardGraphicImage.sprite = cardAsset.CardImage;
+    public void ReadFromAsset() {
+        HealthIcon.SetActive(false);
+        AttackIcon.SetActive(false);
+        CardElementImage.sprite = cardAsset.CardImage;
+        NameText.text = cardAsset.name; // æ·»åŠ å¡ç‰Œåå­—
+        ManaCostText.text = cardAsset.ManaCost.ToString(); // æ·»åŠ å¡ç‰Œæ¶ˆè€—
+        DescriptionText.text = cardAsset.Description; // æ·»åŠ æè¿°
+        CardGraphicImage.sprite = cardAsset.CardImage; // æ›´æ¢å¡ç‰Œå›¾ç‰‡
+        if (cardAsset.MaxHealth != 0) {
+            HealthIcon.SetActive(true);
+            AttackIcon.SetActive(true);
+            AttackText.text = cardAsset.Attack.ToString();
+            HealthText.text = cardAsset.MaxHealth.ToString();
+        }
+    }
 
-		if(cardAsset.MaxHealth != 0) {
-			HealthIcon.SetActive(true);
-			AttackIcon.SetActive(true);
-			// ÕâÊÇÒ»¸öÉúÎï
-			AttackText.text = cardAsset.Attack.ToString();
-			HealthText.text = cardAsset.MaxHealth.ToString();
-		}
+    private void OnMouseEnter() {
+        if (canPreview) {
+            CardPreview = Instantiate(PfbCard, transform.parent.parent);
+            Destroy(CardPreview.GetComponent<BoxCollider>());
+            CardPreview.GetComponent<CardManager>().cardAsset = cardAsset;
+            CardPreview.transform.position = new Vector3(0, 100, 0) + transform.position;
+            CardPreview.transform.localScale = new(2f, 2f, 2f);
+            CardPreview.GetComponent<CardManager>().ReadFromAsset();
+        }
+    }
 
-		if(PreviewManager != null) {
-			// ÕâÊÇÒ»ÕÅ¿¨ÅÆ¶ø²»ÊÇÔ¤ÀÀ
-			// Ô¤ÀÀ¿¨ÅÆÒ²ÓµÓĞ¸Ã½Å±¾£¬µ«ÊôĞÔÊÇnull
-			PreviewManager.cardAsset = cardAsset;
-			PreviewManager.ReadCardFromAsset();
-		}
-	}
+    private void OnMouseExit() {
+        if (canPreview) {
+            Destroy(CardPreview);
+        }
+    }
 }
