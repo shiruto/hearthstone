@@ -1,11 +1,6 @@
 using UnityEngine;
 
-public enum TargetingOptions { NoTarget, AllMinions, EnemyMinions, YourMinions, AllCharacters, EnemyCharacters, YourCharacters }
-public enum Harm { None, Unharmed, Harmed }
-public enum MinionType { None, Murloc, Demon, Mech, Elemental, Beast, Totem, Pirate, Dragon, Quilboar, Naga, Undead, All }
-public enum SpellSchool { None, Arcane, Fire, Frost, Nature, Holy, Shadow, Fel }
-public enum Rarity { Free, Normal, Rare, Epic, Legendary }
-public enum ClassType { DemonHunter, Druid, Hunter, Mage, Paladin, Priest, Rouge, Shaman, Warloc, Warrior, Neutral }
+
 
 public class CardAsset : ScriptableObject {
 
@@ -14,8 +9,8 @@ public class CardAsset : ScriptableObject {
     public Sprite CardImage;
     public int ManaCost;
     public int OrgManaCost;
-    public Rarity rarity;
-    public ClassType ClassType;
+    public GameDataAsset.Rarity rarity;
+    public GameDataAsset.ClassType ClassType;
     public bool isTriggered;
     public CardManager Script;
 
@@ -37,15 +32,15 @@ public class CardAsset : ScriptableObject {
     public bool isFrozen;
     public bool isPoison;
     public string CreatureScriptName;
-    public MinionType MinionType;
+    public GameDataAsset.MinionType MinionType;
 
     [Header("SpellInfo")]
     public string SpellScriptName;
     public int specialSpellAmount;
     public bool isSecret;
-    public TargetingOptions TargetsType;
-    public MinionType TargetMinionType;
-    public Harm TargetsHarm;
-    public SpellSchool SpellSchool;
+    public GameDataAsset.TargetingOptions TargetsType;
+    public GameDataAsset.MinionType TargetMinionType;
+    public GameDataAsset.Harm TargetsHarm;
+    public GameDataAsset.SpellSchool SpellSchool;
 
 }

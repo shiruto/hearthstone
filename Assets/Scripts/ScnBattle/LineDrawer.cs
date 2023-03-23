@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -6,22 +7,32 @@ public class LineDrawer : MonoBehaviour {
     private LineRenderer LR;
     private Transform Target;
     private Transform Arrow;
+    private Transform LineTrans;
+    public GameObject PfbLine;
+    public event Func<bool> isTarget;
 
     private void Awake() {
-        Target = transform.GetChild(2);
-        LR = transform.GetChild(0).GetComponent<LineRenderer>();
-        Arrow = transform.GetChild(1);
+        LineTrans = Instantiate(PfbLine, transform).transform;
+        Target = LineTrans.GetChild(2);
+        LR = LineTrans.GetChild(0).GetComponent<LineRenderer>();
+        Arrow = LineTrans.GetChild(1);
+        LineTrans.gameObject.SetActive(false);
 
-        Target.gameObject.SetActive(false);
-
-        ScnBattleUI.DrawLine += DrawLineHandler;
+        GetComponent<Draggable>().DrawLine += DrawLineHandler;
     }
 
-    private void DrawLineHandler(Vector3 EndPos){
-        Vector3 MousePos = Input.mousePosition;
+    private void DrawLineHandler(Vector3 EndPos) {
+        LineTrans.gameObject.SetActive(true);
+        Target.gameObject.SetActive(false);
+
         Arrow.position = EndPos;
-        LR.SetPosition(1, MousePos);
-        float angle = Mathf.Atan2(MousePos.x, MousePos.y + 270);
-        Arrow.Rotate(new(0, 0, -angle), Space.Self);
+        LR.SetPosition(1, EndPos);
+        float angle = Mathf.Atan2(EndPos.x - 960, EndPos.y - 250);
+        angle *= Mathf.Rad2Deg;
+        Debug.Log("Rotation = " + angle);
+        Arrow.eulerAngles = new(0, 0, -angle);
+        // if (isTarget.Invoke()) {
+        //     Target.gameObject.SetActive(true);
+        // }
     }
 }

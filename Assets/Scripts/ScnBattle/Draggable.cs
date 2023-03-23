@@ -2,68 +2,73 @@ using System;
 using UnityEngine;
 
 public class Draggable : MonoBehaviour {
+    #region variables
+    public bool canPreview;
+    private GameObject CardPreview;
+    public bool canDrag = false;
     private bool isDragging = false;
-    private Vector3 pointerDistance = Vector3.zero;
-    private float ZDistance { get; set; }
-    private Vector3 startPos;
-    private bool isReturning = false;
-    private float Speed;
-    public static event Action<Transform> OnUse;
-    private void Start() {
-        startPos = transform.position;
+    private Vector3 StartPos;
+    Vector3 Distance;
+    public GameObject PfbCard;
+    public static event Action<Transform, Vector3> OnCardReturn;
+    public static event Action<Transform> OnCardUse;
+    public event Action<Vector3> DrawLine;
+    public bool ifDrawLine;
+    #endregion
+    private void OnMouseEnter() {
+        if (canPreview && !isDragging) {
+            CardPreview = Instantiate(PfbCard, transform.parent.parent);
+            Destroy(CardPreview.GetComponent<BoxCollider>());
+            CardPreview.GetComponent<CardManager>().cardAsset = GetComponent<CardManager>().cardAsset;
+            CardPreview.transform.position = new Vector3(0, 100, 0) + transform.position;
+            CardPreview.transform.localScale = new(2f, 2f, 2f);
+            CardPreview.GetComponent<CardManager>().ReadFromAsset();
+        }
     }
-    void OnMouseDown() {
-        startPos = transform.position;
-        isDragging = true;
-        ZDistance = transform.position.z - Camera.main.transform.position.z;
-        pointerDistance = GetMousePosition() - startPos;
+    private void OnMouseExit() {
+        if (canPreview) {
+            Destroy(CardPreview);
+        }
     }
-    void Update() {
-        RaycastHit[] a = Physics.RaycastAll(Camera.main.ScreenPointToRay(Input.mousePosition));
-        if (Input.GetMouseButtonDown(0) && a[0].collider.transform.gameObject.name == this.name) {
-            OnMouseDown();
+    private void OnMouseDown() {
+        if (canDrag) {
+            if (!isDragging) StartPos = transform.position;
+            Debug.Log(StartPos);
+            Distance = Input.mousePosition - transform.position;
         }
-        if (isDragging) {
-            var mousePos = GetMousePosition();
-            transform.position = new Vector3(mousePos.x - pointerDistance.x, mousePos.y - pointerDistance.y, 0);
+        if (canPreview) {
+            Debug.Log(transform.name);
+            transform.localScale = 2 * Vector3.one;
+            Destroy(CardPreview);
         }
-        if (isDragging && Input.GetMouseButtonUp(0)) {
-            OnMouseUp();
-        }
-        if (isReturning) {
-            var dif = Vector3.Magnitude(transform.position - startPos);
-            Speed = GetSpeed(dif);
-            transform.position = transform.position + Speed * Time.deltaTime * Vector3.Normalize(startPos - transform.position);
-            if (dif < 10) {
-                transform.position = startPos;
-                isReturning = false;
+    }
+    private void OnMouseDrag() {
+        if (canDrag) {
+            isDragging = true;
+            if (ifDrawLine && Input.mousePosition.y > 200) {
+                DrawLine?.Invoke(Input.mousePosition);
+            }
+            else {
+                transform.Find("PfbLine(Clone)").gameObject.SetActive(false);
+                transform.position = Input.mousePosition - Distance;
             }
         }
     }
-    void OnMouseUp() {
-        if (RectTransformUtility.RectangleContainsScreenPoint(GameObject.Find("PnlUseCard").GetComponent<RectTransform>(), Input.mousePosition)) {
-            OnUse?.Invoke(GetComponent<Transform>());
-            isReturning = false;
+
+    private void OnMouseUp() {
+        if (Input.mousePosition.y > 200 && canDrag) {
+            OnCardUse?.Invoke(transform);
         }
         else {
-            isReturning = true;
-        }
-        if (isDragging) {
+            OnCardReturn?.Invoke(transform, StartPos);
             isDragging = false;
         }
-    }
-    private Vector3 GetMousePosition() {
-        var screenMousePos = Input.mousePosition;
-        screenMousePos.z = ZDistance;
-        return screenMousePos;
-    }
+        if (ifDrawLine) {
+            transform.Find("PfbLine(Clone)").gameObject.SetActive(false);
+        }
+        if (canPreview) {
+            transform.localScale = Vector3.one;
+        }
 
-    private float GetSpeed(float dif) { // 速度函数
-        if (dif < 300) {
-            return 1200;
-        }
-        else {
-            return dif * dif / 75;
-        }
     }
 }

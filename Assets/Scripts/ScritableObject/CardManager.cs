@@ -1,10 +1,8 @@
 using TMPro;
-using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
 
 public class CardManager : MonoBehaviour {
-
     public CardAsset cardAsset; // 卡牌SO asset
     public CardManager PreviewManager; // 卡牌预览
     [Header("Text Component References")]
@@ -14,7 +12,6 @@ public class CardManager : MonoBehaviour {
     public TextMeshProUGUI HealthText; // 卡牌生命值文本
     public TextMeshProUGUI AttackText; // 卡牌攻击文本
     [Header("GameObject References")]
-
     public GameObject HealthIcon;
     public GameObject AttackIcon;
     [Header("Image References")]
@@ -24,9 +21,7 @@ public class CardManager : MonoBehaviour {
     public Image CardBackGlowImage; // 卡牌背面光效
     public Image CardElementImage; // 卡牌元素图像
     private bool canBePlayedNow = false;
-    public bool canPreview;
-    private GameObject CardPreview;
-    public GameObject PfbCard;
+
     void Awake() {
         if (cardAsset != null)
             ReadFromAsset();
@@ -44,7 +39,6 @@ public class CardManager : MonoBehaviour {
             CardFaceGlowImage.enabled = value;
         }
     }
-
     public void ReadFromAsset() {
         HealthIcon.SetActive(false);
         AttackIcon.SetActive(false);
@@ -61,20 +55,4 @@ public class CardManager : MonoBehaviour {
         }
     }
 
-    private void OnMouseEnter() {
-        if (canPreview) {
-            CardPreview = Instantiate(PfbCard, transform.parent.parent);
-            Destroy(CardPreview.GetComponent<BoxCollider>());
-            CardPreview.GetComponent<CardManager>().cardAsset = cardAsset;
-            CardPreview.transform.position = new Vector3(0, 100, 0) + transform.position;
-            CardPreview.transform.localScale = new(2f, 2f, 2f);
-            CardPreview.GetComponent<CardManager>().ReadFromAsset();
-        }
-    }
-
-    private void OnMouseExit() {
-        if (canPreview) {
-            Destroy(CardPreview);
-        }
-    }
 }
