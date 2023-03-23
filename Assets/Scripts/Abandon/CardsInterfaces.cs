@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -23,5 +24,9 @@ public class CardsInterfaces {
 
     public interface IGetArmor {
         public void GetArmor(Transform Target, int Armor);
+    }
+
+    public interface IGetTarget {
+        public static event Func<Transform> GetTarget;
     }
 }

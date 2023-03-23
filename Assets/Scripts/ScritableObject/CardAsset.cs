@@ -1,7 +1,4 @@
 using UnityEngine;
-
-
-
 public class CardAsset : ScriptableObject {
 
     [TextArea(2, 3)]
