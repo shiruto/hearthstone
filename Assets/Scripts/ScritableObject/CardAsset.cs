@@ -28,6 +28,7 @@ public class CardAsset : ScriptableObject {
     public bool isImmune;
     public bool isFrozen;
     public bool isPoison;
+    public bool haveDeathRattle;
     public string CreatureScriptName;
     public GameDataAsset.MinionType MinionType;
 

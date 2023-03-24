@@ -1,23 +1,43 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class HandControl : MonoBehaviour {
+public class HandLogic : MonoBehaviour {
     List<Transform> CardTrans = new();
     //public static event Action<Transform> OnUse;
     private Vector3 pivot;
     private int MaxHandCard = 10;
+
+    private HandLogic() {
+
+    }
+    private static HandLogic yourHand = null;
+    private static HandLogic opponentHand = null;
+
+    public static HandLogic YourHand() {
+        if (yourHand == null) {
+            yourHand = new();
+        }
+        return yourHand;
+    }
+    public static HandLogic OpponentHand() {
+        if (opponentHand == null) {
+            opponentHand = new();
+        }
+        return opponentHand;
+    }
+
     void Start() {
         foreach (Transform child in transform) {
             CardTrans.Add(child);
         }
-        DeckControl.OnDraw += OnDrawHandler;
+        DeckLogic.OnDraw += OnDrawHandler;
         Draggable.OnCardUse += OnUseHandler;
         pivot = Vector3.zero;
         Align();
     }
 
     private void OnDisable() {
-        DeckControl.OnDraw -= OnDrawHandler;
+        DeckLogic.OnDraw -= OnDrawHandler;
     }
     private void OnUseHandler(Transform CardTransform) { // 手牌区改变
         char[] CharNum = CardTransform.name.ToCharArray();

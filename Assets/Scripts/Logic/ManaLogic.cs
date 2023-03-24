@@ -3,13 +3,31 @@ using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 
-public class ManaControl : MonoBehaviour {
+public class ManaLogic : MonoBehaviour {
     // Start is called before the first frame update
     private int ManaNum;
     private int CurMaxCrystalNum;
     private int MaxCrystalNum = 10;
     readonly Crystal[] Crystals = new Crystal[10];
     TextMeshProUGUI TxtMana;
+
+    private ManaLogic() {
+
+    }
+    private static ManaLogic yourMana;
+    private static ManaLogic opponentMana;
+    public static ManaLogic YourMana() {
+        if (yourMana == null) {
+            yourMana = new();
+        }
+        return yourMana;
+    }
+    public static ManaLogic OpponentMana() {
+        if (opponentMana == null) {
+            opponentMana = new();
+        }
+        return opponentMana;
+    }
 
     private void Start() {
         Transform[] myTransforms = GameObject.Find("PnlManaGraph").GetComponentsInChildren<Transform>();
@@ -74,5 +92,9 @@ public class ManaControl : MonoBehaviour {
 
     public void ChangeMaxCrystalNum(int newMaxCrystalNum) { // 改变水晶上限
         MaxCrystalNum = newMaxCrystalNum;
+    }
+
+    public void ManaReset() { // 充满所有水晶
+        ManaNum = CurMaxCrystalNum;
     }
 }

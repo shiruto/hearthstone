@@ -25,4 +25,8 @@ public class Message {
             isQueuing = false;
         }
     }
+    public static void ReadMessage() {
+        isQueuing = true;
+        MessageQueue.Dequeue().DealMessage();
+    }
 }
