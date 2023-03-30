@@ -58,7 +58,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   cardAsset: {fileID: 0}
-  PreviewManager: {fileID: 0}
   NameText: {fileID: 7634864671678596962}
   ManaCostText: {fileID: 199601265740273480}
   DescriptionText: {fileID: 4785468330761563376}

@@ -36,8 +36,9 @@ MonoBehaviour:
   isImmune: 0
   isFrozen: 0
   isPoison: 0
+  haveDeathRattle: 0
   CreatureScriptName: 
-  MinionType: 0
+  MinionType: 11
   SpellScriptName: 
   specialSpellAmount: 0
   isSecret: 0

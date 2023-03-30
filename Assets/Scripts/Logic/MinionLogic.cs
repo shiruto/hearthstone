@@ -3,27 +3,28 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class MinionLogic : ICharacter, IIdentifiable {
-    private PlayerLogic owner;
-    private CardAsset ca;
+    public PlayerLogic owner;
+    public CardAsset ca;
     private int baseHealth;
-    private bool canAttackHero = false;
     public int MaxHealth {
         get { return baseHealth; }
     }
     private int _health;
-    public int Health {
+    public virtual int Health {
         get => _health;
         set {
             if (value > baseHealth) _health = baseHealth;
-            else if (_health <= 0) Die();
+            else if (value <= 0) {
+                _health = value;
+                Die();
+            }
             else _health = value;
         }
     }
     public bool isFrozen;
     public bool CanAttack {
         get {
-            bool ownersTurn = TurnManager.Instance().whoseTurn == owner;
-            return ownersTurn && (AttacksLeftThisTurn > 0) && !isFrozen;
+            return (AttacksLeftThisTurn > 0) && !isFrozen;
         }
     }
     private int attackChance = 1;
@@ -35,39 +36,80 @@ public class MinionLogic : ICharacter, IIdentifiable {
     // attack with buffs
     public int Attack {
         get { return baseAttack; }
-
-    }
-    private int MinionID;
-    public int ID {
-        get {
-            return MinionID;
+        set {
+            if (value < 0) {
+                _attack = 0;
+            }
+            else _attack = value;
         }
     }
-
-    public MinionLogic(PlayerLogic owner, CardAsset ca) {
-        this.ca = ca;
-        baseHealth = ca.MaxHealth;
-        Health = ca.MaxHealth;
-        baseAttack = ca.Attack;
-        attackChance = ca.AttacksChances;
-        if (ca.isCharge)
+    private int _attack;
+    private int MinionID;
+    public int ID { get => MinionID; }
+    public List<Buff> Buffs {
+        get => Buffs;
+        set => Buffs = value;
+    }
+    public List<Effect> DeathRattleEffects;
+    public MinionLogic(MinionCard CL) {
+        ca = CL.CA;
+        baseHealth = CL.Health;
+        Health = baseHealth;
+        baseAttack = CL.Attack;
+        attackChance = CL.CA.AttacksChances;
+        if (CL.CA.isCharge)
+            AttacksLeftThisTurn = attackChance;
+        MinionID = IDFactory.GetID();
+        BattleControl.MinionCreated.Add(ID, this);
+        DeathRattleEffects = new(CL.DeathRattleEffects);
+    }
+    public MinionLogic(PlayerLogic owner, MinionCard MC) {
+        ca = MC.CA;
+        baseHealth = MC.Health;
+        Health = baseHealth;
+        baseAttack = MC.Attack;
+        attackChance = MC.CA.AttacksChances;
+        if (MC.CA.isCharge)
             AttacksLeftThisTurn = attackChance;
         this.owner = owner;
         MinionID = IDFactory.GetID();
-        // MinionCreatedThisGame.Add(ID, this);
+        BattleControl.MinionCreated.Add(ID, this);
+        DeathRattleEffects = new(MC.DeathRattleEffects);
+    }
+    public MinionLogic(CardAsset CA) {
+        ca = CA;
+        baseHealth = CA.MaxHealth;
+        Health = baseHealth;
+        baseAttack = CA.Attack;
+        attackChance = CA.AttacksChances;
+        if (CA.isCharge)
+            AttacksLeftThisTurn = attackChance;
+        MinionID = IDFactory.GetID();
+        BattleControl.MinionCreated.Add(ID, this);
+    }
+    public MinionLogic(PlayerLogic owner, CardAsset CA) {
+        ca = CA;
+        baseHealth = CA.MaxHealth;
+        Health = baseHealth;
+        baseAttack = CA.Attack;
+        attackChance = CA.AttacksChances;
+        if (CA.isCharge)
+            AttacksLeftThisTurn = attackChance;
+        this.owner = owner;
+        MinionID = IDFactory.GetID();
+        BattleControl.MinionCreated.Add(ID, this);
     }
 
     public void AttackMinion(MinionLogic target) {
         AttacksLeftThisTurn--;
         // calculate the values so that the creature does not fire the DIE command before the Attack command is sent
-        int targetHealthAfter = target.Health - Attack;
-        int attackerHealthAfter = Health - target.Attack;
-        new MinionAttackMessage(target.ID, ID, target.Attack, Attack, attackerHealthAfter, targetHealthAfter).AddToQueue();
-
         target.Health -= Attack;
         Health -= target.Attack;
     }
     public void Die() {
-        owner.
+        owner.Field.GetMinions().Remove(this);
+        foreach (Effect effect in DeathRattleEffects) {
+            effect.ActivateEffect();
+        }
     }
 }

@@ -1,43 +1,27 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UIElements;
 
 public class BattleField : MonoBehaviour {
-    public List<MinionLogic> FriendlyMinionField = new();
-    public List<MinionLogic> EnemyMinionField = new();
+    private List<MinionLogic> Minions = null;
+    public static event Action<int, MinionLogic> OnMinionSummon;
 
     private BattleField() {
-
-    }
-    private static BattleField yourField = null;
-    private static BattleField opponentField = null;
-    public static BattleField YourField() {
-        if (yourField == null) yourField = new();
-        return yourField;
-    }
-    public static BattleField OpponentField() {
-        if (opponentField == null) opponentField = new();
-        return opponentField;
+        Minions = new(7);
     }
 
-    public void PlaceMinionAt(bool isEnemy, int position, MinionLogic Minion) {
-        if (!isEnemy) {
-            FriendlyMinionField.Insert(position, Minion);
-        }
-        else EnemyMinionField.Insert(position, Minion);
-        Align();
+    public void SummonMinionAt(int position, MinionLogic MinionToSummon) {
+        Minions.Insert(position, MinionToSummon);
+        OnMinionSummon?.Invoke(position, MinionToSummon);
     }
 
-    public void RemoveMinionAt(bool isEnemy, int position, MinionLogic Minion) {
-        if (!isEnemy) {
-            FriendlyMinionField.Insert(position, Minion);
-        }
-        else EnemyMinionField.Insert(position, Minion);
-        Align();
+    public void RemoveMinion(MinionLogic Minion) {
+        Minions.Remove(Minion);
     }
 
-    private void Align() {
-        // TODO
+    public List<MinionLogic> GetMinions() {
+        return Minions;
     }
 }

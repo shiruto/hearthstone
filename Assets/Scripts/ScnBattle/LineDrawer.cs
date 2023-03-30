@@ -21,18 +21,16 @@ public class LineDrawer : MonoBehaviour {
         GetComponent<Draggable>().DrawLine += DrawLineHandler;
     }
 
-    private void DrawLineHandler(Vector3 EndPos) {
+    private void DrawLineHandler(Vector3 StartPos, Vector3 EndPos) {
         LineTrans.gameObject.SetActive(true);
         Target.gameObject.SetActive(false);
 
         Arrow.position = EndPos;
+        LR.SetPosition(0, StartPos);
         LR.SetPosition(1, EndPos);
-        float angle = Mathf.Atan2(EndPos.x - 960, EndPos.y - 250);
+        float angle = Mathf.Atan2(EndPos.x - StartPos.x, EndPos.y - StartPos.y);
         angle *= Mathf.Rad2Deg;
         Debug.Log("Rotation = " + angle);
         Arrow.eulerAngles = new(0, 0, -angle);
-        // if (isTarget.Invoke()) {
-        //     Target.gameObject.SetActive(true);
-        // }
     }
 }

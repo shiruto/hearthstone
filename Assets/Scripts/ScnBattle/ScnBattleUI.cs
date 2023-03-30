@@ -25,7 +25,7 @@ public class ScnBattleUI : MonoBehaviour {
         ray = Camera.main.ScreenPointToRay(Input.mousePosition);
         Debug.DrawLine(Camera.main.transform.position, Input.mousePosition, Color.yellow);
         if (Physics.Raycast(ray, out hitInfo, Mathf.Infinity, LayerMask.GetMask("UI"))) {
-            //Debug.Log($"{hitInfo.collider.name}");
+            // BattleControl.Instance.Targeting = hitInfo.collider.GetComponent<ICharacter>();
         }
         if (ReturningCards.Any()) { // 非空
             foreach (var cardInfo in ReturningCards) {

@@ -8,35 +8,102 @@ public class PlayerLogic : MonoBehaviour, ICharacter {
     public HandLogic Hand;
     public ManaLogic Mana;
     public BattleField Field;
+    public CardLogic Weapon;
     private int playerID;
-
-    private PlayerLogic(bool isEnemy, HandLogic Hand, DeckLogic Deck, ManaLogic Mana, BattleField Field) {
-        this.isEnemy = isEnemy;
-        this.Hand = Hand;
-        this.Deck = Deck;
-        this.Mana = Mana;
-        this.Field = Field;
-        playerID = IDFactory.GetID();
+    private int _health;
+    private int MaxHealth;
+    public int Health {
+        get => _health;
+        set {
+            if (_health + value > MaxHealth) {
+                _health = MaxHealth;
+            }
+            else _health += value;
+        }
     }
-
-    private static PlayerLogic you = null;
-    private static PlayerLogic opponent = null;
-
-    public int Health { get => throw new System.NotImplementedException(); set => throw new System.NotImplementedException(); }
+    public int Attack {
+        get => _attack;
+        set {
+            if (_attack + value < 0) {
+                _attack = 0;
+            }
+            else _attack = value;
+        }
+    }
+    private int _attack;
 
     public int ID { get => playerID; }
-
-    public static PlayerLogic You() {
-        if (you == null) {
-            you = new(false, HandLogic.YourHand(), DeckLogic.YourDeck(), ManaLogic.YourMana(), BattleField.YourField());
-        }
-        return you;
+    public List<Buff> Buffs {
+        get => Buffs;
+        set => Buffs = value;
     }
-    public static PlayerLogic Opponent() {
-        if (opponent == null) {
-            opponent = new(true, HandLogic.OpponentHand(), DeckLogic.OpponentDeck(), ManaLogic.OpponentMana(), BattleField.OpponentField());
-        }
-        return opponent;
+
+    private void Awake() {
+        // Draggable.OnCardUse += OnCardUseHandler;
+
+        // Draggable.OnTargetedCardUse += OnTargetedCardUseHander;
+    }
+
+    // private void OnCardUseHandler(CardLogic CL) {
+    //     if (CL.CardAssetInLogic.MaxHealth > 0) {
+    //         UseMinionCard(CL, 0);
+    //     }
+    //     else {
+    //         UseSpellCard(CL, null);
+    //     }
+    // }
+
+    // private void OnTargetedCardUseHander(CardLogic CL, Transform Target) {
+    //     if (Target.GetComponent<MinionManager>()) {
+    //         UseSpellCard(CL, Target.GetComponent<MinionManager>());
+    //     }
+    //     else if (Target.GetComponent<PlayerLogic>()) {
+    //         UseSpellCard(CL, Target.GetComponent<PlayerLogic>());
+    //     }
+    //     else {
+    //         Debug.Log("Target Error");
+    //     }
+    // }
+
+    // public void UseMinionCard(CardBase playedCard, int tablePos) {
+    //     Mana.Manas -= playedCard.Card.CurManaCost;
+    //     Field.SummonMinionAt(tablePos, new((MinionCard)playedCard.Card));
+    //     // TODO new PlayACreatureCommand(playedCard, this, tablePos, newCreature.UniqueCreatureID).AddToQueue();
+    //     Hand.DiscardCrad(playedCard);
+    //     // TODO HighlightPlayableCards();
+    // }
+
+    // public void UseSpellCard(int SpellCardID, int TargetID) {
+    //     // TODO: !!!
+    //     // if TargetUnique ID < 0 , for example = -1, there is no target.
+    //     if (TargetID < 0)
+    //         UseSpellCard(BattleControl.CardCreated[SpellCardID], null);
+    //     else if (TargetID == BattleControl.you.ID) {
+    //         UseSpellCard(BattleControl.CardCreated[SpellCardID], BattleControl.you);
+    //     }
+    //     else if (TargetID == BattleControl.opponent.ID) {
+    //         UseSpellCard(BattleControl.CardCreated[SpellCardID], BattleControl.opponent);
+    //     }
+    //     else {
+    //         // target is a creature
+    //         UseSpellCard(BattleControl.CardCreated[SpellCardID], BattleControl.MinionCreated[TargetID]);
+    //     }
+
+    // }
+    // public void UseSpellCard(CardLogic playedCard, ICharacter target) {
+    //     Mana.Manas -= playedCard.ManaCost;
+    //     // cause effect instantly:
+    //     // if (playedCard.effect != null)
+    //     //     playedCard.effect.ActivateEffect(playedCard.CardAssetInLogic.SpellDamage, target);
+    //     // else {
+    //     //     Debug.LogWarning("No effect found on card " + playedCard.CardAssetInLogic.name);
+    //     // }
+    //     // new PlayASpellCardCommand(this, playedCard).AddToQueue();
+    //     Hand.DiscardCrad(playedCard);
+    // }
+
+    public void DrawCard() {
+        Hand.GetCard(Deck.RemoveCard(0));
     }
 
     public void Die() {
