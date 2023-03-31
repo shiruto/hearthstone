@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 4733398058812576862}
   - component: {fileID: -1645747348731855977}
   - component: {fileID: 3460413234799256158}
+  - component: {fileID: -3006986779822334777}
   m_Layer: 5
   m_Name: PfbMinion
   m_TagString: Untagged
@@ -71,6 +72,20 @@ BoxCollider:
   serializedVersion: 2
   m_Size: {x: 65, y: 75, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &-3006986779822334777
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 894242916013561587}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 57e648e5db59c4590af231574328063e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  canDrag: 1
+  PfbCard: {fileID: 793903120601311278, guid: 73ac77b5731f56848a2028fa8beed353, type: 3}
 --- !u!1 &4267469516798644610
 GameObject:
   m_ObjectHideFlags: 0

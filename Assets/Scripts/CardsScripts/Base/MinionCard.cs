@@ -40,7 +40,7 @@ public abstract class MinionCard : CardBase {
         IsDivineShield = CA.isDivineShield;
         IsStealth = CA.isStealth;
         IsPoisonous = CA.isPoisonous;
-        IsWindFury = CA.AttacksChances == 2;
+        IsWindFury = CA.isWindFury;
         IsRush = CA.isRush;
         IsCharge = CA.isCharge;
         _battleCryEffects = new();
@@ -58,5 +58,6 @@ public abstract class MinionCard : CardBase {
     public override void Use() {
         BattleControl.Instance.ActivePlayer.Field.SummonMinionAt(0, new(this));
         BattleCry();
+
     }
 }

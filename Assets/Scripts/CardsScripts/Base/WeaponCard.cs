@@ -29,7 +29,7 @@ public class WeaponCard : CardBase {
     public bool IsWindFury { get; set; }
     public WeaponCard(CardAsset CA) : base(CA) {
         IsPoisonous = CA.isPoisonous;
-        IsWindFury = CA.AttacksChances == 2;
+        IsWindFury = CA.isWindFury;
     }
 
     public override void Use() {

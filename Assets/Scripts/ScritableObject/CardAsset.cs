@@ -14,9 +14,9 @@ public class CardAsset : ScriptableObject {
     [Header("Creature Info")]
     public int Attack;
     public int MaxHealth;
-    public int AttacksChances = 1;
     public int SpellDamage = 0;
     public int specialCreatureAmount;
+    public bool isWindFury;
     public bool isTaunt;
     public bool isCharge;
     public bool isRush;

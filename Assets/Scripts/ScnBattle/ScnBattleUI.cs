@@ -6,7 +6,6 @@ using UnityEngine;
 public class ScnBattleUI : MonoBehaviour {
     RaycastHit hitInfo = new();
     private List<ReturningCardInfo> ReturningCards = new();
-    public static event Action<CardAsset> OnCardUse;
     class ReturningCardInfo {
         public Transform card;
         public Vector3 ReturnPos;
@@ -18,8 +17,7 @@ public class ScnBattleUI : MonoBehaviour {
     private Ray ray;
     private void Awake() {
         Application.targetFrameRate = 60;
-
-        Draggable.OnCardReturn += OnCardReturnHandler;
+        EventManager.AddListener(VisualEvent.OnCardReturn, OnCardReturnHandler);
     }
     private void Update() {
         ray = Camera.main.ScreenPointToRay(Input.mousePosition);
@@ -38,7 +36,10 @@ public class ScnBattleUI : MonoBehaviour {
         }
     }
 
-    private void OnCardReturnHandler(Transform card, Vector3 ReturnPos) {
+    private void OnCardReturnHandler(BaseEventArgs eventData) {
+        VisualEventArgs _event = (VisualEventArgs)eventData;
+        Transform card = _event.Sender.transform;
+        Vector3 ReturnPos = _event.Destination;
         if (!ReturningCards.Exists((ReturningCardInfo a) => a.card.Equals(card))) {
             ReturningCardInfo ReturningCard = new(card, ReturnPos);
             ReturningCards.Add(ReturningCard);

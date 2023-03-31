@@ -12,6 +12,14 @@ public class PlayerLogic : MonoBehaviour, ICharacter {
     private int playerID;
     private int _health;
     private int MaxHealth;
+    private bool _isStealth;
+    public bool IsStealth { get => _isStealth; set => _isStealth = value; }
+    private bool _isImmune;
+    public bool IsImmune { get => _isImmune; set => _isImmune = value; }
+    private bool _isLifeSteal;
+    public bool IsLifeSteal { get => _isLifeSteal; set => _isLifeSteal = value; }
+    private bool _isWindFury;
+    public bool IsWindFury { get => _isWindFury; set => _isWindFury = value; }
     public int Health {
         get => _health;
         set {
@@ -31,6 +39,7 @@ public class PlayerLogic : MonoBehaviour, ICharacter {
         }
     }
     private int _attack;
+    public bool isStealth;
 
     public int ID { get => playerID; }
     public List<Buff> Buffs {
@@ -103,7 +112,7 @@ public class PlayerLogic : MonoBehaviour, ICharacter {
     // }
 
     public void DrawCard() {
-        Hand.GetCard(Deck.RemoveCard(0));
+        Hand.GetCard(-1, Deck.RemoveCard(0));
     }
 
     public void Die() {

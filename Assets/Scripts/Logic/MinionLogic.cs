@@ -7,7 +7,13 @@ public class MinionLogic : ICharacter, IIdentifiable {
     public CardAsset ca;
     private int baseHealth;
     public int MaxHealth {
-        get { return baseHealth; }
+        get {
+            int temp = 0;
+            foreach (Buff _buff in Buffs) {
+                temp += _buff.HealthChange;
+            }
+            return baseHealth + temp;
+        }
     }
     private int _health;
     public virtual int Health {
@@ -22,20 +28,32 @@ public class MinionLogic : ICharacter, IIdentifiable {
         }
     }
     public bool isFrozen;
+    public bool isTaunt;
+    private bool _canAttack;
+    private bool _windFuryAttack;
+    public bool isRush;
+    public bool isImmune;
+    public bool isStealth;
+    public bool isCharge;
+    public bool NewSummoned;
     public bool CanAttack {
-        get {
-            return (AttacksLeftThisTurn > 0) && !isFrozen;
+        get => _canAttack && !isFrozen;
+        set {
+            if (value) {
+                _windFuryAttack = IsWindFury;
+                _canAttack = true;
+            }
+            else {
+                if (_windFuryAttack) {
+                    _windFuryAttack = false;
+                }
+                else _canAttack = false;
+            }
         }
     }
-    private int attackChance = 1;
-    public int AttacksLeftThisTurn {
-        get;
-        set;
-    }
-    private int baseAttack;
-    // attack with buffs
+    private int _attack;
     public int Attack {
-        get { return baseAttack; }
+        get => _attack;
         set {
             if (value < 0) {
                 _attack = 0;
@@ -43,66 +61,83 @@ public class MinionLogic : ICharacter, IIdentifiable {
             else _attack = value;
         }
     }
-    private int _attack;
     private int MinionID;
     public int ID { get => MinionID; }
     public List<Buff> Buffs {
         get => Buffs;
         set => Buffs = value;
     }
+    private bool _isStealth;
+    public bool IsStealth { get => _isStealth; set => _isStealth = value; }
+    private bool _isImmune;
+    public bool IsImmune { get => _isImmune; set => _isImmune = value; }
+    private bool _isLifeSteal;
+    public bool IsLifeSteal { get => _isLifeSteal; set => _isLifeSteal = value; }
+    private bool _isWindFury;
+    public bool IsWindFury { get => _isWindFury; set => _isWindFury = value; }
+
     public List<Effect> DeathRattleEffects;
-    public MinionLogic(MinionCard CL) {
-        ca = CL.CA;
-        baseHealth = CL.Health;
+    public MinionLogic(MinionCard MC) {
+        ca = MC.CA;
+        baseHealth = MC.Health;
         Health = baseHealth;
-        baseAttack = CL.Attack;
-        attackChance = CL.CA.AttacksChances;
-        if (CL.CA.isCharge)
-            AttacksLeftThisTurn = attackChance;
+        _attack = MC.Attack;
         MinionID = IDFactory.GetID();
         BattleControl.MinionCreated.Add(ID, this);
-        DeathRattleEffects = new(CL.DeathRattleEffects);
+        DeathRattleEffects = new(MC.DeathRattleEffects);
+        isTaunt = MC.IsTaunt;
+        NewSummoned = true;
+        isRush = MC.IsRush;
+        isCharge = MC.IsCharge;
     }
     public MinionLogic(PlayerLogic owner, MinionCard MC) {
         ca = MC.CA;
         baseHealth = MC.Health;
         Health = baseHealth;
-        baseAttack = MC.Attack;
-        attackChance = MC.CA.AttacksChances;
-        if (MC.CA.isCharge)
-            AttacksLeftThisTurn = attackChance;
+        _attack = MC.Attack;
+        IsWindFury = MC.CA.isWindFury;
         this.owner = owner;
         MinionID = IDFactory.GetID();
         BattleControl.MinionCreated.Add(ID, this);
         DeathRattleEffects = new(MC.DeathRattleEffects);
+        NewSummoned = true;
+        isRush = MC.IsRush;
+        isCharge = MC.IsCharge;
     }
     public MinionLogic(CardAsset CA) {
         ca = CA;
         baseHealth = CA.MaxHealth;
         Health = baseHealth;
-        baseAttack = CA.Attack;
-        attackChance = CA.AttacksChances;
-        if (CA.isCharge)
-            AttacksLeftThisTurn = attackChance;
+        _attack = CA.Attack;
         MinionID = IDFactory.GetID();
         BattleControl.MinionCreated.Add(ID, this);
+        NewSummoned = true;
+        isRush = CA.isRush;
+        isCharge = CA.isCharge;
     }
     public MinionLogic(PlayerLogic owner, CardAsset CA) {
         ca = CA;
         baseHealth = CA.MaxHealth;
         Health = baseHealth;
-        baseAttack = CA.Attack;
-        attackChance = CA.AttacksChances;
-        if (CA.isCharge)
-            AttacksLeftThisTurn = attackChance;
+        _attack = CA.Attack;
         this.owner = owner;
         MinionID = IDFactory.GetID();
         BattleControl.MinionCreated.Add(ID, this);
+        NewSummoned = true;
+        isRush = CA.isRush;
+        isCharge = CA.isCharge;
     }
-
-    public void AttackMinion(MinionLogic target) {
-        AttacksLeftThisTurn--;
-        // calculate the values so that the creature does not fire the DIE command before the Attack command is sent
+    public void NewTurn() {
+        CanAttack = true;
+        NewSummoned = false;
+    }
+    public void EndTurn() {
+        if (isFrozen) {
+            isFrozen = _canAttack;
+        }
+    }
+    public virtual void AttackAgainst(ICharacter target) {
+        CanAttack = false;
         target.Health -= Attack;
         Health -= target.Attack;
     }
@@ -111,5 +146,6 @@ public class MinionLogic : ICharacter, IIdentifiable {
         foreach (Effect effect in DeathRattleEffects) {
             effect.ActivateEffect();
         }
+        BattleControl.MinionCreated.Remove(MinionID);
     }
 }

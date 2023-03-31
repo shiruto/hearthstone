@@ -682,7 +682,7 @@ GameObject:
   - component: {fileID: 6342285500362568590}
   - component: {fileID: 105307254680211606}
   - component: {fileID: 7535663363602897000}
-  - component: {fileID: 3419172478790147558}
+  - component: {fileID: 8240409539954048157}
   m_Layer: 5
   m_Name: PfbBattleCard
   m_TagString: Untagged
@@ -751,8 +751,7 @@ MonoBehaviour:
   AttackIcon: {fileID: 944984497954895628}
   CardGraphicImage: {fileID: 0}
   CardFaceGlowImage: {fileID: 0}
-  Card: {fileID: 0}
---- !u!114 &3419172478790147558
+--- !u!114 &8240409539954048157
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -761,10 +760,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 6342285500362568586}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: bee57ff1aa64849908b1d57cf8c6783d, type: 3}
+  m_Script: {fileID: 11500000, guid: b315b0c414a55494798898c450ee70c2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  canPreview: 1
   canDrag: 1
   PfbCard: {fileID: 793903120601311278, guid: 73ac77b5731f56848a2028fa8beed353, type: 3}
   ifDrawLine: 0

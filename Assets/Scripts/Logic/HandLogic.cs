@@ -6,16 +6,15 @@ using UnityEngine;
 public class HandLogic : MonoBehaviour {
     private List<CardBase> Hands;
     private int _maxHandCard = 10;
-    public static event Action<int, CardBase> OnCardGet;
-    public static event Action<CardBase> OnCardLose;
     private void Awake() {
         Hands = new();
-        Draggable.OnCardUse += UseCard;
+        EventManager.AddListener(CardEvent.OnCardUse, UseCard);
     }
     private void Start() {
         GetCard(0, new AbusiveSergeant(AssetDatabase.LoadAssetAtPath<CardAsset>("Assets/Resources/ScriptableObject/Card/Abusive Sergeant.asset")));
     }
     public void GetCard(int position, CardBase newCard) {
+        if (position == -1) position = Hands.Count;
         if (Hands.Count >= _maxHandCard) {
             Debug.Log("Too Many Cards");
             return;
@@ -26,10 +25,11 @@ public class HandLogic : MonoBehaviour {
         else {
             Hands.Insert(position, newCard);
         }
-        OnCardGet?.Invoke(Hands.Count, newCard);
+        EventManager.Invoke(EventManager.Allocate<CardEventArgs>().CreateEventArgs(CardEvent.OnCardGet, gameObject, newCard, position));
     }
 
-    public void UseCard(CardBase Card) {
+    public void UseCard(BaseEventArgs args) {
+        CardBase Card = (args as CardEventArgs).Card;
         Debug.Log("Using Card :ID = " + Card.ID + "\tname = " + Card.CA.name);
         Hands.Remove(Card);
     }

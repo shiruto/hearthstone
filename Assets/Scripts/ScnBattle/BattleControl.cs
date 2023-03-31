@@ -5,7 +5,6 @@ public class BattleControl : MonoBehaviour {
     public static PlayerLogic you;
     public static PlayerLogic opponent;
     private void Awake() {
-        Draggable.OnCardUse += OnCardUseHandler;
         Instance = this;
         CardCreated = new();
         MinionCreated = new();
@@ -32,11 +31,5 @@ public class BattleControl : MonoBehaviour {
     }
     public void OnGameEnd() {
 
-    }
-
-    public void OnCardUseHandler(CardBase CL) {
-        Debug.Log("OnCardUseHandler");
-        ActivePlayer.Field.SummonMinionAt(0, new((MinionCard)CL));
-        Debug.Log("Minion count in logic" + ActivePlayer.Field.GetMinions().Count);
     }
 }

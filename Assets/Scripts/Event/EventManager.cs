@@ -3,13 +3,14 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class EventSystem {
+public class EventManager {
     private static Dictionary<Enum, Action<BaseEventArgs>> _eventTable = new();
     #region Singleton
-    private static EventSystem _instance = null;
-    public static EventSystem Instance => _instance ?? new();
-    private EventSystem() {
-        this.Capacity = 40;
+    private static EventManager _instance = null;
+    public static EventManager Instance => _instance ??= new();
+
+    private EventManager() {
+        Capacity = 40;
         InitEvent();
     }
     #endregion
@@ -37,7 +38,7 @@ public class EventSystem {
             _eventTable[_eventType] = actions;
         }
         else {
-            Debug.LogWarning("no such event exists");
+            Debug.LogWarning("empty callback");
         }
     }
     private void CallEvent(BaseEventArgs args) {
@@ -64,50 +65,51 @@ public class EventSystem {
         recycled = new Dictionary<Type, Queue<BaseEventArgs>>();
         _eventTable = new Dictionary<Enum, Action<BaseEventArgs>>();
     }
+
     #region static functions
     public static void AddListener(Enum eventType, Action<BaseEventArgs> callback) {
-        _instance.AddEvent(eventType, callback);
+        Instance.AddEvent(eventType, callback);
     }
     public static void Invoke(BaseEventArgs args) {
-        _instance?.CallEvent(args);
+        Instance?.CallEvent(args);
     }
     public static void DelListener(Enum _eventType, Action<BaseEventArgs> action) {
-        _instance?.DelEvent(_eventType, action);
+        Instance?.DelEvent(_eventType, action);
     }
     public static void DelListener(Enum _eventType) {
-        _instance?.DelEvent(_eventType);
+        Instance?.DelEvent(_eventType);
     }
     public static void RemoveAllListener() {
-        _instance?.InitEvent();
+        Instance?.InitEvent();
     }
     #endregion
 
     #region Object pool implement
-    internal Dictionary<Type, Queue<BaseEventArgs>> recycled;
-    int Capacity { get; set; }
+    private Dictionary<Type, Queue<BaseEventArgs>> recycled;
+    public int Capacity { get; set; }
     public static T Allocate<T>() where T : BaseEventArgs, new() { // 分配
         Type type = typeof(T);
-        if (Instance.recycled.TryGetValue(type, out Queue<BaseEventArgs> args)) {
-            if (null != args && args.Count == Instance.Capacity) {
-                T arg = args.Dequeue() as T; // 从池里取值
-                arg.Dispose(); // 清空
-                return arg;
-            }
+        if (Instance.recycled.TryGetValue(type, out Queue<BaseEventArgs> args) && null != args && args.Count > 0) {
+            T arg = args.Dequeue() as T; // 从池里取值
+            arg.Dispose(); // 清空
+            return arg;
         }
         return new T();
     }
-    void Recycle(BaseEventArgs target) {
-        Type type = target.GetType();
-        if (!Instance.recycled.TryGetValue(type, out Queue<BaseEventArgs> args)) {
-            args = new Queue<BaseEventArgs>();
-        }
-        if (args.Count < Instance.Capacity && !args.Contains(target)) {
-            args.Enqueue(target);
+    void Recycle(BaseEventArgs arg) {
+        Type type = arg.GetType();
+        if (Instance.recycled.TryGetValue(type, out Queue<BaseEventArgs> args)) {
+            if (args.Count < Instance.Capacity) {
+                args.Enqueue(arg);
+                return;
+            }
         }
         else {
-            target.Dispose();
+            args = new Queue<BaseEventArgs>();
+            args.Enqueue(arg);
+            Instance.recycled.Add(type, args);
         }
-        Instance.recycled[type] = args;
+        arg.Dispose();
     }
     #endregion
 }

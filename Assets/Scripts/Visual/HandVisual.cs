@@ -9,8 +9,8 @@ public class HandVisual : MonoBehaviour {
     public GameObject PfbBattleCard;
     Vector3 pivot = new(0, 0, 0);
     private void Awake() {
-        HandLogic.OnCardGet += OnCardGetHandler;
-        EventSystem.AddListener(CardEvent.OnCardUse, OnCardUseHandler);
+        EventManager.AddListener(CardEvent.OnCardGet, OnCardGetHandler);
+        EventManager.AddListener(CardEvent.OnCardUse, OnCardUseHandler);
     }
     void Start() {
         foreach (Transform child in transform) {
@@ -19,7 +19,10 @@ public class HandVisual : MonoBehaviour {
         Align();
     }
 
-    private void OnCardGetHandler(int position, CardBase newCard) {
+    private void OnCardGetHandler(BaseEventArgs _eventData) {
+        CardEventArgs _event = _eventData as CardEventArgs;
+        int position = _event.position;
+        CardBase newCard = _event.Card;
         Transform newCardTrans = Instantiate(PfbBattleCard, transform).transform;
         newCardTrans.GetComponent<BattleCardManager>().Card = newCard;
         newCardTrans.GetComponent<BattleCardManager>().ReadFromAsset();
@@ -34,7 +37,7 @@ public class HandVisual : MonoBehaviour {
 
     private void OnCardUseHandler(BaseEventArgs eventData) {
         CardBase CardToLose = (eventData as CardEventArgs).Card;
-        Transform temp = CardTrans.Where((Transform a) => a.GetComponent<BattleCardManager>().Card == CardToLose).First();
+        Transform temp = CardTrans.First((Transform a) => a.GetComponent<BattleCardManager>().Card == CardToLose);
         CardTrans.Remove(temp);
         Destroy(temp.gameObject);
     }

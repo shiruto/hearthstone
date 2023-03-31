@@ -9,22 +9,21 @@ public class LineDrawer : MonoBehaviour {
     private Transform Arrow;
     private Transform LineTrans;
     public GameObject PfbLine;
-    public event Func<bool> isTarget;
-
     private void Awake() {
         LineTrans = Instantiate(PfbLine, transform).transform;
         Target = LineTrans.GetChild(2);
         LR = LineTrans.GetChild(0).GetComponent<LineRenderer>();
         Arrow = LineTrans.GetChild(1);
         LineTrans.gameObject.SetActive(false);
-
-        GetComponent<Draggable>().DrawLine += DrawLineHandler;
+        EventManager.AddListener(VisualEvent.DrawLine, DrawLineHandler);
     }
-
-    private void DrawLineHandler(Vector3 StartPos, Vector3 EndPos) {
+    private void DrawLineHandler(BaseEventArgs eventData) {
+        Debug.Log("Drawing Line");
+        VisualEventArgs _event = eventData as VisualEventArgs;
+        Vector3 StartPos = _event.StartPos;
+        Vector3 EndPos = _event.Destination;
         LineTrans.gameObject.SetActive(true);
         Target.gameObject.SetActive(false);
-
         Arrow.position = EndPos;
         LR.SetPosition(0, StartPos);
         LR.SetPosition(1, EndPos);
