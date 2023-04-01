@@ -10,6 +10,5 @@ public abstract class SpellCard : CardBase {
     }
     public override void Use() {
         Debug.Log("Use a Spell Card");
-
     }
 }

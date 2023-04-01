@@ -30,11 +30,11 @@ public class ManaLogic : MonoBehaviour {
             if (crystalNum == MaxCrystalNum) {
                 // TODO give a spell card with 'draw a card' effect
             }
-            else if (crystalNum + value > MaxCrystalNum) {
+            else if (value > MaxCrystalNum) {
                 crystalNum = MaxCrystalNum;
             }
             else {
-                crystalNum += value;
+                crystalNum = value;
             }
         }
     }

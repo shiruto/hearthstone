@@ -167,8 +167,7 @@ public class SelectedCards : MonoBehaviour {
     }
 
     private int SelectedNumber(CardAsset CA) {
-        int num = 0;
-        if (CardDictionary.TryGetValue(CA, out num)) {
+        if (CardDictionary.TryGetValue(CA, out int num)) {
             return num;
         }
         else return 0;

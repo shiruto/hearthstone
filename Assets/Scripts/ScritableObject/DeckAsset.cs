@@ -8,6 +8,7 @@ public class DeckAsset : ScriptableObject {
     public GameDataAsset.ClassType DeckClass;
     public List<CardAsset> myCardAssets;
     public List<int> myCardNums;
+    public int SkinID;
     public DeckAsset(DeckAsset DA) {
         this.Order = DA.Order;
         this.DeckClass = DA.DeckClass;

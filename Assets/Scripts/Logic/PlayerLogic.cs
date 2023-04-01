@@ -42,10 +42,8 @@ public class PlayerLogic : MonoBehaviour, ICharacter {
     public bool isStealth;
 
     public int ID { get => playerID; }
-    public List<Buff> Buffs {
-        get => Buffs;
-        set => Buffs = value;
-    }
+    private List<Buff> _buffs;
+    public List<Buff> Buffs { get => _buffs; set => _buffs = value; }
 
     private void Awake() {
         // Draggable.OnCardUse += OnCardUseHandler;
@@ -112,7 +110,7 @@ public class PlayerLogic : MonoBehaviour, ICharacter {
     // }
 
     public void DrawCard() {
-        Hand.GetCard(-1, Deck.RemoveCard(0));
+        Hand.GetCard(-1, Deck.RemoveCardFromDeckAt(0));
     }
 
     public void Die() {

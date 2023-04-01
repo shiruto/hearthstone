@@ -27,9 +27,15 @@ public enum MinionEvent {
 }
 
 public enum ManaEvent {
-    OnManaSpend
+    OnManaSpend,
+    TemporaryCrystal
 }
 
 public enum HeroEvent {
     AfterHeroAttack
+}
+
+public enum DeckEvent {
+    OnDeckSelect,
+    OnDeckComfirm
 }

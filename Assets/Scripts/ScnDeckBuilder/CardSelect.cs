@@ -16,13 +16,10 @@ public class CardSelect : MonoBehaviour {
     private readonly int MaxPageSize = 8;
     private List<int> PageSize = new();
     private string LastClassFilter = "";
-    private Dictionary<string, int> ClassIndex = new();
+    public Dictionary<GameDataAsset.ClassType, int> ClassIndex = new();
     private Transform TxtPage;
     public static event Func<CardAsset, int> SelectedNum;
-    public GameObject PfbCardFrame;
-
     private void Awake() {
-        ClassIndexInitialize();
         CardLibrary = new List<CardAsset>(Resources.LoadAll<CardAsset>("ScriptableObject/Card"));
         CardLibrary.Sort((CardAsset a, CardAsset b) => {
             if (a.ClassType != b.ClassType) {
@@ -58,15 +55,18 @@ public class CardSelect : MonoBehaviour {
     private void Initialize() {
         PageSize.Clear();
         PageSize.Add(0);
+        foreach (GameDataAsset.ClassType classType in Enum.GetValues(typeof(GameDataAsset.ClassType))) {
+            ClassIndex[classType] = 0;
+        }
         for (int i = 0, j = 0; i < AvailableCards.Count; i++) { // i 为卡牌 j 为当前页的卡牌 初始化所有页的卡牌数
-            if (j == MaxPageSize) { // 本页卡牌到达上限
+            if ((j != 0) && AvailableCards[i - 1].ClassType != AvailableCards[i].ClassType) { // 某一职业卡牌全部加载完毕
                 PageSize.Add(j + PageSize[^1]);
+                ClassIndex[AvailableCards[i].ClassType] = PageSize.Count - 1; // 记下每个职业对应的开始页码
                 j = 0;
                 i--;
             }
-            else if ((j != 0) && AvailableCards[i - 1].ClassType != AvailableCards[i].ClassType) { // 某一职业卡牌全部加载完毕
+            else if (j == MaxPageSize) { // 本页卡牌到达上限
                 PageSize.Add(j + PageSize[^1]);
-                ClassIndex[AvailableCards[i].ClassType.ToString("G")] = PageSize.Count - 1; // 记下每个职业对应的开始页码
                 j = 0;
                 i--;
             }
@@ -79,7 +79,6 @@ public class CardSelect : MonoBehaviour {
         }
         Load(0);
     }
-
     private void Load(int PageIndex) {
         if (PageIndex > PageSize.Count - 1) {
             Debug.Log("Page Index Out of Range");
@@ -105,7 +104,7 @@ public class CardSelect : MonoBehaviour {
             }
         }
         BtnLastPage.gameObject.SetActive(PageIndex != 0);
-        BtnNextPage.gameObject.SetActive(PageIndex != PageSize.Count - 1);
+        BtnNextPage.gameObject.SetActive(PageIndex != PageSize.Count - 2);
         PageNum = PageIndex;
         TxtPage.GetComponent<TextMeshProUGUI>().text = PageNum + 1 + "/" + (PageSize.Count - 1);
     }
@@ -131,7 +130,7 @@ public class CardSelect : MonoBehaviour {
             LastClassFilter = "";
         }
         else {
-            Load(ClassIndex[ClassName]);
+            Load(ClassIndex[(GameDataAsset.ClassType)Enum.Parse(typeof(GameDataAsset.ClassType), ClassName)]);
             LastClassFilter = ClassName;
         }
     }
@@ -172,20 +171,6 @@ public class CardSelect : MonoBehaviour {
 
     private void OnSelectedCardChangeHandler() {
         Load(PageNum);
-    }
-
-    private void ClassIndexInitialize() {
-        ClassIndex.Add("DemonHunter", 0);
-        ClassIndex.Add("Druid", 0);
-        ClassIndex.Add("Hunter", 0);
-        ClassIndex.Add("Mage", 0);
-        ClassIndex.Add("Paladin", 0);
-        ClassIndex.Add("Priest", 0);
-        ClassIndex.Add("Rouge", 0);
-        ClassIndex.Add("Shaman", 0);
-        ClassIndex.Add("Warloc", 0);
-        ClassIndex.Add("Warrior", 0);
-        ClassIndex.Add("Neutral", 0);
     }
 
 }
