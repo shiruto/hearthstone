@@ -27,8 +27,8 @@ public abstract class Draggable : MonoBehaviour {
         if (TargetTrans.GetComponent<MinionManager>()) {
             Targeting = TargetTrans.GetComponent<MinionManager>().ML;
         }
-        else if (TargetTrans.GetComponent<PlayerLogic>()) {
-            Targeting = TargetTrans.GetComponent<PlayerLogic>();
+        else if (TargetTrans.GetComponent<PlayerVisual>()) {
+            Targeting = TargetTrans.GetComponent<PlayerVisual>().Player;
         }
         return Targeting;
     }

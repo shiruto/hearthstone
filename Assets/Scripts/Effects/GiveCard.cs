@@ -1,9 +1,9 @@
 public class GiveCard : Effect {
-    CardBase CardToGive;
+    CardViewController CardToGive;
     int position;
     PlayerLogic player;
     public override string Name => "Give Card Effect";
-    public GiveCard(PlayerLogic player, int position, CardBase cardToGive) {
+    public GiveCard(PlayerLogic player, int position, CardViewController cardToGive) {
         this.player = player;
         this.position = position;
         CardToGive = cardToGive;

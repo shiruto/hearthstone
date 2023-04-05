@@ -1,19 +1,24 @@
-using System;
 using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 
-public class HandLogic : MonoBehaviour {
-    private List<CardBase> Hands;
+public class HandLogic {
+    public List<CardViewController> Hands;
     private int _maxHandCard = 10;
-    private void Awake() {
+
+    public HandLogic() {
         Hands = new();
         EventManager.AddListener(CardEvent.OnCardUse, UseCard);
+        EventManager.AddListener(CardEvent.OnCardDraw, DrawCardHandler);
+        // GetCard(0, new AbusiveSergeant(AssetDatabase.LoadAssetAtPath<CardAsset>("Assets/Resources/ScriptableObject/Card/Abusive Sergeant.asset")));
     }
-    private void Start() {
-        GetCard(0, new AbusiveSergeant(AssetDatabase.LoadAssetAtPath<CardAsset>("Assets/Resources/ScriptableObject/Card/Abusive Sergeant.asset")));
+
+    private void DrawCardHandler(BaseEventArgs e) {
+        CardEventArgs _event = e as CardEventArgs;
+        GetCard(-1, _event.Card);
     }
-    public void GetCard(int position, CardBase newCard) {
+
+    public void GetCard(int position, CardViewController newCard) {
         if (position == -1) position = Hands.Count;
         if (Hands.Count >= _maxHandCard) {
             Debug.Log("Too Many Cards");
@@ -25,13 +30,18 @@ public class HandLogic : MonoBehaviour {
         else {
             Hands.Insert(position, newCard);
         }
-        EventManager.Invoke(EventManager.Allocate<CardEventArgs>().CreateEventArgs(CardEvent.OnCardGet, gameObject, newCard, position));
+        EventManager.Invoke(EventManager.Allocate<CardEventArgs>().CreateEventArgs(CardEvent.OnCardGet, null, newCard, position));
     }
 
     public void UseCard(BaseEventArgs args) {
         CardBase Card = (args as CardEventArgs).Card;
-        Debug.Log("Using Card :ID = " + Card.ID + "\tname = " + Card.CA.name);
         Hands.Remove(Card);
+        EventManager.Invoke(EventManager.Allocate<CardEventArgs>().CreateEventArgs(CardEvent.OnCardUse, null, Card));
+    }
+
+    public void CardDiscard(CardBase Card) {
+        Hands.Remove(Card);
+        EventManager.Invoke(EventManager.Allocate<CardEventArgs>().CreateEventArgs(CardEvent.OnCardDiscard, null, Card));
     }
 
     public void ChangeMaxHandCard(int newMaxHandCardNum) {

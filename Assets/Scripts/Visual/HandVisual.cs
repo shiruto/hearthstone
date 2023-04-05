@@ -1,13 +1,16 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using Unity.VisualScripting;
 using UnityEditor;
 using UnityEngine;
 
 public class HandVisual : MonoBehaviour {
+    public HandLogic Hand;
     public List<Transform> CardTrans = new();
     public GameObject PfbBattleCard;
-    Vector3 pivot = new(0, 0, 0);
+    Vector3 pivot = Vector3.zero;
+
     private void Awake() {
         EventManager.AddListener(CardEvent.OnCardGet, OnCardGetHandler);
         EventManager.AddListener(CardEvent.OnCardUse, OnCardUseHandler);
@@ -16,7 +19,7 @@ public class HandVisual : MonoBehaviour {
         foreach (Transform child in transform) {
             CardTrans.Add(child);
         }
-        Align();
+        AlignTheCards();
     }
 
     private void OnCardGetHandler(BaseEventArgs _eventData) {
@@ -32,7 +35,7 @@ public class HandVisual : MonoBehaviour {
         else {
             CardTrans.Insert(position, newCardTrans);
         }
-        Align();
+        AlignTheCards();
     }
 
     private void OnCardUseHandler(BaseEventArgs eventData) {
@@ -41,7 +44,8 @@ public class HandVisual : MonoBehaviour {
         CardTrans.Remove(temp);
         Destroy(temp.gameObject);
     }
-    private void Align() { // 重新排列卡牌 需要实现创建新增卡牌和销毁旧卡牌
+
+    private void AlignTheCards() {
         int Dis = 76;
         Debug.Log("Align");
         if (CardTrans.Count > 6) {

@@ -2,31 +2,31 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class DeckLogic : MonoBehaviour {
+public class DeckLogic {
     private readonly int MaxCardNum = 60;
-    public List<CardBase> Deck;
-    private enum Sum { Empty, LastOne, Less, Medium, Alot, Full }
+
+    public List<CardViewController> Deck = new();
 
     public void DrawCards(int Num) {
         for (; Num > 0; Num--) {
-            EventManager.Invoke(EventManager.Allocate<CardEventArgs>().CreateEventArgs(CardEvent.OnCardDraw, gameObject, RemoveCardFromDeckAt(0)));
+            EventManager.Invoke(EventManager.Allocate<CardEventArgs>().CreateEventArgs(CardEvent.OnCardDraw, null, RemoveCardFromDeckAt(0)));
         }
     }
 
-    public CardBase RemoveCardFromDeckAt(int index) {
-        CardBase Card = Deck[index];
+    public CardViewController RemoveCardFromDeckAt(int index) {
+        CardViewController Card = Deck[index];
         Deck.RemoveAt(index);
+        EventManager.Invoke(EventManager.Allocate<EmptyParaArgs>().CreateEventArgs(EmptyParaEvent.DeckVisualUpdate));
         return Card;
     }
 
     public void SortDeck() {
-        Deck.Sort((CardBase a, CardBase b) => {
-            return a.CurManaCost.CompareTo(b.CurManaCost);
-        });
+        Deck.Sort((CardViewController a, CardViewController b) => a.ManaCost.CompareTo(b.ManaCost));
     }
 
-    public void AddCardToDeck(CardBase Card) {
-        if (Deck.Count < MaxCardNum) Deck.Add(Card);
+    public void AddCardToDeck(int position, CardViewController Card) {
+        if (Deck.Count == 0) Deck.Add(Card);
+        else if (Deck.Count < MaxCardNum) Deck.Insert(position, Card);
         else Debug.Log("Too Many Cards in Deck");
     }
 

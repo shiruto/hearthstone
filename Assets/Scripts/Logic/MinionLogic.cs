@@ -3,9 +3,15 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class MinionLogic : ICharacter, IIdentifiable {
+    # region minion property
     public PlayerLogic owner;
     public CardAsset ca;
+
+    private int MinionID;
+    public int ID { get => MinionID; }
+
     private int baseHealth;
+    private int _health;
     public int MaxHealth {
         get {
             int temp = 0;
@@ -15,7 +21,6 @@ public class MinionLogic : ICharacter, IIdentifiable {
             return baseHealth + temp;
         }
     }
-    private int _health;
     public virtual int Health {
         get => _health;
         set {
@@ -27,17 +32,21 @@ public class MinionLogic : ICharacter, IIdentifiable {
             else _health = value;
         }
     }
-    public bool isFrozen;
-    public bool isTaunt;
+
+    private int _attack;
+    public int Attack {
+        get => _attack;
+        set {
+            if (value < 0) {
+                _attack = 0;
+            }
+            else _attack = value;
+        }
+    }
     private bool _canAttack;
     private bool _windFuryAttack;
-    public bool isRush;
-    public bool isImmune;
-    public bool isStealth;
-    public bool isCharge;
-    public bool NewSummoned;
     public bool CanAttack {
-        get => _canAttack && !isFrozen;
+        get => _canAttack && !isFrozen && BattleControl.Instance.ActivePlayer == owner;
         set {
             if (value) {
                 _windFuryAttack = IsWindFury;
@@ -51,22 +60,13 @@ public class MinionLogic : ICharacter, IIdentifiable {
             }
         }
     }
-    private int _attack;
-    public int Attack {
-        get => _attack;
-        set {
-            if (value < 0) {
-                _attack = 0;
-            }
-            else _attack = value;
-        }
-    }
-    private int MinionID;
-    public int ID { get => MinionID; }
-    public List<Buff> Buffs {
-        get => Buffs;
-        set => Buffs = value;
-    }
+
+    public bool isFrozen;
+    public bool isTaunt;
+    public bool isRush;
+    public bool isImmune;
+    public bool isStealth;
+    public bool isCharge;
     private bool _isStealth;
     public bool IsStealth { get => _isStealth; set => _isStealth = value; }
     private bool _isImmune;
@@ -75,8 +75,14 @@ public class MinionLogic : ICharacter, IIdentifiable {
     public bool IsLifeSteal { get => _isLifeSteal; set => _isLifeSteal = value; }
     private bool _isWindFury;
     public bool IsWindFury { get => _isWindFury; set => _isWindFury = value; }
-
+    public bool NewSummoned;
+    public List<Buff> Buffs {
+        get => Buffs;
+        set => Buffs = value;
+    }
     public List<Effect> DeathRattleEffects;
+    #endregion
+
     public MinionLogic(MinionCard MC) {
         ca = MC.CA;
         baseHealth = MC.Health;
@@ -127,25 +133,31 @@ public class MinionLogic : ICharacter, IIdentifiable {
         isRush = CA.isRush;
         isCharge = CA.isCharge;
     }
+
     public void NewTurn() {
         CanAttack = true;
         NewSummoned = false;
     }
+
     public void EndTurn() {
         if (isFrozen) {
             isFrozen = _canAttack;
         }
     }
-    public virtual void AttackAgainst(ICharacter target) {
+
+    public void AttackAgainst(ICharacter target) {
         CanAttack = false;
         target.Health -= Attack;
         Health -= target.Attack;
     }
+
     public void Die() {
-        owner.Field.GetMinions().Remove(this);
+        owner.Field.RemoveMinion(this);
         foreach (Effect effect in DeathRattleEffects) {
             effect.ActivateEffect();
         }
-        BattleControl.MinionCreated.Remove(MinionID);
+        BattleControl.MinionCreated.Remove(MinionID); // record the sequence of summon order
+        EventManager.Invoke(EventManager.Allocate<MinionEventArgs>().CreateEventArgs(MinionEvent.AfterMinionDie, null, this));
     }
+
 }

@@ -4,7 +4,8 @@ public enum CardEvent {
     OnCardDraw,
     OnCardLose,
     OnCardChange,
-    OnCardDiscard
+    OnCardDiscard,
+    OnHeroPowerUse
 }
 
 public enum VisualEvent {
@@ -14,7 +15,8 @@ public enum VisualEvent {
 
 public enum TurnEvent {
     OnTurnStart,
-    OnTurnEnd
+    OnTurnEnd,
+    OnGameOver
 }
 
 public enum MinionEvent {
@@ -38,4 +40,10 @@ public enum HeroEvent {
 public enum DeckEvent {
     OnDeckSelect,
     OnDeckComfirm
+}
+
+public enum EmptyParaEvent {
+    ManaVisualUpdate,
+    FieldVisualUpdate,
+    DeckVisualUpdate
 }
