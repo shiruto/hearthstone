@@ -5,7 +5,8 @@ public enum CardEvent {
     OnCardLose,
     OnCardChange,
     OnCardDiscard,
-    OnHeroPowerUse
+    OnHeroPowerUse,
+    OnDiscover
 }
 
 public enum VisualEvent {

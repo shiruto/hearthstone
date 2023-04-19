@@ -1,4 +1,3 @@
-using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
@@ -22,6 +21,7 @@ public class DiscoverPnlController : MonoBehaviour {
             _isHide = !_isHide;
             (BtnHide.transform.GetChild(0).GetComponent<TextMeshProUGUI>().text, _txt) = (_txt, BtnHide.transform.GetChild(0).GetComponent<TextMeshProUGUI>().text);
         });
+        gameObject.SetActive(false);
     }
 
 

@@ -40,7 +40,6 @@ public class BattleControl : MonoBehaviour {
     }
 
     public ICharacter Targeting;
-    public List<Transform> Options = new();
 
     private void Awake() {
         Instance = this;
@@ -134,9 +133,14 @@ public class BattleControl : MonoBehaviour {
         PnlDiscover.SetActive(true);
         int index = 0;
         foreach (Transform child in PnlDiscover.transform.GetChild(1)) {
-            Options.Add(child);
-            child.GetComponent<BattleCardViewController>().Card = _cards[index];
-            child.GetComponent<BattleCardViewController>().ReadFromAsset();
+            if (index >= _cards.Count) {
+                child.gameObject.SetActive(false);
+            }
+            else {
+                child.gameObject.SetActive(true);
+                child.GetComponent<BattleCardViewController>().Card = _cards[index];
+                child.GetComponent<BattleCardViewController>().ReadFromAsset();
+            }
             index++;
         }
     }

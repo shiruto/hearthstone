@@ -43,7 +43,7 @@ public class DeckList : MonoBehaviour {
         }
     }
 
-    private void LoadDeck() { // TODO wrong order
+    private void LoadDeck() { // TODO: wrong order
         AssetDatabase.Refresh();
         DeckAssetList = new List<DeckAsset>(Resources.LoadAll<DeckAsset>("ScriptableObject/Deck"));
         DeckAssetList.Sort((DeckAsset a, DeckAsset b) => a.Order.CompareTo(b.Order));

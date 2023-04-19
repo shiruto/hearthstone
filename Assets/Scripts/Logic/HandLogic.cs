@@ -1,6 +1,4 @@
 using System.Collections.Generic;
-using Unity.VisualScripting;
-using UnityEditor;
 using UnityEngine;
 
 public class HandLogic {
@@ -42,7 +40,6 @@ public class HandLogic {
         if (evt.Player == owner) {
             CardBase Card = evt.Card;
             RemoveCard(Card);
-            EventManager.Invoke(EventManager.Allocate<CardEventArgs>().CreateEventArgs(CardEvent.OnCardUse, null, owner, Card));
         }
     }
 

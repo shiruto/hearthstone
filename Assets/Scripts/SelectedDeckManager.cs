@@ -1,7 +1,4 @@
-using System.Collections;
-using System.Collections.Generic;
 using TMPro;
-using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -16,9 +13,9 @@ public class SelectedDeckManager : MonoBehaviour {
 
     private void ReadFromAsset(BaseEventArgs _eventData) {
         DeckEventArgs _event = _eventData as DeckEventArgs;
-        // TODO DeckPic = _event.Deck.;
+        // TODO: DeckPic = _event.Deck.;
         DeckName.text = _event.Deck.name;
-        SkillCost.text = 2 + ""; // TODO
+        SkillCost.text = 2 + "";
         //TODO SkillPic = _event.Deck.ClassType
     }
 }

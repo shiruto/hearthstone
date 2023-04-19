@@ -1,5 +1,3 @@
-using UnityEngine;
-
 public class AbusiveSergeant : MinionCard {
     public AbusiveSergeant(CardAsset CA) : base(CA) {
         ifDrawLine = true;

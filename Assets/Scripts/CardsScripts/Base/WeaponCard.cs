@@ -1,6 +1,4 @@
-using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
 
 public abstract class WeaponCard : CardBase {
     private int _attack;
@@ -18,6 +16,7 @@ public abstract class WeaponCard : CardBase {
         set {
             if (value < 0) {
                 _durability = value;
+                Die();
             }
             else _durability = value;
         }
@@ -34,7 +33,14 @@ public abstract class WeaponCard : CardBase {
     }
 
     public override void Use() {
+        owner.Weapon?.Die();
         owner.Weapon = this;
+    }
+
+    private void Die() {
+        foreach (Effect e in DeathRattleEffects) {
+            e.ActivateEffect();
+        }
     }
 
 }

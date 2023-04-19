@@ -51,9 +51,9 @@ public class DraggableCard : Draggable {
                 GetComponent<BattleCardViewController>().Card.Target = GetTarget();
                 if (GetComponent<BattleCardViewController>().Card.Target != null) {
                     GetComponent<BattleCardViewController>().Card.Use();
+                    EventManager.Invoke(EventManager.Allocate<CardEventArgs>().CreateEventArgs(CardEvent.OnCardUse, gameObject, BattleControl.Instance.ActivePlayer, GetComponent<BattleCardViewController>().Card));
                 }
-                // TODO: use here?
-                EventManager.Invoke(EventManager.Allocate<CardEventArgs>().CreateEventArgs(CardEvent.OnCardUse, gameObject, BattleControl.Instance.ActivePlayer, GetComponent<BattleCardViewController>().Card));
+
             }
             else {
                 EventManager.Invoke(EventManager.Allocate<CardEventArgs>().CreateEventArgs(CardEvent.OnCardUse, gameObject, BattleControl.Instance.ActivePlayer, GetComponent<BattleCardViewController>().Card));

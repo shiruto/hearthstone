@@ -31,7 +31,8 @@
         "**/*.csproj": true,
         "**/*.sln": true,
         "**/*./dll": true,
-        "**/Temp": true
+        "**/Temp": true,
+        "**/UIElementsSchema": true
     },
     "omnisharp.sdkPath": "/usr/local/share/dotnet/sdk/7.0.202",
     "omnisharp.useEditorFormattingSettings": false,

@@ -17,7 +17,7 @@ public class PlayerLogic : ICharacter {
     public bool isEnemy;
     private int playerID;
     public int ID { get => playerID; }
-    private readonly int MaxHealth = 30;
+    private int MaxHealth = 30;
     private int _health = 30;
     public int Health {
         get => _health;

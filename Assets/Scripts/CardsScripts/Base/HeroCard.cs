@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class HeroCard : CardBase {
-    // TODO
+    // TODO:
     public HeroCard(CardAsset CA) : base(CA) {
     }
 
