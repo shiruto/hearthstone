@@ -1,23 +1,15 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class StarterOptionController : MonoBehaviour {
-    Transform CancelTrans;
-    private bool _isCancelled;
-    public bool IsCancelled {
-        get {
-            _isCancelled = !_isCancelled;
-            return _isCancelled;
-        }
-    }
+    public Transform CancelTrans;
+    public bool IsCancelled;
 
     private void Awake() {
-        CancelTrans = transform.Find("Cancel");
-        _isCancelled = false;
+        IsCancelled = false;
     }
 
     private void OnMouseDown() {
+        IsCancelled = !IsCancelled;
         CancelTrans.gameObject.SetActive(IsCancelled);
     }
 }

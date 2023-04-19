@@ -2,12 +2,14 @@ using System;
 using UnityEngine;
 
 public class TurnEventArgs : BaseEventArgs {
+
     public int TurnNum;
-    public bool isOver;
-    public TurnEventArgs CreateEventArgs(Enum eventType, GameObject sender, int TurnNum, bool isOver = false) {
-        CreateEventArgs(eventType, sender);
+    public GameDataAsset.GameStatus status;
+
+    public TurnEventArgs CreateEventArgs(Enum eventType, GameObject sender, PlayerLogic player, int TurnNum, GameDataAsset.GameStatus status = GameDataAsset.GameStatus.Playing) {
+        CreateEventArgs(eventType, sender, player);
         this.TurnNum = TurnNum;
-        this.isOver = isOver;
+        this.status = status;
         return this;
     }
 }

@@ -23,8 +23,8 @@ public class FieldVisual : MonoBehaviour {
         MinionLogic ML = _event.minion;
         var M = Instantiate(PfbMinion, transform);
         M.transform.localPosition = new(0, 0, 0);
-        M.GetComponent<MinionManager>().ML = ML;
-        M.GetComponent<MinionManager>().ReadFromMinionLogic();
+        M.GetComponent<MinionViewController>().ML = ML;
+        M.GetComponent<MinionViewController>().ReadFromMinionLogic();
         if (MinionsOnField.Count == 0) {
             MinionsOnField.Add(M.transform);
         }
@@ -34,7 +34,7 @@ public class FieldVisual : MonoBehaviour {
 
     public void MinionDie(BaseEventArgs _eventData) {
         MinionLogic minion = (_eventData as MinionEventArgs).minion;
-        MinionsOnField.Remove(MinionsOnField.First((Transform a) => a.GetComponent<MinionManager>().ML == minion));
+        MinionsOnField.Remove(MinionsOnField.First((Transform a) => a.GetComponent<MinionViewController>().ML == minion));
         AlignTheField();
     }
 

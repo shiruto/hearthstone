@@ -32,7 +32,7 @@ public class CardPrevManager : MonoBehaviour {
         if (canPreview) {
             float DiffY = transform.position.y - 610;
             CardPreview = Instantiate(PfbCard, transform.parent.parent.parent);
-            CardPreview.GetComponent<CardManager>().cardAsset = cardAsset;
+            CardPreview.GetComponent<CardViewController>().CA = cardAsset;
             if (DiffY > 380) {
                 DiffY = 380;
             }
@@ -41,7 +41,7 @@ public class CardPrevManager : MonoBehaviour {
             }
             CardPreview.transform.localPosition = new(-220, DiffY, 0);
             CardPreview.transform.localScale = new(1.5f, 1.5f, 1.5f);
-            CardPreview.GetComponent<CardManager>().ReadFromAsset();
+            CardPreview.GetComponent<CardViewController>().ReadFromAsset();
         }
     }
 

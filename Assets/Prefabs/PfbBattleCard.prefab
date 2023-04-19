@@ -681,8 +681,8 @@ GameObject:
   m_Component:
   - component: {fileID: 6342285500362568590}
   - component: {fileID: 105307254680211606}
-  - component: {fileID: 7535663363602897000}
   - component: {fileID: 8240409539954048157}
+  - component: {fileID: 579617058853144218}
   m_Layer: 5
   m_Name: PfbBattleCard
   m_TagString: Untagged
@@ -730,27 +730,6 @@ BoxCollider:
   serializedVersion: 2
   m_Size: {x: 114, y: 176, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
---- !u!114 &7535663363602897000
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6342285500362568586}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7fdc529140ca74835991d38715385289, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  NameText: {fileID: 4248210935261322438}
-  ManaCostText: {fileID: 5892381678928760044}
-  DescriptionText: {fileID: 1254735965563909972}
-  HealthText: {fileID: 680023185519691383}
-  AttackText: {fileID: 7277092082079310829}
-  HealthIcon: {fileID: 7815957934942691610}
-  AttackIcon: {fileID: 944984497954895628}
-  CardGraphicImage: {fileID: 0}
-  CardFaceGlowImage: {fileID: 0}
 --- !u!114 &8240409539954048157
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -766,6 +745,27 @@ MonoBehaviour:
   canDrag: 1
   PfbCard: {fileID: 793903120601311278, guid: 73ac77b5731f56848a2028fa8beed353, type: 3}
   ifDrawLine: 0
+--- !u!114 &579617058853144218
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6342285500362568586}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e86ed5d4c98ff4858b72d997a2919e21, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  NameText: {fileID: 4248210935261322438}
+  ManaCostText: {fileID: 5892381678928760044}
+  DescriptionText: {fileID: 1254735965563909972}
+  HealthText: {fileID: 680023185519691383}
+  AttackText: {fileID: 7277092082079310829}
+  HealthIcon: {fileID: 7815957934942691610}
+  AttackIcon: {fileID: 944984497954895628}
+  CardGraphicImage: {fileID: 460406936940536656}
+  CardFaceGlowImage: {fileID: 0}
 --- !u!1 &7517242864820602009
 GameObject:
   m_ObjectHideFlags: 0

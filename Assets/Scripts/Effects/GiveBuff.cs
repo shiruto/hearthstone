@@ -9,7 +9,7 @@ public class GiveBuff : Effect {
         BuffToGive = buff;
     }
     public override void ActivateEffect() {
-        BattleControl.Instance.Targeting.Buffs.Add(BuffToGive);
+        BattleControl.Instance.Targeting.Buffs.Add(BuffToGive); // TODO: change? target
     }
 
 }

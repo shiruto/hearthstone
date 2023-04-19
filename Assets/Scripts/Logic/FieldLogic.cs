@@ -3,6 +3,7 @@ using UnityEngine;
 
 public class FieldLogic {
     private List<MinionLogic> Minions = null;
+    public PlayerLogic owner;
 
     public FieldLogic() {
         Minions = new(7);
@@ -11,7 +12,7 @@ public class FieldLogic {
     public void SummonMinionAt(int position, MinionLogic MinionToSummon) {
         if (Minions.Count == 0) Minions.Add(MinionToSummon);
         else Minions.Insert(position, MinionToSummon);
-        EventManager.Invoke(EventManager.Allocate<MinionEventArgs>().CreateEventArgs(MinionEvent.AfterMinionSummon, null, MinionToSummon, position));
+        EventManager.Invoke(EventManager.Allocate<MinionEventArgs>().CreateEventArgs(MinionEvent.AfterMinionSummon, null, owner, MinionToSummon, position));
     }
 
     public void RemoveMinion(MinionLogic Minion) {

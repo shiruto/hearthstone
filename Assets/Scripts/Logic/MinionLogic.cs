@@ -46,7 +46,7 @@ public class MinionLogic : ICharacter, IIdentifiable {
     private bool _canAttack;
     private bool _windFuryAttack;
     public bool CanAttack {
-        get => _canAttack && !isFrozen && BattleControl.Instance.ActivePlayer == owner;
+        get => _canAttack && !IsFrozen && BattleControl.Instance.ActivePlayer == owner;
         set {
             if (value) {
                 _windFuryAttack = IsWindFury;
@@ -61,7 +61,6 @@ public class MinionLogic : ICharacter, IIdentifiable {
         }
     }
 
-    public bool isFrozen;
     public bool isTaunt;
     public bool isRush;
     public bool isImmune;
@@ -75,6 +74,8 @@ public class MinionLogic : ICharacter, IIdentifiable {
     public bool IsLifeSteal { get => _isLifeSteal; set => _isLifeSteal = value; }
     private bool _isWindFury;
     public bool IsWindFury { get => _isWindFury; set => _isWindFury = value; }
+    private bool _isFrozen;
+    public bool IsFrozen { get => _isFrozen; set => _isFrozen = value; }
     public bool NewSummoned;
     public List<Buff> Buffs {
         get => Buffs;
@@ -95,13 +96,16 @@ public class MinionLogic : ICharacter, IIdentifiable {
         NewSummoned = true;
         isRush = MC.IsRush;
         isCharge = MC.IsCharge;
+        EventManager.AddListener(TurnEvent.OnTurnStart, OnTurnStartHandler);
+        EventManager.AddListener(TurnEvent.OnTurnEnd, OnTurnEndHandler);
     }
+
     public MinionLogic(PlayerLogic owner, MinionCard MC) {
         ca = MC.CA;
         baseHealth = MC.Health;
         Health = baseHealth;
         _attack = MC.Attack;
-        IsWindFury = MC.CA.isWindFury;
+        IsWindFury = MC.IsWindFury;
         this.owner = owner;
         MinionID = IDFactory.GetID();
         BattleControl.MinionCreated.Add(ID, this);
@@ -109,10 +113,13 @@ public class MinionLogic : ICharacter, IIdentifiable {
         NewSummoned = true;
         isRush = MC.IsRush;
         isCharge = MC.IsCharge;
+        EventManager.AddListener(TurnEvent.OnTurnStart, OnTurnStartHandler);
+        EventManager.AddListener(TurnEvent.OnTurnEnd, OnTurnEndHandler);
     }
+
     public MinionLogic(CardAsset CA) {
         ca = CA;
-        baseHealth = CA.MaxHealth;
+        baseHealth = CA.Health;
         Health = baseHealth;
         _attack = CA.Attack;
         MinionID = IDFactory.GetID();
@@ -120,10 +127,13 @@ public class MinionLogic : ICharacter, IIdentifiable {
         NewSummoned = true;
         isRush = CA.isRush;
         isCharge = CA.isCharge;
+        EventManager.AddListener(TurnEvent.OnTurnStart, OnTurnStartHandler);
+        EventManager.AddListener(TurnEvent.OnTurnEnd, OnTurnEndHandler);
     }
+
     public MinionLogic(PlayerLogic owner, CardAsset CA) {
         ca = CA;
-        baseHealth = CA.MaxHealth;
+        baseHealth = CA.Health;
         Health = baseHealth;
         _attack = CA.Attack;
         this.owner = owner;
@@ -132,16 +142,22 @@ public class MinionLogic : ICharacter, IIdentifiable {
         NewSummoned = true;
         isRush = CA.isRush;
         isCharge = CA.isCharge;
+        EventManager.AddListener(TurnEvent.OnTurnStart, OnTurnStartHandler);
+        EventManager.AddListener(TurnEvent.OnTurnEnd, OnTurnEndHandler);
     }
 
-    public void NewTurn() {
-        CanAttack = true;
-        NewSummoned = false;
+    public void OnTurnStartHandler(BaseEventArgs e) {
+        if (e.Player == owner) {
+            CanAttack = true;
+            NewSummoned = false;
+        }
     }
 
-    public void EndTurn() {
-        if (isFrozen) {
-            isFrozen = _canAttack;
+    public void OnTurnEndHandler(BaseEventArgs e) {
+        if (e.Player == owner) {
+            if (IsFrozen) {
+                IsFrozen = _canAttack;
+            }
         }
     }
 
@@ -157,7 +173,7 @@ public class MinionLogic : ICharacter, IIdentifiable {
             effect.ActivateEffect();
         }
         BattleControl.MinionCreated.Remove(MinionID); // record the sequence of summon order
-        EventManager.Invoke(EventManager.Allocate<MinionEventArgs>().CreateEventArgs(MinionEvent.AfterMinionDie, null, this));
+        EventManager.Invoke(EventManager.Allocate<MinionEventArgs>().CreateEventArgs(MinionEvent.AfterMinionDie, null, BattleControl.Instance.ActivePlayer, this));
     }
 
 }

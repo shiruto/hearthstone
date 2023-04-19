@@ -1,6 +1,3 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class DraggableCard : Draggable {
@@ -11,52 +8,56 @@ public class DraggableCard : Draggable {
     // protected override bool IsAvailable => BattleControl.Instance.ActivePlayer == GetComponent<BattleCardManager>().Card.owner && GetComponent<BattleCardManager>().Card.CurManaCost <= BattleControl.Instance.ActivePlayer.Mana.Manas;
     public override bool CanPreview { get => !isDragging && _canPreview; set => _canPreview = value; }
     public override bool CanBeTarget => DrawTarget(GetTarget());
+
     private void OnMouseEnter() {
         if (CanPreview) {
             CardPreview = Instantiate(PfbCard, transform.parent.parent);
             Destroy(CardPreview.GetComponent<BoxCollider>());
-            CardPreview.GetComponent<CardManager>().cardAsset = GetComponent<BattleCardManager>().Card.CA;
+            CardPreview.GetComponent<CardViewController>().CA = GetComponent<BattleCardViewController>().Card.CA;
             CardPreview.transform.position = new Vector3(0, 100, 0) + transform.position;
             CardPreview.transform.localScale = new(2f, 2f, 2f);
-            CardPreview.GetComponent<CardManager>().ReadFromAsset();
+            CardPreview.GetComponent<CardViewController>().ReadFromAsset();
         }
     }
+
     private void OnMouseDown() {
         if (canDrag) {
             if (!isDragging) StartPos = transform.position;
-            Debug.Log(StartPos);
             Distance = Input.mousePosition - transform.position;
         }
         if (CanPreview) {
-            Debug.Log(transform.name);
             transform.localScale = 2 * Vector3.one;
             Destroy(CardPreview);
         }
     }
+
     protected override void OnMouseDrag() {
         if (canDrag) {
             isDragging = true;
-            if (ifDrawLine && Input.mousePosition.y > 200) {
-                EventManager.Invoke(EventManager.Allocate<VisualEventArgs>().CreateEventArgs(VisualEvent.DrawLine, gameObject, new(0, 200, 0), Input.mousePosition));
+            if (ifDrawLine && Input.mousePosition.y > 300) {
+                EventManager.Invoke(EventManager.Allocate<VisualEventArgs>().CreateEventArgs(VisualEvent.DrawLine, gameObject, new(960, 300, 0), Input.mousePosition));
             }
             else {
-                // transform.Find("PfbLine(Clone)").gameObject.SetActive(false);
+                EventManager.Invoke(EventManager.Allocate<VisualEventArgs>().CreateEventArgs(VisualEvent.DeleteLine, gameObject, Vector3.zero, Vector3.zero));
                 transform.position = Input.mousePosition - Distance;
             }
         }
     }
 
     protected override void OnMouseUp() {
-        if (Input.mousePosition.y > 200 && canDrag && IsAvailable) {
+        if (Input.mousePosition.y > 300 && canDrag && IsAvailable) {
             if (ifDrawLine) {
-                transform.Find("PfbLine(Clone)").gameObject.SetActive(false);
-                (GetComponent<BattleCardManager>().Card as SpellCard).Target = GetTarget();
-                GetComponent<BattleCardManager>().Card.Use();
-                EventManager.Invoke(EventManager.Allocate<CardEventArgs>().CreateEventArgs(CardEvent.OnCardUse, gameObject, GetComponent<BattleCardManager>().Card));
+                EventManager.Invoke(EventManager.Allocate<VisualEventArgs>().CreateEventArgs(VisualEvent.DeleteLine, gameObject, Vector3.zero, Vector3.zero));
+                GetComponent<BattleCardViewController>().Card.Target = GetTarget();
+                if (GetComponent<BattleCardViewController>().Card.Target != null) {
+                    GetComponent<BattleCardViewController>().Card.Use();
+                }
+                // TODO: use here?
+                EventManager.Invoke(EventManager.Allocate<CardEventArgs>().CreateEventArgs(CardEvent.OnCardUse, gameObject, BattleControl.Instance.ActivePlayer, GetComponent<BattleCardViewController>().Card));
             }
             else {
-                EventManager.Invoke(EventManager.Allocate<CardEventArgs>().CreateEventArgs(CardEvent.OnCardUse, gameObject, GetComponent<BattleCardManager>().Card));
-                GetComponent<BattleCardManager>().Card.Use();
+                EventManager.Invoke(EventManager.Allocate<CardEventArgs>().CreateEventArgs(CardEvent.OnCardUse, gameObject, BattleControl.Instance.ActivePlayer, GetComponent<BattleCardViewController>().Card));
+                GetComponent<BattleCardViewController>().Card.Use();
             }
         }
         else {
@@ -67,8 +68,9 @@ public class DraggableCard : Draggable {
             transform.localScale = Vector3.one;
         }
     }
+
     public override bool DrawTarget(ICharacter Target) {
-        GameDataAsset.TargetingOptions TargetType = GetComponent<BattleCardManager>().Card.CA.TargetsType;
+        GameDataAsset.TargetingOptions TargetType = GetComponent<BattleCardViewController>().Card.CA.TargetsType;
         bool isMinion = Target is MinionLogic;
         bool isPlayer = Target is PlayerLogic;
         PlayerLogic owner;
@@ -91,6 +93,7 @@ public class DraggableCard : Draggable {
             _ => false,
         };
     }
+
 
 
 }

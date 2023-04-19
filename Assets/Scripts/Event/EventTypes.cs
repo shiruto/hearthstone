@@ -10,6 +10,7 @@ public enum CardEvent {
 
 public enum VisualEvent {
     DrawLine,
+    DeleteLine,
     OnCardReturn
 }
 
@@ -45,5 +46,11 @@ public enum DeckEvent {
 public enum EmptyParaEvent {
     ManaVisualUpdate,
     FieldVisualUpdate,
-    DeckVisualUpdate
+    DeckVisualUpdate,
+    HandVisualUpdate,
+    PlayerVisualUpdate
+}
+
+public enum AttackEvent {
+
 }

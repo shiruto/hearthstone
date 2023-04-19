@@ -9,7 +9,7 @@ public class SkillVisual : MonoBehaviour {
 
     public void InitSkill(SkillCard sc) {
         Skill = sc;
-        ManaCost.text = sc.CurManaCost + "";
+        ManaCost.text = sc.ManaCost + "";
         // TODO: SkillPic =
     }
 }

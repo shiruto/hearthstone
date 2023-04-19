@@ -1,4 +1,3 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -7,7 +6,6 @@ public class StarterPnlController : MonoBehaviour {
     public List<Transform> CardTrans;
     public GameObject PnlOpts;
     public Button BtnConfirm;
-    private List<CardBase> _toPutBack = new();
 
     private void Awake() {
         foreach (Transform child in PnlOpts.transform) {
@@ -17,15 +15,22 @@ public class StarterPnlController : MonoBehaviour {
         BtnConfirm.onClick.AddListener(() => {
             foreach (var card in CardTrans) {
                 if (card.GetComponent<StarterOptionController>().IsCancelled) {
-                    _toPutBack.Add(card.GetComponent<BattleCardManager>().Card);
+                    Debug.Log("StarterPnl Draw");
+                    BattleControl.you.Deck.DrawCards(1);
+                    BattleControl.you.Deck.BackToDeck(card.GetComponent<BattleCardViewController>().Card);
+                    Debug.Log("discard a card named: " + card.GetComponent<BattleCardViewController>().Card);
+                }
+                else {
+                    BattleControl.you.Hand.GetCard(-1, card.GetComponent<BattleCardViewController>().Card);
+                    Debug.Log("put a card into hand, which named: " + card.GetComponent<BattleCardViewController>().Card);
                 }
             }
-            BattleControl.you.Deck.DrawCards(_toPutBack.Count);
-            foreach (var card in _toPutBack) {
-                BattleControl.you.Deck.AddCardToDeck(Random.Range(0, BattleControl.you.Deck.Deck.Count), card);
-            }
+            BattleControl.Instance.AnotherPlayer.Deck.DrawCards(1);
+            BattleControl.Instance.AnotherPlayer.Hand.GetCard(-1, new Coin(Resources.Load<CardAsset>("ScriptableObject/UnCollectableCard/Coin")));
+            BattleControl.Instance.ActivePlayer.OnTurnStart();
+            gameObject.SetActive(false);
         });
-
+        gameObject.SetActive(false);
     }
 
 }

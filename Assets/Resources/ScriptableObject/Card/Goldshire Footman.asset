@@ -1,0 +1,38 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 42c713fb9583240f6a0721d20f3d54ae, type: 3}
+  m_Name: Goldshire Footman
+  m_EditorClassIdentifier: 
+  Description: 
+  CardImage: {fileID: 0}
+  ManaCost: 1
+  rarity: 0
+  ClassType: 10
+  isTriggered: 0
+  cardType: 1
+  Attack: 2
+  Health: 1
+  SpellDamage: 0
+  isWindFury: 0
+  isTaunt: 1
+  isCharge: 0
+  isRush: 0
+  isDivineShield: 0
+  isStealth: 0
+  isImmune: 0
+  isFrozen: 0
+  isPoisonous: 0
+  Overload: 0
+  MinionType: 0
+  isSecret: 0
+  TargetsType: 0
+  SpellSchool: 0

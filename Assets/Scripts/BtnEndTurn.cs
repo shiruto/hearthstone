@@ -1,4 +1,5 @@
 using TMPro;
+using UnityEditor.UI;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -8,9 +9,14 @@ public class BtnEndTurn : MonoBehaviour {
 
     void Start() {
         GetComponent<Button>().onClick.AddListener(() => {
-            (TxtOpponentsTurn.color, TxtEndTurn.color) = (TxtEndTurn.color, TxtOpponentsTurn.color);
-            BattleControl.Instance.OnTurnEnd();
+            SwapText();
+            BattleControl.Instance.ActivePlayer.OnTurnEnd();
         });
+    }
+
+    public void SwapText() {
+        (TxtOpponentsTurn.color, TxtEndTurn.color) = (TxtEndTurn.color, TxtOpponentsTurn.color);
+        GetComponent<Button>().interactable = TxtEndTurn.color.a != 0;
     }
 
 }

@@ -10,8 +10,11 @@ public interface ICharacter : IIdentifiable {
     bool IsImmune { get; set; }
     bool IsLifeSteal { get; set; }
     bool IsWindFury { get; set; }
+    bool IsFrozen { get; set; }
+    bool CanAttack { get; set; }
     void Die();
 
+    public void AttackAgainst(ICharacter target);
 }
 
 public interface IIdentifiable {

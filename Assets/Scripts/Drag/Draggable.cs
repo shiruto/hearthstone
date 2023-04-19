@@ -20,12 +20,14 @@ public abstract class Draggable : MonoBehaviour {
     protected abstract void OnMouseDrag();
     protected abstract void OnMouseUp();
     public abstract bool DrawTarget(ICharacter Target);
+
     public ICharacter GetTarget() {
         ICharacter Targeting = null;
-        Physics.Raycast(ray, out RaycastHit hitInfo, Mathf.Infinity);
+        Physics.Raycast(ray, out RaycastHit hitInfo, Mathf.Infinity, LayerMask.GetMask("UI"));
         Transform TargetTrans = hitInfo.collider.transform;
-        if (TargetTrans.GetComponent<MinionManager>()) {
-            Targeting = TargetTrans.GetComponent<MinionManager>().ML;
+        Debug.Log(TargetTrans.name);
+        if (TargetTrans.GetComponent<MinionViewController>()) {
+            Targeting = TargetTrans.GetComponent<MinionViewController>().ML;
         }
         else if (TargetTrans.GetComponent<PlayerVisual>()) {
             Targeting = TargetTrans.GetComponent<PlayerVisual>().Player;

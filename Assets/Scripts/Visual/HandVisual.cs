@@ -1,8 +1,5 @@
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using Unity.VisualScripting;
-using UnityEditor;
 using UnityEngine;
 
 public class HandVisual : MonoBehaviour {
@@ -12,58 +9,61 @@ public class HandVisual : MonoBehaviour {
     Vector3 pivot = Vector3.zero;
 
     private void Awake() {
-        EventManager.AddListener(CardEvent.OnCardGet, OnCardGetHandler);
-        EventManager.AddListener(CardEvent.OnCardUse, OnCardUseHandler);
-    }
-    void Start() {
         foreach (Transform child in transform) {
             CardTrans.Add(child);
+            child.gameObject.SetActive(false);
         }
-        AlignTheCards();
+        EventManager.AddListener(EmptyParaEvent.HandVisualUpdate, VisualUpdate);
     }
 
-    private void OnCardGetHandler(BaseEventArgs _eventData) {
-        CardEventArgs _event = _eventData as CardEventArgs;
-        int position = _event.position;
-        CardBase newCard = _event.Card;
-        Transform newCardTrans = Instantiate(PfbBattleCard, transform).transform;
-        newCardTrans.GetComponent<BattleCardManager>().Card = newCard;
-        newCardTrans.GetComponent<BattleCardManager>().ReadFromAsset();
-        if (CardTrans.Count == 0) {
-            CardTrans.Add(newCardTrans);
+    private void VisualUpdate(BaseEventArgs e) {
+        if (CardTrans.Count > Hand.Hands.Count) {
+            for (int i = 0; i < CardTrans.Count; i++) {
+                if (i < Hand.Hands.Count) {
+                    CardTrans[i].gameObject.SetActive(true);
+                    CardTrans[i].GetComponent<BattleCardViewController>().Card = Hand.Hands[i];
+                    CardTrans[i].GetComponent<BattleCardViewController>().ReadFromAsset();
+                }
+                else {
+                    CardTrans[i].gameObject.SetActive(false);
+                }
+            }
         }
         else {
-            CardTrans.Insert(position, newCardTrans);
+            for (int i = 0; i < Hand.Hands.Count; i++) {
+                if (i < CardTrans.Count) {
+                    CardTrans[i].gameObject.SetActive(true);
+                    CardTrans[i].GetComponent<BattleCardViewController>().Card = Hand.Hands[i];
+                    CardTrans[i].GetComponent<BattleCardViewController>().ReadFromAsset();
+                }
+                else {
+                    CardTrans.Add(Instantiate(PfbBattleCard, transform).transform);
+                    CardTrans[i].GetComponent<BattleCardViewController>().Card = Hand.Hands[i];
+                    CardTrans[i].GetComponent<BattleCardViewController>().ReadFromAsset();
+                }
+            }
         }
         AlignTheCards();
-    }
-
-    private void OnCardUseHandler(BaseEventArgs eventData) {
-        CardBase CardToLose = (eventData as CardEventArgs).Card;
-        Transform temp = CardTrans.First((Transform a) => a.GetComponent<BattleCardManager>().Card == CardToLose);
-        CardTrans.Remove(temp);
-        Destroy(temp.gameObject);
     }
 
     private void AlignTheCards() {
         int Dis = 76;
         Debug.Log("Align");
-        if (CardTrans.Count > 6) {
-            Debug.Log(CardTrans.Count);
-            for (int i = 0; i < CardTrans.Count; i++) {
-                Debug.Log(CardTrans[i].name);
+        if (Hand.Hands.Count > 8) {
+            Debug.Log(Hand.Hands.Count);
+            for (int i = 0; i < Hand.Hands.Count; i++) {
                 CardTrans[i].name = "card" + (i + 1);
             }
         }
-        else if (CardTrans.Count > 1) {
-            int PanelWidth = 114 + (CardTrans.Count - 2) * 76;
-            for (int i = 0; i < CardTrans.Count; i++) {
+        else if (Hand.Hands.Count > 1) {
+            int PanelWidth = 114 + (Hand.Hands.Count - 2) * 76;
+            for (int i = 0; i < Hand.Hands.Count; i++) {
                 pivot.x = -PanelWidth / 2 + 57 + i * Dis;
                 CardTrans[i].localPosition = pivot;
                 CardTrans[i].name = "card" + (i + 1);
             }
         }
-        else if (CardTrans.Count == 1) {
+        else if (Hand.Hands.Count == 1) {
             CardTrans[0].localPosition = new(0, 0, -1);
             CardTrans[0].name = "Card1";
         }

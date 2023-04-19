@@ -19,17 +19,18 @@ public class GameDataAsset {
     }
 
     public enum SpellSchool {
+        None,
         Arcane,
         Frost,
         Fire,
         Nature,
         Fel,
         Shadow,
-        Holy,
-        None
+        Holy
     }
 
     public enum MinionType {
+        None,
         Beast,
         Demon,
         Undead,
@@ -40,8 +41,7 @@ public class GameDataAsset {
         Dragon,
         Pirate,
         Quilboar,
-        Naga,
-        None
+        Naga
     }
 
     public enum TargetingOptions {
@@ -83,7 +83,14 @@ public class GameDataAsset {
         GiveBuff,
         GiveCard,
         ManaChange,
-        SummonMinion
+        SummonMinion,
+        Discover
     }
 
+    public enum GameStatus {
+        Playing,
+        Win,
+        Lose,
+        Tie
+    }
 }

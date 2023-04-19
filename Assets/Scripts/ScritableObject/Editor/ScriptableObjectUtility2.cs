@@ -7,9 +7,4 @@ public static class ScriptableObjectUtility2 {
         ProjectWindowUtil.CreateAsset(asset, "New " + typeof(T).Name + ".asset");
     }
 
-    public static void CreateDeck<T>() where T : ScriptableObject {
-        var asset = ScriptableObject.CreateInstance<T>();
-        ProjectWindowUtil.CreateAsset(asset, "New " + typeof(T).Name + ".asset");
-    }
-
 }

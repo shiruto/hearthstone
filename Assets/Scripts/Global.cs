@@ -3,5 +3,5 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public static class Global {
-    public static string DeckName;
+    public static string DeckName = "New Deck";
 }

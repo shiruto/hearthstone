@@ -19,6 +19,7 @@ public class CardSelect : MonoBehaviour {
     public Dictionary<GameDataAsset.ClassType, int> ClassIndex = new();
     private Transform TxtPage;
     public static event Func<CardAsset, int> SelectedNum;
+
     private void Awake() {
         CardLibrary = new List<CardAsset>(Resources.LoadAll<CardAsset>("ScriptableObject/Card"));
         CardLibrary.Sort((CardAsset a, CardAsset b) => {
@@ -87,11 +88,11 @@ public class CardSelect : MonoBehaviour {
         for (int i = 0, j = PageSize[PageIndex]; i < MaxPageSize; i++, j++) {
             if (i < PageSize[PageIndex + 1] - PageSize[PageIndex]) {
                 CardTrans[i].gameObject.SetActive(true);
-                CardManager cm = CardTrans[i].GetComponent<CardManager>();
-                cm.cardAsset = AvailableCards[j];
+                CardViewController cm = CardTrans[i].GetComponent<CardViewController>();
+                cm.CA = AvailableCards[j];
                 CardTrans[i].Find("PfbSeletedFrame").gameObject.SetActive(false);
                 if (DeckBuilderControl.isEditing) {
-                    int tempNum = SelectedNum(cm.cardAsset);
+                    int tempNum = SelectedNum(cm.CA);
                     CardTrans[i].Find("PfbSeletedFrame").gameObject.SetActive(tempNum > 0);
                     if (tempNum > 0) {
                         CardTrans[i].Find("PfbSeletedFrame").GetComponent<CardFrameManager>().AddCardNum(tempNum);

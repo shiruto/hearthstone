@@ -29,18 +29,17 @@ public class ScnBattleUI : MonoBehaviour {
         if (Physics.Raycast(ray, out RaycastHit hitInfo, Mathf.Infinity, LayerMask.GetMask("UI"))) {
             // BattleControl.Instance.Targeting = hitInfo.collider.GetComponent<ICharacter>();
         }
-        if (ReturningCards.Count != 0) { // 非空
-            foreach (var cardInfo in ReturningCards) {
-                cardInfo.card.position -= GetSpeed(Vector3.Magnitude(cardInfo.card.position - cardInfo.ReturnPos)) * Time.deltaTime * Vector3.Normalize(cardInfo.card.position - cardInfo.ReturnPos);
-                if (Vector3.Magnitude(cardInfo.card.position - cardInfo.ReturnPos) < 10) { // 距离足够近时不再移动
-                    cardInfo.card.position = cardInfo.ReturnPos;
-                    ReturningCards.Remove(cardInfo);
+
+        if (ReturningCards.Count != 0) { // 非空 TODO: coroutine?
+            for (int i = 0; i < ReturningCards.Count; i++) {
+                ReturningCards[i].card.position -= GetSpeed(Vector3.Magnitude(ReturningCards[i].card.position - ReturningCards[i].ReturnPos)) * Time.deltaTime * Vector3.Normalize(ReturningCards[i].card.position - ReturningCards[i].ReturnPos);
+                if (Vector3.Magnitude(ReturningCards[i].card.position - ReturningCards[i].ReturnPos) < 10) { // 距离足够近时不再移动
+                    ReturningCards[i].card.position = ReturningCards[i].ReturnPos;
+                    ReturningCards.Remove(ReturningCards[i]);
                 }
             }
         }
     }
-
-
 
     private void OnCardReturnHandler(BaseEventArgs eventData) {
         VisualEventArgs _event = (VisualEventArgs)eventData;

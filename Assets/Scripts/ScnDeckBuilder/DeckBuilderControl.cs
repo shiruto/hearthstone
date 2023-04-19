@@ -64,7 +64,7 @@ public class DeckBuilderControl : MonoBehaviour {
                         OnClassFilter?.Invoke(go.transform.GetChild(0).GetComponent<TextMeshProUGUI>().text);
                     }
                 }
-                else if (isEditing && go.GetComponent<CardManager>()) {
+                else if (isEditing && go.GetComponent<CardViewController>()) {
                     Debug.Log("Selecting card");
                     OnCardClick?.Invoke(go.transform);
                 }

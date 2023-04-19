@@ -79,7 +79,7 @@ public class SelectedCards : MonoBehaviour {
     }
 
     private void OnCardClickHandler(Transform CardTrans) {
-        CardAsset newCA = CardTrans.GetComponent<CardManager>().cardAsset;
+        CardAsset newCA = CardTrans.GetComponent<CardViewController>().CA;
         if (SelectedCardNum < MaxCardNum) { // 卡组中的卡牌小于最大卡牌数
             if (!CardDictionary.ContainsKey(newCA)) { // 卡组中不存在这张卡
                 CardDictionary.Add(newCA, 1); // 添加这张卡 数量为一
