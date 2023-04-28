@@ -11,4 +11,5 @@ public class DrawCard : Effect {
     public override void ActivateEffect() {
         Owner.Deck.DrawCards(CardNum);
     }
+
 }

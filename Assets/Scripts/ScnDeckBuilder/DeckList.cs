@@ -88,7 +88,7 @@ public class DeckList : MonoBehaviour {
         newDA.myCardAssets = new List<CardAsset>();
         newDA.myCardNums = new List<int>();
         newDA.Order = DeckAssetList.Count;
-        newDA.DeckClass = (GameDataAsset.ClassType)Enum.Parse(typeof(GameDataAsset.ClassType), ClassName);
+        newDA.DeckClass = (ClassType)Enum.Parse(typeof(ClassType), ClassName);
         AssetDatabase.CreateAsset(newDA, "Assets/Resources/ScriptableObject/Deck/" + newName + ".asset");
         AssetDatabase.SaveAssets();
         AssetDatabase.Refresh();

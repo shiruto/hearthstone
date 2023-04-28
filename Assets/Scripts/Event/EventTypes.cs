@@ -6,11 +6,18 @@ public enum CardEvent {
     OnCardChange,
     OnCardDiscard,
     OnHeroPowerUse,
-    OnDiscover
+    OnDiscover,
+    BeforeCardUse,
+    OnCardPreview,
+    AfterCardPreview,
+    OnWeaponEquip,
+    OnWeaponDestroy,
+    OnSecretReveal
 }
 
 public enum VisualEvent {
-    DrawLine,
+    DrawCardLine,
+    DrawMinionLine,
     DeleteLine,
     OnCardReturn
 }
@@ -25,6 +32,7 @@ public enum MinionEvent {
     BeforeMinonAttack,
     AfterMinionAttack,
     AfterMinionDie,
+    BeforeMinionSummon,
     AfterMinionSummon,
     AfterMinionStatusChange,
     AfterHealed
@@ -32,7 +40,11 @@ public enum MinionEvent {
 
 public enum ManaEvent {
     OnManaSpend,
-    TemporaryCrystal
+    OnTemporaryCrystalGet,
+    OnPermanentCrystalGet,
+    OnEmptyCrystalGet,
+    OnManaRecover,
+    OnCrystalOverload
 }
 
 public enum HeroEvent {
@@ -49,9 +61,13 @@ public enum EmptyParaEvent {
     FieldVisualUpdate,
     DeckVisualUpdate,
     HandVisualUpdate,
-    PlayerVisualUpdate
+    PlayerVisualUpdate,
+    SecretVisualUpdate,
+    CardPreviewDelete
 }
 
 public enum AttackEvent {
-
+    BeforeAttack,
+    AfterAttack,
+    MagicAttack
 }

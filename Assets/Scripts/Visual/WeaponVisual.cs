@@ -10,6 +10,6 @@ public class WeaponVisual : MonoBehaviour {
 
     public void ReadFromCard() {
         TxtAttack.text = Weapon.Attack + "";
-        TxtDurability.text = Weapon.Durability + "";
+        TxtDurability.text = Weapon.Health + "";
     }
 }

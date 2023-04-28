@@ -1,12 +1,14 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 public abstract class SpellCard : CardBase {
-
     public SpellCard(CardAsset CA) : base(CA) {
 
     }
 
-    public override void Use() {
-        Debug.Log("Use a Spell Card");
+    public override void ExtendUse() {
+        Debug.Log("Cast a Spell");
+        BattleControl.CardUsed.Add(ID, this);
     }
+
 }

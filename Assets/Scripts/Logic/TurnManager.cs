@@ -24,8 +24,8 @@ public class TurnManager : MonoBehaviour {
     }
 
     public void OnGameStart() {
-        BattleControl.CardCreated.Clear();
-        BattleControl.MinionCreated.Clear();
+        BattleControl.CardUsed.Clear();
+        BattleControl.MinionSummoned.Clear();
     }
 
     // public void EndTurn() {

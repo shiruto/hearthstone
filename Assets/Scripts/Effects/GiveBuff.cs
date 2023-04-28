@@ -1,15 +1,17 @@
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-
 public class GiveBuff : Effect {
-    private Buff BuffToGive;
+    public Buff BuffToGive;
     public override string Name => "buff effect";
-    public GiveBuff(Buff buff) {
+    public IBuffable Target { get; set; }
+    public CardBase giver;
+
+    public GiveBuff(Buff buff, CardBase giver, IBuffable Target = null) {
         BuffToGive = buff;
+        this.giver = giver;
+        this.Target = Target;
     }
+
     public override void ActivateEffect() {
-        BattleControl.Instance.Targeting.Buffs.Add(BuffToGive); // TODO: change? target
+        Target.BuffList.Add(BuffToGive);
     }
 
 }

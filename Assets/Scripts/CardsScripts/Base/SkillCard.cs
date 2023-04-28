@@ -14,7 +14,7 @@ public class SkillCard : CardBase {
         foreach (Effect effect in effects) {
             effect.ActivateEffect();
         }
-        EventManager.Invoke(EventManager.Allocate<CardEventArgs>().CreateEventArgs(CardEvent.OnHeroPowerUse, null, BattleControl.Instance.ActivePlayer, this));
+        EventManager.Allocate<CardEventArgs>().CreateEventArgs(CardEvent.OnHeroPowerUse, null, BattleControl.Instance.ActivePlayer, this).Invoke();
     }
 
 }

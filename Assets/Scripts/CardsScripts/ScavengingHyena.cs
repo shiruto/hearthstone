@@ -1,14 +1,21 @@
-public class ScavengingHyena : MinionCard {
+using System.Collections.Generic;
+
+public class ScavengingHyena : MinionCard, ITriggerMinionCard {
+    private readonly Buff _buff;
+    public List<TriggerStruct> Triggers { get; set; }
 
     public ScavengingHyena(CardAsset CA) : base(CA) {
-        EventManager.AddListener(MinionEvent.AfterMinionDie, AfterBeastDie);
+        _buff = new(1, 2) {
+            BuffName = "sc"
+        };
+        Triggers = new() { new(MinionEvent.AfterMinionDie, Triggered) };
     }
 
-    public void AfterBeastDie(BaseEventArgs e) {
-        GameDataAsset.MinionType MinionType = (e as MinionEventArgs).minion.ca.MinionType;
-        if (MinionType == GameDataAsset.MinionType.Beast) {
-            Health += 1;
-            Attack += 2;
+    public void Triggered(BaseEventArgs e) {
+        if (Minion == null) return;
+        MinionEventArgs evt = e as MinionEventArgs;
+        if (evt.minion.Card.CA.MinionType == MinionType.Beast) {
+            new GiveBuff(_buff, this, Minion).ActivateEffect();
         }
     }
 

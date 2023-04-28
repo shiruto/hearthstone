@@ -14,7 +14,7 @@ public class DeckVisual : MonoBehaviour {
     }
 
     public void UpdateDeckStatus(BaseEventArgs e) {
-        decks = new(Deck.cardName);
+        decks = new(Deck?.cardName);
         if (e.Player == Deck.owner)
             switch (Deck.Deck.Count) {
                 case >= 60:

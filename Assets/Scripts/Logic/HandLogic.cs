@@ -8,7 +8,7 @@ public class HandLogic {
 
     public HandLogic() {
         Hands = new();
-        EventManager.AddListener(CardEvent.OnCardUse, UseCard);
+        EventManager.AddListener(CardEvent.BeforeCardUse, UseCard);
         EventManager.AddListener(CardEvent.OnCardDraw, DrawCardHandler);
     }
 
@@ -20,6 +20,7 @@ public class HandLogic {
     }
 
     public void GetCard(int position, CardBase newCard) {
+        newCard.Owner = owner;
         if (position == -1) position = Hands.Count;
         if (Hands.Count >= _maxHandCard) {
             Debug.Log("Too Many Cards");
@@ -31,11 +32,12 @@ public class HandLogic {
         else {
             Hands.Insert(position, newCard);
         }
-        EventManager.Invoke(EventManager.Allocate<CardEventArgs>().CreateEventArgs(CardEvent.OnCardGet, null, owner, newCard, position));
-        EventManager.Invoke(EventManager.Allocate<EmptyParaArgs>().CreateEventArgs(EmptyParaEvent.HandVisualUpdate));
+        EventManager.Allocate<CardEventArgs>().CreateEventArgs(CardEvent.OnCardGet, null, owner, newCard, position).Invoke();
+        EventManager.Allocate<EmptyParaArgs>().CreateEventArgs(EmptyParaEvent.HandVisualUpdate).Invoke();
     }
 
-    public void UseCard(BaseEventArgs e) { // TODO: call the use func here?
+    public void UseCard(BaseEventArgs e) {
+        Debug.Log("UseCardHandler in HandLogic");
         CardEventArgs evt = e as CardEventArgs;
         if (evt.Player == owner) {
             CardBase Card = evt.Card;
@@ -45,12 +47,12 @@ public class HandLogic {
 
     public void CardDiscard(CardBase Card) {
         RemoveCard(Card);
-        EventManager.Invoke(EventManager.Allocate<CardEventArgs>().CreateEventArgs(CardEvent.OnCardDiscard, null, owner, Card));
+        EventManager.Allocate<CardEventArgs>().CreateEventArgs(CardEvent.OnCardDiscard, null, owner, Card).Invoke();
     }
 
     private void RemoveCard(CardBase Card) {
         Hands.Remove(Card);
-        EventManager.Invoke(EventManager.Allocate<EmptyParaArgs>().CreateEventArgs(EmptyParaEvent.HandVisualUpdate));
+        EventManager.Allocate<EmptyParaArgs>().CreateEventArgs(EmptyParaEvent.HandVisualUpdate).Invoke();
     }
 
     public void ChangeMaxHandCard(int newMaxHandCardNum) {

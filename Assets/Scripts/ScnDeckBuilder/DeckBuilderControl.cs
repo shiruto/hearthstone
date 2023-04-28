@@ -59,7 +59,7 @@ public class DeckBuilderControl : MonoBehaviour {
                         OnClassSelect?.Invoke(SelectedClass);
                         isSelectingClass = false;
                     }
-                    else if (Enum.IsDefined(typeof(GameDataAsset.ClassType), go.transform.GetChild(0).GetComponent<TextMeshProUGUI>().text)) {
+                    else if (Enum.IsDefined(typeof(ClassType), go.transform.GetChild(0).GetComponent<TextMeshProUGUI>().text)) {
                         // Class Filter On
                         OnClassFilter?.Invoke(go.transform.GetChild(0).GetComponent<TextMeshProUGUI>().text);
                     }
@@ -77,7 +77,7 @@ public class DeckBuilderControl : MonoBehaviour {
                     isEditing = true;
                     OnDeckPrevClick?.Invoke(go.transform);
                 }
-                else if (isSelectingClass && Enum.IsDefined(typeof(GameDataAsset.ClassType), go.name)) {
+                else if (isSelectingClass && Enum.IsDefined(typeof(ClassType), go.name)) {
                     Debug.Log("Selecting class");
                     PnlClassSelect.Find("Selected").GetComponent<Image>().sprite = go.GetComponent<Image>().sprite;
                     SelectedClass = go.name;

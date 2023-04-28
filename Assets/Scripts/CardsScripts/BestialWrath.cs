@@ -1,11 +1,17 @@
-public class BestialWrath : SpellCard {
-    Buff _buff = new Buff(0, 2);
+public class BestialWrath : SpellCard, ITarget {
+    public ICharacter Target { get; set; }
 
     public BestialWrath(CardAsset CA) : base(CA) {
 
     }
 
-    public override void Use() {
-        new GiveBuff(_buff).ActivateEffect();
+    public bool CanBeTarget(CardBase Card) {
+        return Card is MinionCard && Card.CA.MinionType == MinionType.Beast;
     }
+
+    public override void ExtendUse() {
+        base.ExtendUse();
+        new GiveBuff(new(0, 2), this, ScnBattleUI.Instance.Targeting).ActivateEffect();
+    }
+
 }

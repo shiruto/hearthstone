@@ -1,9 +1,7 @@
-using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
 
 public class Buff {
-    public List<Effect> BuffEffects;
+    public string BuffName;
     public int HealthChange;
     public int AttackChange;
     public int CostChange;
@@ -18,19 +16,15 @@ public class Buff {
     }
     private int _expire;
 
-    public Buff(int HealthChange, int AttackChange) {
+    public Buff(int HealthChange, int AttackChange, int CostChange = 0) {
         this.HealthChange = HealthChange;
         this.AttackChange = AttackChange;
-    }
-    public Buff(Effect effect) {
-        BuffEffects = new() {
-            effect
-        };
+        this.CostChange = CostChange;
     }
 
     public void RemoveBuff() {
-        BuffEffects.Clear();
         HealthChange = 0;
         AttackChange = 0;
     }
+
 }

@@ -1,16 +1,23 @@
-using System;
-
 public class FreezingTrap : SecretCard {
     public FreezingTrap(CardAsset CA) : base(CA) {
 
     }
 
-    public void Trigger() {
-        EventManager.AddListener(MinionEvent.BeforeMinonAttack, EventHandler);
+    public override void AddTrigger() {
+        EventManager.AddListener(AttackEvent.BeforeAttack, Triggered);
     }
 
-    public void EventHandler(BaseEventArgs e) {
-        MinionEventArgs evt = e as MinionEventArgs;
-        // TODO: minion back to hand as a card
+    public override void DelTrigger() {
+        EventManager.DelListener(AttackEvent.BeforeAttack, Triggered);
     }
+
+    public override void SecretImplement(BaseEventArgs e, out bool isTriggered) {
+        AttackEventArgs evt = e as AttackEventArgs;
+        if (evt.target == Owner && evt.attacker is MinionLogic) {
+            isTriggered = true;
+            (evt.attacker as MinionLogic).BackToHand().BuffList.Add(new(0, 0, 2));
+        }
+        else isTriggered = false;
+    }
+
 }

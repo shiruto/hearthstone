@@ -9,13 +9,14 @@ public class PlayerLogic : ICharacter {
     public FieldLogic Field;
     public WeaponCard Weapon;
     public SkillCard Skill;
-    public List<SpellCard> Secrets;
+    public SecretLogic Secrets;
+    public HeroCard Card;
     #endregion
 
     #region player property
-    public GameDataAsset.ClassType HeroClass;
+    public ClassType HeroClass;
     public bool isEnemy;
-    private int playerID;
+    private readonly int playerID;
     public int ID { get => playerID; }
     private int MaxHealth = 30;
     private int _health = 30;
@@ -45,7 +46,7 @@ public class PlayerLogic : ICharacter {
                 Debug.Log("recover");
                 _health = value;
             }
-            EventManager.Invoke(EventManager.Allocate<EmptyParaArgs>().CreateEventArgs(EmptyParaEvent.PlayerVisualUpdate));
+            EventManager.Allocate<EmptyParaArgs>().CreateEventArgs(EmptyParaEvent.PlayerVisualUpdate).Invoke();
         }
     }
     private int _attack = 0;
@@ -61,7 +62,7 @@ public class PlayerLogic : ICharacter {
                 _attack = 0;
             }
             else _attack = value;
-            EventManager.Invoke(EventManager.Allocate<EmptyParaArgs>().CreateEventArgs(EmptyParaEvent.PlayerVisualUpdate));
+            EventManager.Allocate<EmptyParaArgs>().CreateEventArgs(EmptyParaEvent.PlayerVisualUpdate).Invoke();
         }
     }
     private int _armor = 0;
@@ -70,19 +71,14 @@ public class PlayerLogic : ICharacter {
         set {
             if (value < 0) _armor = 0;
             else _armor = value;
-            EventManager.Invoke(EventManager.Allocate<EmptyParaArgs>().CreateEventArgs(EmptyParaEvent.PlayerVisualUpdate));
+            EventManager.Allocate<EmptyParaArgs>().CreateEventArgs(EmptyParaEvent.PlayerVisualUpdate).Invoke();
         }
     }
-    private bool _isStealth = false;
-    public bool IsStealth { get => _isStealth; set => _isStealth = value; }
-    private bool _isImmune = false;
-    public bool IsImmune { get => _isImmune; set => _isImmune = value; }
-    private bool _isLifeSteal = false;
-    public bool IsLifeSteal { get => _isLifeSteal; set => _isLifeSteal = value; }
-    private bool _isWindFury = false;
-    public bool IsWindFury { get => _isWindFury; set => _isWindFury = value; }
-    private bool _isFrozen;
-    public bool IsFrozen { get => _isFrozen; set => _isFrozen = value; }
+    public bool IsStealth { get; set; }
+    public bool IsImmune { get; set; }
+    public bool IsLifeSteal { get; set; }
+    public bool IsWindFury { get; set; }
+    public bool IsFrozen { get; set; }
     public int TurnCount;
     private bool _canAttack;
     private bool _windFuryAttack;
@@ -102,11 +98,10 @@ public class PlayerLogic : ICharacter {
         }
     }
 
-    private List<Buff> _buffs;
-    public List<Buff> Buffs { get => _buffs; set => _buffs = value; }
+    public List<Buff> BuffList { get; set; }
     #endregion
 
-    public PlayerLogic(GameDataAsset.ClassType classType) {
+    public PlayerLogic(ClassType classType) {
         HeroClass = classType;
         Deck = new() {
             owner = this
@@ -121,12 +116,17 @@ public class PlayerLogic : ICharacter {
             owner = this
         };
         Weapon = null;
+        Secrets = new();
         //TODO: get skill and hero depending on its ClassType
         playerID = IDFactory.GetID();
     }
 
+    public void ChangeMaxHealth(int newMaxHealth) {
+        MaxHealth = newMaxHealth;
+    }
+
     public void Die() {
-        EventManager.Invoke(EventManager.Allocate<TurnEventArgs>().CreateEventArgs(TurnEvent.OnGameOver, null, this, -1, GameDataAsset.GameStatus.Lose));
+        EventManager.Allocate<TurnEventArgs>().CreateEventArgs(TurnEvent.OnGameOver, null, this, -1, GameStatus.Lose).Invoke();
     }
 
     public void AttackAgainst(ICharacter target) {
@@ -136,17 +136,14 @@ public class PlayerLogic : ICharacter {
     }
 
     public void OnTurnStart() {
-        Mana.CurCrystals++;
-        Mana.ManaReset();
-        Deck.DrawCards(1);
-        EventManager.Invoke(EventManager.Allocate<TurnEventArgs>().CreateEventArgs(TurnEvent.OnTurnStart, null, this, TurnCount));
+        EventManager.Allocate<TurnEventArgs>().CreateEventArgs(TurnEvent.OnTurnStart, null, this, TurnCount).Invoke();
     }
 
     public void OnTurnEnd() {
         if (TurnCount >= 45) {
-            EventManager.Invoke(EventManager.Allocate<TurnEventArgs>().CreateEventArgs(TurnEvent.OnTurnEnd, null, this, TurnCount, GameDataAsset.GameStatus.Tie));
+            EventManager.Allocate<TurnEventArgs>().CreateEventArgs(TurnEvent.OnTurnEnd, null, this, TurnCount, GameStatus.Tie).Invoke();
         }
         TurnCount++;
-        EventManager.Invoke(EventManager.Allocate<TurnEventArgs>().CreateEventArgs(TurnEvent.OnTurnEnd, null, this, TurnCount));
+        EventManager.Allocate<TurnEventArgs>().CreateEventArgs(TurnEvent.OnTurnEnd, null, this, TurnCount).Invoke();
     }
 }

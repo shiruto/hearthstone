@@ -1,4 +1,4 @@
-using UnityEngine;
+using System.Collections.Generic;
 
 public class Tracking : SpellCard, IDiscover {
 
@@ -6,14 +6,19 @@ public class Tracking : SpellCard, IDiscover {
 
     }
 
-    public override void Use() {
-        EventManager.AddListener(CardEvent.OnDiscover, DiscoverHandler);
-        new Discover(BattleControl.you.Deck.Deck).ActivateEffect();
-    }
-
     public void DiscoverHandler(BaseEventArgs e) {
         CardEventArgs evt = e as CardEventArgs;
-        owner.Hand.GetCard(-1, evt.Card);
+        Owner.Deck.DrawSpecificCard(evt.Card);
+        EventManager.DelListener(CardEvent.OnDiscover, DiscoverHandler);
+    }
+
+    public List<CardBase> GetPool() {
+        return Owner.Deck.Deck;
+    }
+
+    public override void ExtendUse() {
+        base.ExtendUse();
+        new Discover(this).ActivateEffect();
     }
 
 }

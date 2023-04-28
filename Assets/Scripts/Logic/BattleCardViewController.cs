@@ -22,8 +22,8 @@ public class BattleCardViewController : MonoBehaviour {
         ManaCostText.text = Card.CA.ManaCost.ToString(); // 添加卡牌消耗
         DescriptionText.text = Card.CA.Description; // 添加描述
         //TODO: CardGraphicImage.sprite = Card.CA.CardImage;
-        if (Card is SpellCard && GetComponent<DraggableCard>()) {
-            GetComponent<DraggableCard>().ifDrawLine = (Card as SpellCard).ifDrawLine;
+        if (GetComponent<DraggableCard>()) {
+            GetComponent<DraggableCard>().ifDrawLine = Card is ITarget;
         }
         if (Card is MinionCard) {
             CardAsset Card = this.Card.CA;

@@ -4,37 +4,21 @@ using UnityEngine;
 
 public class FieldVisual : MonoBehaviour {
     public FieldLogic Field;
-    private List<Transform> MinionsOnField = new(7);
-
-    public GameObject PfbMinion;
+    public List<Transform> MinionsOnField = new(7);
 
     private void Awake() {
-        EventManager.AddListener(MinionEvent.AfterMinionSummon, CreateMinionOnField);
-        EventManager.AddListener(MinionEvent.AfterMinionDie, MinionDie);
-        // foreach (Transform child in transform) {
-        //     MinionsOnField.Add(child);
-        // }
-        MinionsOnField = transform.Cast<Transform>().ToList(); // this really work?? TODO: remove it if not working right
+        EventManager.AddListener(EmptyParaEvent.FieldVisualUpdate, FieldVisualUpdateHandler);
+        MinionsOnField = transform.Cast<Transform>().ToList(); // this really work?? yes it worked perfectly
     }
 
-    public void CreateMinionOnField(BaseEventArgs _eventData) {
-        MinionEventArgs _event = _eventData as MinionEventArgs;
-        int position = _event.MinionSummonPos;
-        MinionLogic ML = _event.minion;
-        var M = Instantiate(PfbMinion, transform);
-        M.transform.localPosition = new(0, 0, 0);
-        M.GetComponent<MinionViewController>().ML = ML;
-        M.GetComponent<MinionViewController>().ReadFromMinionLogic();
-        if (MinionsOnField.Count == 0) {
-            MinionsOnField.Add(M.transform);
+    public void FieldVisualUpdateHandler(BaseEventArgs e) {
+        for (int i = 0; i < 7; i++) {
+            MinionsOnField[i].gameObject.SetActive(i < Field.Minions.Count);
+            if (i < Field.Minions.Count) {
+                MinionsOnField[i].GetComponent<DraggableMinion>().Minion = MinionsOnField[i].GetComponent<MinionViewController>().ML = Field.Minions[i];
+                MinionsOnField[i].GetComponent<MinionViewController>().ReadFromMinionLogic();
+            }
         }
-        else MinionsOnField.Insert(position, M.transform);
-        AlignTheField();
-    }
-
-    public void MinionDie(BaseEventArgs _eventData) {
-        MinionLogic minion = (_eventData as MinionEventArgs).minion;
-        MinionsOnField.Remove(MinionsOnField.First((Transform a) => a.GetComponent<MinionViewController>().ML == minion));
         AlignTheField();
     }
 

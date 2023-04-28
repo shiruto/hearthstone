@@ -6,7 +6,7 @@ public class DemonHunterSkill : SkillCard {
 
     public DemonHunterSkill(CardAsset CA) : base(CA) {
         buff = new(_healthModifier, _attackModifier);
-        effects.Add(new GiveBuff(buff));
+        effects.Add(new GiveBuff(buff, this, Owner));
     }
 
 }

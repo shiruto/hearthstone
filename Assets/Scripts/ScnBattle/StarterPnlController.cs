@@ -15,14 +15,11 @@ public class StarterPnlController : MonoBehaviour {
         BtnConfirm.onClick.AddListener(() => {
             foreach (var card in CardTrans) {
                 if (card.GetComponent<StarterOptionController>().IsCancelled) {
-                    Debug.Log("StarterPnl Draw");
                     BattleControl.you.Deck.DrawCards(1);
                     BattleControl.you.Deck.BackToDeck(card.GetComponent<BattleCardViewController>().Card);
-                    Debug.Log("discard a card named: " + card.GetComponent<BattleCardViewController>().Card);
                 }
                 else {
                     BattleControl.you.Hand.GetCard(-1, card.GetComponent<BattleCardViewController>().Card);
-                    Debug.Log("put a card into hand, which named: " + card.GetComponent<BattleCardViewController>().Card);
                 }
             }
             BattleControl.Instance.AnotherPlayer.Deck.DrawCards(1);

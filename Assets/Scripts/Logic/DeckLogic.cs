@@ -11,7 +11,7 @@ public class DeckLogic {
     public int Fatigue = 0;
 
     public DeckLogic() {
-        UpdateCardName();
+        EventManager.AddListener(TurnEvent.OnTurnStart, OnTurnStartHandler);
     }
 
     public void DrawCards(int Num) {
@@ -22,7 +22,7 @@ public class DeckLogic {
                 owner.Health -= Fatigue;
             }
             else {
-                EventManager.Invoke(EventManager.Allocate<CardEventArgs>().CreateEventArgs(CardEvent.OnCardDraw, null, owner, CardToDraw));
+                EventManager.Allocate<CardEventArgs>().CreateEventArgs(CardEvent.OnCardDraw, null, owner, CardToDraw).Invoke();
             }
         }
         UpdateCardName();
@@ -36,9 +36,14 @@ public class DeckLogic {
         CardBase Card = Deck[index];
         Deck.Remove(Card);
         cardName.RemoveAt(index);
-        EventManager.Invoke(EventManager.Allocate<EmptyParaArgs>().CreateEventArgs(EmptyParaEvent.DeckVisualUpdate));
         UpdateCardName();
         return Card;
+    }
+
+    public void DrawSpecificCard(CardBase card) {
+        Deck.Remove(card);
+        EventManager.Allocate<CardEventArgs>().CreateEventArgs(CardEvent.OnCardDraw, null, owner, card).Invoke();
+        UpdateCardName();
     }
 
     public void SortDeck(Comparison<CardBase> compare) {
@@ -67,15 +72,18 @@ public class DeckLogic {
         foreach (CardBase card in Deck) {
             cardName.Add(card.CA.name);
         }
+        EventManager.Allocate<EmptyParaArgs>().CreateEventArgs(EmptyParaEvent.DeckVisualUpdate).Invoke();
     }
 
     public void ReadCardsFromDeck(DeckAsset da) {
         for (int i = 0; i < da.myCardAssets.Count; i++) {
             object[] parameters = new object[] { da.myCardAssets[i] };
+            CardBase CardToAdd = Activator.CreateInstance(Type.GetType(da.myCardAssets[i].name.Replace(" ", "")), parameters) as CardBase;
+            CardToAdd.Owner = owner;
             if (da.myCardNums[i] == 2) {
-                Deck.Add(Activator.CreateInstance(Type.GetType(da.myCardAssets[i].name.Replace(" ", "")), parameters) as CardBase);
+                Deck.Add(CardToAdd);
             }
-            Deck.Add(Activator.CreateInstance(Type.GetType(da.myCardAssets[i].name.Replace(" ", "")), parameters) as CardBase);
+            Deck.Add(CardToAdd);
         }
         Shuffle(Deck);
     }
@@ -84,6 +92,13 @@ public class DeckLogic {
         for (int i = cardList.Count - 1; i > 0; i--) {
             int j = Random.Range(0, i + 1);
             (cardList[j], cardList[i]) = (cardList[i], cardList[j]);
+        }
+    }
+
+    private void OnTurnStartHandler(BaseEventArgs e) {
+        TurnEventArgs evt = e as TurnEventArgs;
+        if (evt.Player == owner) {
+            DrawCards(1);
         }
     }
 

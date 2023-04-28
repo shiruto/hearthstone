@@ -13,15 +13,25 @@ public class LineDrawer : MonoBehaviour {
         LR = LineTrans.GetChild(0).GetComponent<LineRenderer>();
         Arrow = LineTrans.GetChild(1);
         LineTrans.gameObject.SetActive(false);
-        EventManager.AddListener(VisualEvent.DrawLine, DrawLineHandler);
+        EventManager.AddListener(VisualEvent.DrawCardLine, DrawCardLineHandler);
+        EventManager.AddListener(VisualEvent.DrawMinionLine, DrawMinionLineHandler);
         EventManager.AddListener(VisualEvent.DeleteLine, DeleteLineHandler);
     }
 
-    private void DrawLineHandler(BaseEventArgs eventData) {
-        VisualEventArgs _event = eventData as VisualEventArgs;
-        HideCard(_event.Sender, true);
-        Vector3 StartPos = _event.StartPos;
-        Vector3 EndPos = _event.Destination;
+    private void DrawCardLineHandler(BaseEventArgs e) {
+        VisualEventArgs evt = e as VisualEventArgs;
+        HideCard(evt.Sender, true);
+        DrawLine(evt.StartPos, evt.Destination);
+    }
+
+    private void DrawMinionLineHandler(BaseEventArgs e) {
+        VisualEventArgs evt = e as VisualEventArgs;
+        HideCard(evt.Sender, false);
+        DrawLine(evt.StartPos, evt.Destination);
+    }
+
+    private void DrawLine(Vector3 StartPos, Vector3 EndPos) {
+
         LineTrans.gameObject.SetActive(true);
         Target.gameObject.SetActive(false); // TODO: Draw Target
         Arrow.position = EndPos;
@@ -43,7 +53,7 @@ public class LineDrawer : MonoBehaviour {
         }
     }
 
-    public bool ifDrawTarget() {
+    public bool ifDrawTarget() { // TODO:
         return false;
     }
 

@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-public abstract class WeaponCard : CardBase {
+public abstract class WeaponCard : CardBase, ITakeDamage {
     private int _attack;
     public int Attack {
         get => _attack;
@@ -11,7 +11,7 @@ public abstract class WeaponCard : CardBase {
             else _attack = value;
         }
     }
-    public int Durability {
+    public int Health {
         get => _durability;
         set {
             if (value < 0) {
@@ -33,14 +33,15 @@ public abstract class WeaponCard : CardBase {
     }
 
     public override void Use() {
-        owner.Weapon?.Die();
-        owner.Weapon = this;
+        Owner.Weapon?.Die();
+        Owner.Weapon = this;
     }
 
     private void Die() {
         foreach (Effect e in DeathRattleEffects) {
             e.ActivateEffect();
         }
+        EventManager.Allocate<CardEventArgs>().CreateEventArgs(CardEvent.OnWeaponDestroy, null, Owner, this);
     }
 
 }

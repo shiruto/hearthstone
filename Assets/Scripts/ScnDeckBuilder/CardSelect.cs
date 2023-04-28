@@ -16,7 +16,7 @@ public class CardSelect : MonoBehaviour {
     private readonly int MaxPageSize = 8;
     private List<int> PageSize = new();
     private string LastClassFilter = "";
-    public Dictionary<GameDataAsset.ClassType, int> ClassIndex = new();
+    public Dictionary<ClassType, int> ClassIndex = new();
     private Transform TxtPage;
     public static event Func<CardAsset, int> SelectedNum;
 
@@ -56,7 +56,7 @@ public class CardSelect : MonoBehaviour {
     private void Initialize() {
         PageSize.Clear();
         PageSize.Add(0);
-        foreach (GameDataAsset.ClassType classType in Enum.GetValues(typeof(GameDataAsset.ClassType))) {
+        foreach (ClassType classType in Enum.GetValues(typeof(ClassType))) {
             ClassIndex[classType] = 0;
         }
         for (int i = 0, j = 0; i < AvailableCards.Count; i++) { // i 为卡牌 j 为当前页的卡牌 初始化所有页的卡牌数
@@ -131,7 +131,7 @@ public class CardSelect : MonoBehaviour {
             LastClassFilter = "";
         }
         else {
-            Load(ClassIndex[(GameDataAsset.ClassType)Enum.Parse(typeof(GameDataAsset.ClassType), ClassName)]);
+            Load(ClassIndex[(ClassType)Enum.Parse(typeof(ClassType), ClassName)]);
             LastClassFilter = ClassName;
         }
     }

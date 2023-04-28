@@ -7,7 +7,7 @@ public class DeckPrevManager : MonoBehaviour {
     public DeckAsset DA;
     public TextMeshProUGUI DeckName;
     public Image DeckImage;
-    public GameDataAsset.ClassType DeckClass;
+    public ClassType DeckClass;
     public int Order;
     public void ReadFromAsset() {
         DeckName.text = DA.name;
@@ -16,6 +16,6 @@ public class DeckPrevManager : MonoBehaviour {
     }
     private void OnMouseDown() {
         Debug.Log("mouse down");
-        EventManager.Invoke(EventManager.Allocate<DeckEventArgs>().CreateEventArgs(DeckEvent.OnDeckSelect, gameObject, DA));
+        EventManager.Allocate<DeckEventArgs>().CreateEventArgs(DeckEvent.OnDeckSelect, gameObject, DA).Invoke();
     }
 }

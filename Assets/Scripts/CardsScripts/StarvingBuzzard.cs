@@ -1,15 +1,18 @@
-public class StarvingBuzzard : MinionCard {
+using System.Collections.Generic;
+
+public abstract class StarvingBuzzard : MinionCard, ITriggerMinionCard {
+    public List<TriggerStruct> Triggers { get; set; }
+
     public StarvingBuzzard(CardAsset CA) : base(CA) {
-
+        Triggers = new() { new(MinionEvent.AfterMinionSummon, Triggered) };
     }
 
-    public void Trigger() {
-        EventManager.AddListener(MinionEvent.AfterMinionSummon, EventHandler);
-    }
-
-    public void EventHandler(BaseEventArgs e) {
-        if ((e as MinionEventArgs).minion.ca.MinionType == GameDataAsset.MinionType.Beast) {
-            (e as MinionEventArgs).minion.owner.Deck.DrawCards(1);
+    public void Triggered(BaseEventArgs e) {
+        if (e.Player != Owner) return;
+        MinionEventArgs evt = e as MinionEventArgs;
+        if (evt.minion.Card.CA.MinionType == MinionType.Beast) {
+            evt.minion.Owner.Deck.DrawCards(1);
         }
     }
+
 }

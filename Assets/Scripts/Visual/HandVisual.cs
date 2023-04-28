@@ -16,6 +16,7 @@ public class HandVisual : MonoBehaviour {
     }
 
     private void VisualUpdate(BaseEventArgs e) {
+        Debug.Log("VisualUpdate");
         if (CardTrans.Count > Hand.Hands.Count) {
             for (int i = 0; i < CardTrans.Count; i++) {
                 if (i < Hand.Hands.Count) {
@@ -32,14 +33,12 @@ public class HandVisual : MonoBehaviour {
             for (int i = 0; i < Hand.Hands.Count; i++) {
                 if (i < CardTrans.Count) {
                     CardTrans[i].gameObject.SetActive(true);
-                    CardTrans[i].GetComponent<BattleCardViewController>().Card = Hand.Hands[i];
-                    CardTrans[i].GetComponent<BattleCardViewController>().ReadFromAsset();
                 }
                 else {
                     CardTrans.Add(Instantiate(PfbBattleCard, transform).transform);
-                    CardTrans[i].GetComponent<BattleCardViewController>().Card = Hand.Hands[i];
-                    CardTrans[i].GetComponent<BattleCardViewController>().ReadFromAsset();
                 }
+                CardTrans[i].GetComponent<BattleCardViewController>().Card = Hand.Hands[i];
+                CardTrans[i].GetComponent<BattleCardViewController>().ReadFromAsset();
             }
         }
         AlignTheCards();
@@ -47,8 +46,7 @@ public class HandVisual : MonoBehaviour {
 
     private void AlignTheCards() {
         int Dis = 76;
-        Debug.Log("Align");
-        if (Hand.Hands.Count > 8) {
+        if (Hand.Hands.Count > 8) { // TODO:
             Debug.Log(Hand.Hands.Count);
             for (int i = 0; i < Hand.Hands.Count; i++) {
                 CardTrans[i].name = "card" + (i + 1);
@@ -60,11 +58,12 @@ public class HandVisual : MonoBehaviour {
                 pivot.x = -PanelWidth / 2 + 57 + i * Dis;
                 CardTrans[i].localPosition = pivot;
                 CardTrans[i].name = "card" + (i + 1);
+                CardTrans[i].GetComponent<BoxCollider>().center = new(0, 0, -i);
             }
         }
         else if (Hand.Hands.Count == 1) {
-            CardTrans[0].localPosition = new(0, 0, -1);
-            CardTrans[0].name = "Card1";
+            CardTrans[0].localPosition = new(0, 0, 0);
+            CardTrans[0].name = "card1";
         }
     }
 }

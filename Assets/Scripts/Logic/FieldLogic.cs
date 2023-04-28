@@ -1,8 +1,7 @@
 using System.Collections.Generic;
-using UnityEngine;
 
 public class FieldLogic {
-    private List<MinionLogic> Minions = null;
+    public List<MinionLogic> Minions;
     public PlayerLogic owner;
 
     public FieldLogic() {
@@ -10,14 +9,15 @@ public class FieldLogic {
     }
 
     public void SummonMinionAt(int position, MinionLogic MinionToSummon) {
+        if (position == -1) position = Minions.Count - 1;
         if (Minions.Count == 0) Minions.Add(MinionToSummon);
         else Minions.Insert(position, MinionToSummon);
-        EventManager.Invoke(EventManager.Allocate<MinionEventArgs>().CreateEventArgs(MinionEvent.AfterMinionSummon, null, owner, MinionToSummon, position));
+        EventManager.Allocate<EmptyParaArgs>().CreateEventArgs(EmptyParaEvent.FieldVisualUpdate).Invoke();
     }
 
     public void RemoveMinion(MinionLogic Minion) {
         Minions.Remove(Minion);
-        EventManager.Invoke(EventManager.Allocate<EmptyParaArgs>().CreateEventArgs(EmptyParaEvent.FieldVisualUpdate));
+        EventManager.Allocate<EmptyParaArgs>().CreateEventArgs(EmptyParaEvent.FieldVisualUpdate).Invoke();
     }
 
     public List<MinionLogic> GetMinions() {

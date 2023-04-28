@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using UnityEngine;
 
 public class CardAsset : ScriptableObject {
@@ -7,10 +6,9 @@ public class CardAsset : ScriptableObject {
     public string Description;
     public Sprite CardImage;
     public int ManaCost;
-    public GameDataAsset.Rarity rarity;
-    public GameDataAsset.ClassType ClassType;
-    public bool isTriggered;
-    public GameDataAsset.CardType cardType;
+    public Rarity rarity;
+    public ClassType ClassType;
+    public CardType cardType;
     [Header("MinionSection")]
     public int Attack;
     public int Health;
@@ -22,14 +20,14 @@ public class CardAsset : ScriptableObject {
     public bool isDivineShield;
     public bool isStealth;
     public bool isImmune;
-    public bool isFrozen;
+    public bool isLifeSteal;
     public bool isPoisonous;
     public int Overload;
-    public GameDataAsset.MinionType MinionType;
+    public MinionType MinionType;
 
     [Header("SpellSection")]
     public bool isSecret;
-    public GameDataAsset.TargetingOptions TargetsType;
-    public GameDataAsset.SpellSchool SpellSchool;
+    public TargetingOptions TargetsType;
+    public SpellSchool SpellSchool;
 
 }

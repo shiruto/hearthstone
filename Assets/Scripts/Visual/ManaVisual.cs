@@ -3,9 +3,10 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class ManaVisual : MonoBehaviour {
+public class ManaVisual : MonoBehaviour { // TODO: overload cyrstal visual
     private readonly Color _colorOn = new(102 / 255f, 204 / 255f, 255 / 255f, 1);
     private readonly Color _colorOff = new(51 / 255f, 102 / 255f, 153 / 255f, 1);
+    // private readonly Color _colorOverload = new(); overload color yellow?
 
     public ManaLogic Mana;
     public List<Transform> Crystals;

@@ -1,12 +1,11 @@
-using System;
 using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
 public class BattleControl : MonoBehaviour {
-    public static Dictionary<int, CardBase> CardCreated;
-    public static Dictionary<int, MinionLogic> MinionCreated;
+    public static Dictionary<int, CardBase> CardUsed;
+    public static Dictionary<int, MinionLogic> MinionSummoned;
 
     #region view stuff
     public static PlayerLogic you;
@@ -17,6 +16,7 @@ public class BattleControl : MonoBehaviour {
     public ManaVisual yourManaVisual;
     public SkillVisual yourSkill;
     public WeaponVisual yourWeapon;
+    public SecretVisual yourSecret;
     public static PlayerLogic opponent;
     public PlayerVisual opponentVisual;
     public DeckVisual opponentsDeckVisual;
@@ -25,6 +25,7 @@ public class BattleControl : MonoBehaviour {
     public ManaVisual opponentsManaVisual;
     public SkillVisual opponentsSkill;
     public WeaponVisual opponentsWeapon;
+    public SecretVisual opponentsSecret;
     public GameObject PnlStarter;
     public GameObject PnlDiscover;
     public GameObject BtnEndTurn;
@@ -39,12 +40,14 @@ public class BattleControl : MonoBehaviour {
         }
     }
 
+    public int SpellDamage;
+    public CardBase CardUsing;
     public ICharacter Targeting;
 
     private void Awake() {
         Instance = this;
-        CardCreated = new();
-        MinionCreated = new();
+        CardUsed = new();
+        MinionSummoned = new();
         EventManager.AddListener(TurnEvent.OnTurnEnd, OnTurnEndHandler);
         EventManager.AddListener(TurnEvent.OnGameOver, OnGameEnd);
     }
@@ -60,7 +63,6 @@ public class BattleControl : MonoBehaviour {
         opponent = new(SelectedDeck.DeckClass);
 
         you.Deck.ReadCardsFromDeck(SelectedDeck);
-        you.Deck.UpdateCardName();
         youVisual.Player = you;
         youVisual.ReadFromLogic();
         yourDeckVisual.Deck = you.Deck;
@@ -68,12 +70,11 @@ public class BattleControl : MonoBehaviour {
         yourFieldVisual.Field = you.Field;
         yourManaVisual.Mana = you.Mana;
         yourWeapon.gameObject.SetActive(false);
+        yourSecret.sl = you.Secrets;
         // TODO: Create Skill Card Asset
         // object[] parameters = new object[] { AssetDatabase.LoadAllAssetsAtPath("Assets/ResourcesScriptableObject/UnCollectableCard/" + SelectedDeck.DeckClass + ".asset") as object};
         // yourSkill.InitSkill(Activator.CreateInstance(Type.GetType(SelectedDeck.DeckClass.ToString("G") + "Skill"), parameters) as SkillCard);
-
         opponent.Deck.ReadCardsFromDeck(SelectedDeck); // TODO: change opponent's deck
-        opponent.Deck.UpdateCardName();
         opponentVisual.Player = opponent;
         opponentVisual.ReadFromLogic();
         opponentsDeckVisual.Deck = opponent.Deck;
@@ -81,7 +82,12 @@ public class BattleControl : MonoBehaviour {
         opponentsManaVisual.Mana = opponent.Mana;
         opponentsHandVisual.Hand = opponent.Hand;
         opponentsWeapon.gameObject.SetActive(false);
-        EventManager.Invoke(EventManager.Allocate<EmptyParaArgs>().CreateEventArgs(EmptyParaEvent.ManaVisualUpdate));
+        opponentsSecret.sl = opponent.Secrets;
+        opponent.Deck.UpdateCardName();
+        you.Deck.UpdateCardName();
+        EventManager.Allocate<EmptyParaArgs>().CreateEventArgs(EmptyParaEvent.FieldVisualUpdate).Invoke();
+        EventManager.Allocate<EmptyParaArgs>().CreateEventArgs(EmptyParaEvent.ManaVisualUpdate).Invoke();
+        EventManager.Allocate<EmptyParaArgs>().CreateEventArgs(EmptyParaEvent.SecretVisualUpdate).Invoke();
     }
 
     public void OnGameStart() {
@@ -94,8 +100,6 @@ public class BattleControl : MonoBehaviour {
         if (you != ActivePlayer) {
             BtnEndTurn.GetComponent<BtnEndTurn>().SwapText();
         }
-        Debug.Log($"I have {you.Deck.Deck.Count} Cards");
-        Debug.Log("Starter Draw");
         List<CardBase> _opts = new(3);
         for (int i = 0; i < 3; i++) {
             _opts.Add(you.Deck.RemoveCardFromDeckAt(Random.Range(0, you.Deck.Deck.Count)));
@@ -112,15 +116,15 @@ public class BattleControl : MonoBehaviour {
     public void OnGameEnd(BaseEventArgs e) {
         //TODO: implement these scene
         TurnEventArgs evt = e as TurnEventArgs;
-        GameDataAsset.GameStatus status = evt.status;
+        GameStatus status = evt.status;
         switch (status) {
-            case GameDataAsset.GameStatus.Tie:
+            case GameStatus.Tie:
                 Debug.Log("Tie");
                 break;
-            case GameDataAsset.GameStatus.Lose:
+            case GameStatus.Lose:
                 Debug.Log("Lose");
                 break;
-            case GameDataAsset.GameStatus.Win:
+            case GameStatus.Win:
                 Debug.Log("Win");
                 break;
             default:
@@ -130,7 +134,9 @@ public class BattleControl : MonoBehaviour {
     }
 
     public void ShowDiscoverPanel(List<CardBase> _cards) {
+        if (_cards.Count <= 0) return;
         PnlDiscover.SetActive(true);
+        PnlDiscover.GetComponent<DiscoverPnlController>().showingCardNum = _cards.Count;
         int index = 0;
         foreach (Transform child in PnlDiscover.transform.GetChild(1)) {
             if (index >= _cards.Count) {
@@ -153,6 +159,12 @@ public class BattleControl : MonoBehaviour {
             child.GetComponent<BattleCardViewController>().ReadFromAsset();
             index++;
         }
+    }
+
+    public List<MinionLogic> GetAllMinions() {
+        List<MinionLogic> minions = new(you.Field.GetMinions());
+        minions.AddRange(opponent.Field.GetMinions());
+        return minions;
     }
 
 }

@@ -25,12 +25,12 @@ public class CardViewController : MonoBehaviour {
         ManaCostText.text = CA.ManaCost.ToString(); // 添加卡牌消耗
         DescriptionText.text = CA.Description; // 添加描述
         // CardGraphicImage.sprite = Card.CA.CardImage; // 更换卡牌图片
-        if (CA.cardType == GameDataAsset.CardType.Minion) {
+        if (CA.cardType == CardType.Minion) {
             AttackText.text = CA.Attack.ToString();
             HealthText.text = CA.Health.ToString();
         }
-        HealthIcon.SetActive(CA.cardType == GameDataAsset.CardType.Minion);
-        AttackIcon.SetActive(CA.cardType == GameDataAsset.CardType.Minion);
+        HealthIcon.SetActive(CA.cardType == CardType.Minion);
+        AttackIcon.SetActive(CA.cardType == CardType.Minion);
     }
 
 }

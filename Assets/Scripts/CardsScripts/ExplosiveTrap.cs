@@ -1,27 +1,32 @@
-using System;
-
 public class ExplosiveTrap : SecretCard {
+
     public ExplosiveTrap(CardAsset CA) : base(CA) {
 
     }
 
-    public void Trigger() {
-        EventManager.AddListener(MinionEvent.BeforeMinonAttack, EventHandler);
+    public override void AddTrigger() {
+        EventManager.AddListener(AttackEvent.BeforeAttack, Triggered);
     }
 
-    public void EventHandler(BaseEventArgs e) {
-        MinionEventArgs evt = e as MinionEventArgs;
-        if (evt.minion.owner != owner && evt.Sender.GetComponent<DraggableMinion>()._target == owner) {
-            new DealAoeDamage(2, (ICharacter taget) => {
-                if (Target is MinionLogic && (Target as MinionLogic).owner != owner) {
-                    return true;
+    public override void DelTrigger() {
+        EventManager.DelListener(AttackEvent.BeforeAttack, Triggered);
+    }
+
+    public override void SecretImplement(BaseEventArgs e, out bool isTriggered) {
+        AttackEventArgs evt = e as AttackEventArgs;
+        if (evt.target == Owner) {
+            isTriggered = true;
+            new DealAoeDamage(2, (ICharacter a) => {
+                if (a is MinionLogic) {
+                    return (a as MinionLogic).Owner != Owner;
                 }
-                else if (Target is PlayerLogic && (Target as PlayerLogic) != owner) {
-                    return true;
+                else if (a is PlayerLogic) {
+                    return (a as PlayerLogic) != Owner;
                 }
                 else return false;
-            }).ActivateEffect();
+            }, true).ActivateEffect();
         }
-
+        else isTriggered = false;
     }
+
 }

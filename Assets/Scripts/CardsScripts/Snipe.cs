@@ -1,17 +1,24 @@
-public class Snipe : SecretCard {
+using System.Linq;
+
+public class Snipe : SecretCard, IDealDamage {
+    public int Damage => 4;
+
     public Snipe(CardAsset CA) : base(CA) {
 
     }
 
-    public void Trigger() {
-        EventManager.AddListener(MinionEvent.AfterMinionSummon, EventHandler);
+    public override void AddTrigger() {
+        EventManager.AddListener(MinionEvent.AfterMinionSummon, Triggered);
     }
 
-    public void EventHandler(BaseEventArgs e) {
+    public override void DelTrigger() {
+        EventManager.DelListener(MinionEvent.AfterMinionSummon, Triggered);
+    }
+
+    public override void SecretImplement(BaseEventArgs e, out bool isTriggered) {
         MinionEventArgs evt = e as MinionEventArgs;
-        if (evt.minion.owner != owner) {
-            new DealDamageToTarget(4, evt.minion).ActivateEffect(); // TODO: Use EventManager?
-        }
+        new DealDamageToTarget(false, Damage, this, evt.minion, true).ActivateEffect();
+        isTriggered = true;
     }
 
 }
