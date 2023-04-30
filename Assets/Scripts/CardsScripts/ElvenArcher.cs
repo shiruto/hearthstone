@@ -14,8 +14,8 @@ public class ElvenArcher : MinionCard, IBattleCry, IDealDamage, ITarget {
         new DealDamageToTarget(false, Damage, this, ScnBattleUI.Instance.Targeting).ActivateEffect();
     }
 
-    public bool CanBeTarget(CardBase Card) {
-        return Card is ICharacter;
+    public bool CanBeTarget(ICharacter Card) {
+        return true;
     }
 
 }

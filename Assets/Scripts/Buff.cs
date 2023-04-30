@@ -1,30 +1,40 @@
 using System.Collections.Generic;
+using UnityEngine;
 
 public class Buff {
-    public string BuffName;
-    public int HealthChange;
-    public int AttackChange;
-    public int CostChange;
-    public int Expire {
-        get => _expire;
-        set {
-            if (value == 0) {
-                RemoveBuff();
-            }
-            _expire = value;
+    public readonly string BuffName;
+    public List<StatusChange> statusChange;
+    public List<TriggerStruct> Triggers;
+    public HashSet<CharacterAttribute> Attributes;
+
+    public Buff(string name, List<StatusChange> sc, List<TriggerStruct> triggers = null, HashSet<CharacterAttribute> attributes = null) {
+        BuffName = name;
+        statusChange = sc;
+        Triggers = triggers;
+        Attributes = attributes;
+    }
+
+    public static void Modify(ref int variable, Operator op, int value) {
+        switch (op) {
+            case Operator.Plus:
+                variable += value;
+                break;
+            case Operator.Minus:
+                variable -= value;
+                break;
+            case Operator.Time:
+                variable *= value;
+                break;
+            case Operator.Divide:
+                variable /= value;
+                break;
+            case Operator.equal:
+                variable = value;
+                break;
+            default:
+                Debug.Log("no such operator");
+                break;
         }
-    }
-    private int _expire;
-
-    public Buff(int HealthChange, int AttackChange, int CostChange = 0) {
-        this.HealthChange = HealthChange;
-        this.AttackChange = AttackChange;
-        this.CostChange = CostChange;
-    }
-
-    public void RemoveBuff() {
-        HealthChange = 0;
-        AttackChange = 0;
     }
 
 }

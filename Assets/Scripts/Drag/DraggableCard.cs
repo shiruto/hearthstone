@@ -44,14 +44,14 @@ public class DraggableCard : Draggable {
                     (CardUsing as ITarget).Target = ScnBattleUI.Instance.Targeting;
                     BattleControl.Instance.CardUsing = CardUsing;
                     EventManager.Allocate<CardEventArgs>().CreateEventArgs(CardEvent.BeforeCardUse, gameObject, CardUsing.Owner, CardUsing).Invoke();
-                    BattleControl.Instance.CardUsing.Use();
+                    BattleControl.Instance.CardUsing?.Use();
                 }
                 else StartCoroutine(MoveTo(StartPos)); // target select failed.
             }
             else {
                 BattleControl.Instance.CardUsing = CardUsing;
                 EventManager.Allocate<CardEventArgs>().CreateEventArgs(CardEvent.BeforeCardUse, gameObject, CardUsing.Owner, CardUsing).Invoke();
-                BattleControl.Instance.CardUsing.Use();
+                BattleControl.Instance.CardUsing?.Use();
             }
             // TODO: Card Used in BattleControl, not here. So can manage the Counter trigger.
         }

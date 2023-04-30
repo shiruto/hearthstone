@@ -63,7 +63,8 @@ public enum EmptyParaEvent {
     HandVisualUpdate,
     PlayerVisualUpdate,
     SecretVisualUpdate,
-    CardPreviewDelete
+    CardPreviewDelete,
+    WeaponVisualUpdate
 }
 
 public enum AttackEvent {

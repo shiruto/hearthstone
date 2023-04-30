@@ -1,10 +1,10 @@
 using System.Collections.Generic;
 
-public abstract class StarvingBuzzard : MinionCard, ITriggerMinionCard {
-    public List<TriggerStruct> Triggers { get; set; }
+public abstract class StarvingBuzzard : MinionCard, IGrantTrigger {
+    public List<TriggerStruct> TriggersToGrant { get; set; }
 
     public StarvingBuzzard(CardAsset CA) : base(CA) {
-        Triggers = new() { new(MinionEvent.AfterMinionSummon, Triggered) };
+        TriggersToGrant = new() { new(MinionEvent.AfterMinionSummon, Triggered) };
     }
 
     public void Triggered(BaseEventArgs e) {

@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 public class CardAsset : ScriptableObject {
@@ -13,21 +14,11 @@ public class CardAsset : ScriptableObject {
     public int Attack;
     public int Health;
     public int SpellDamage = 0;
-    public bool isWindFury;
-    public bool isTaunt;
-    public bool isCharge;
-    public bool isRush;
-    public bool isDivineShield;
-    public bool isStealth;
-    public bool isImmune;
-    public bool isLifeSteal;
-    public bool isPoisonous;
     public int Overload;
     public MinionType MinionType;
-
+    public List<CharacterAttribute> attributes;
     [Header("SpellSection")]
     public bool isSecret;
-    public TargetingOptions TargetsType;
     public SpellSchool SpellSchool;
 
 }

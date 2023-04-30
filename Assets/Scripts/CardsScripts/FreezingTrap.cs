@@ -1,6 +1,11 @@
 public class FreezingTrap : SecretCard {
-    public FreezingTrap(CardAsset CA) : base(CA) {
+    private readonly Buff buff;
 
+    public FreezingTrap(CardAsset CA) : base(CA) {
+        buff = new(
+            "Freeze Trap",
+            new() { new(Status.ManaCost, Operator.Plus, 2) }
+        );
     }
 
     public override void AddTrigger() {
@@ -15,7 +20,7 @@ public class FreezingTrap : SecretCard {
         AttackEventArgs evt = e as AttackEventArgs;
         if (evt.target == Owner && evt.attacker is MinionLogic) {
             isTriggered = true;
-            (evt.attacker as MinionLogic).BackToHand().BuffList.Add(new(0, 0, 2));
+            ((evt.attacker as MinionLogic).BackToHand() as IBuffable).AddBuff(buff);
         }
         else isTriggered = false;
     }

@@ -1,14 +1,16 @@
 using System.Collections.Generic;
 
-public class ScavengingHyena : MinionCard, ITriggerMinionCard {
+public class ScavengingHyena : MinionCard, IGrantTrigger {
     private readonly Buff _buff;
-    public List<TriggerStruct> Triggers { get; set; }
+    public List<TriggerStruct> TriggersToGrant { get; set; }
 
     public ScavengingHyena(CardAsset CA) : base(CA) {
-        _buff = new(1, 2) {
-            BuffName = "sc"
-        };
-        Triggers = new() { new(MinionEvent.AfterMinionDie, Triggered) };
+        _buff = new(
+            "sc",
+            new() { new(Status.Attack, Operator.Plus, 2), new(Status.Health, Operator.Plus, 1) }
+
+        );
+        TriggersToGrant = new() { new(MinionEvent.AfterMinionDie, Triggered) };
     }
 
     public void Triggered(BaseEventArgs e) {

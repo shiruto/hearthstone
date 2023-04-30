@@ -10,9 +10,36 @@ public struct TriggerStruct {
         this.eventType = eventType;
         this.callback = callback;
     }
-};
+}
 
-public struct AuraStruct {
+public struct StatusChange {
+    public Status status;
+    public Operator op;
+    public int Num;
+
+    public StatusChange(Status s, Operator o, int n) {
+        status = s;
+        op = o;
+        Num = n;
+    }
+}
+
+public enum Status {
+    Health,
+    Attack,
+    ManaCost,
+    SpellDamage
+}
+
+public enum Operator {
+    Plus,
+    Minus,
+    Time,
+    Divide,
+    equal
+}
+
+public struct AuraStruct { // TODO:
     public Buff buff;
 }
 
@@ -107,9 +134,24 @@ public enum GameStatus {
     Tie
 }
 
+[Serializable]
+public enum CharacterAttribute {
+    Windfury,
+    Taunt,
+    Charge,
+    Rush,
+    DivineShield,
+    Stealth,
+    Immune,
+    LifeSteal,
+    Poisonous,
+    Elusive,
+    Frozen
+}
+
 public class GameDataAsset {
     public static readonly Dictionary<ClassType, Color> SecretColor = new() {
-        {ClassType.Mage, Color.cyan},
+        {ClassType.Mage, new(1, 104/255f, 248/255f, 1)},
         {ClassType.Hunter, Color.green},
         {ClassType.Rouge, Color.gray},
         {ClassType.Paladin, Color.yellow}

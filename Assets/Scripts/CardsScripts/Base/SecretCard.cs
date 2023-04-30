@@ -21,9 +21,9 @@ public abstract class SecretCard : SpellCard {
         if (Owner != BattleControl.Instance.ActivePlayer) {
             SecretImplement(e, out bool isTriggered);
             if (isTriggered) {
-                EventManager.Allocate<EmptyParaArgs>().CreateEventArgs(EmptyParaEvent.SecretVisualUpdate).Invoke();
                 EventManager.Allocate<CardEventArgs>().CreateEventArgs(CardEvent.OnSecretReveal, null, Owner, this).Invoke();
                 DelTrigger();
+                Owner.Secrets.RemoveSecret(this);
             }
         }
     }

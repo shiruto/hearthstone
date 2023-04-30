@@ -1,12 +1,18 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using UnityEngine;
 
 public class DealAoeDamage : Effect {
+    public bool isHeal;
     public int damage;
     readonly Func<ICharacter, bool> range;
     public override string Name => "Deal AoE Damage Effect";
     public bool isMagicDamage;
+    public List<ICharacter> CharacterToDamage = new(BattleControl.Instance.GetAllMinions()) {
+            BattleControl.you,
+            BattleControl.opponent
+        };
 
     public DealAoeDamage(int damage) {
         this.damage = damage;
@@ -20,13 +26,10 @@ public class DealAoeDamage : Effect {
     }
 
     public override void ActivateEffect() {
-        List<ICharacter> CharacterToDamage = new(BattleControl.you.Field.GetMinions());
-        CharacterToDamage.AddRange(BattleControl.you.Field.GetMinions());
-        CharacterToDamage.Add(BattleControl.you);
-        CharacterToDamage.Add(BattleControl.opponent);
-        CharacterToDamage.Where(range);
-        foreach (ICharacter minion in CharacterToDamage) {
-            minion.Health -= damage;
+        CharacterToDamage = new(CharacterToDamage.Where(range));
+        if (isMagicDamage) damage += BattleControl.Instance.SpellDamage;
+        foreach (ICharacter c in CharacterToDamage) {
+            c.Health -= damage;
         }
     }
 }

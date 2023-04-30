@@ -8,11 +8,11 @@ public class MoonFire : SpellCard, IDealDamage, ITarget {
 
     public override void ExtendUse() {
         base.ExtendUse();
-        new DealDamageToTarget(false, Damage, this, ScnBattleUI.Instance.Targeting, true).ActivateEffect();
+        new DealDamageToTarget(false, Damage, this, Target, true).ActivateEffect();
     }
 
-    public bool CanBeTarget(CardBase Card) {
-        return Card is ICharacter;
+    public bool CanBeTarget(ICharacter Card) {
+        return true;
     }
 
 }

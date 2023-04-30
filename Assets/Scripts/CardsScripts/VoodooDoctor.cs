@@ -10,11 +10,11 @@ public class VooDooDoctor : MinionCard, IHeal, IBattleCry, ITarget {
     }
 
     public void BattleCry() {
-        new DealDamageToTarget(true, Heal, this, ScnBattleUI.Instance.Targeting);
+        new DealDamageToTarget(true, Heal, this, Target);
     }
 
-    public bool CanBeTarget(CardBase Card) {
-        return Card is ICharacter;
+    public bool CanBeTarget(ICharacter Card) {
+        return true;
     }
 
 }

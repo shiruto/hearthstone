@@ -40,7 +40,7 @@ public class BattleControl : MonoBehaviour {
         }
     }
 
-    public int SpellDamage;
+    public int SpellDamage = 0;
     public CardBase CardUsing;
     public ICharacter Targeting;
 
@@ -69,6 +69,7 @@ public class BattleControl : MonoBehaviour {
         yourHandVisual.Hand = you.Hand;
         yourFieldVisual.Field = you.Field;
         yourManaVisual.Mana = you.Mana;
+        yourWeapon.WL = you.Weapon;
         yourWeapon.gameObject.SetActive(false);
         yourSecret.sl = you.Secrets;
         // TODO: Create Skill Card Asset
@@ -81,6 +82,7 @@ public class BattleControl : MonoBehaviour {
         opponentsFieldVisual.Field = opponent.Field;
         opponentsManaVisual.Mana = opponent.Mana;
         opponentsHandVisual.Hand = opponent.Hand;
+        opponentsWeapon.WL = opponent.Weapon;
         opponentsWeapon.gameObject.SetActive(false);
         opponentsSecret.sl = opponent.Secrets;
         opponent.Deck.UpdateCardName();

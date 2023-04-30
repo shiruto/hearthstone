@@ -17,24 +17,12 @@ MonoBehaviour:
   ManaCost: 1
   rarity: 1
   ClassType: 10
-  isTriggered: 0
   cardType: 1
   Attack: 2
   Health: 1
   SpellDamage: 0
-  isWindFury: 0
-  isTaunt: 0
-  isCharge: 0
-  isRush: 0
-  isDivineShield: 0
-  isStealth: 0
-  isImmune: 0
-  isFrozen: 0
-  isPoisonous: 0
-  CreatureScriptName: 
-  MinionType: 11
+  Overload: 0
+  MinionType: 0
+  attributes: 
   isSecret: 0
-  TargetsType: 0
   SpellSchool: 0
-  Effects:
-  - effectType: 6

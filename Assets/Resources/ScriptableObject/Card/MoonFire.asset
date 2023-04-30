@@ -12,12 +12,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 42c713fb9583240f6a0721d20f3d54ae, type: 3}
   m_Name: MoonFire
   m_EditorClassIdentifier: 
-  Description: 
+  Description: Deal 1 damage.
   CardImage: {fileID: 0}
   ManaCost: 0
   rarity: 0
   ClassType: 1
-  isTriggered: 0
   cardType: 0
   Attack: 0
   Health: 0
@@ -29,10 +28,10 @@ MonoBehaviour:
   isDivineShield: 0
   isStealth: 0
   isImmune: 0
-  isFrozen: 0
+  isLifeSteal: 0
   isPoisonous: 0
+  isElusive: 0
   Overload: 0
   MinionType: 0
   isSecret: 0
-  TargetsType: 0
-  SpellSchool: 0
+  SpellSchool: 1

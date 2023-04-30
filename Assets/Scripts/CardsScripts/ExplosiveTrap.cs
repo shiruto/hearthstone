@@ -1,3 +1,5 @@
+using UnityEngine;
+
 public class ExplosiveTrap : SecretCard {
 
     public ExplosiveTrap(CardAsset CA) : base(CA) {

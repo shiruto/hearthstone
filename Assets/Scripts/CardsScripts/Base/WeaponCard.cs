@@ -1,6 +1,4 @@
-using System.Collections.Generic;
-
-public abstract class WeaponCard : CardBase, ITakeDamage {
+public abstract class WeaponCard : CardBase {
     private int _attack;
     public int Attack {
         get => _attack;
@@ -15,33 +13,39 @@ public abstract class WeaponCard : CardBase, ITakeDamage {
         get => _durability;
         set {
             if (value < 0) {
-                _durability = value;
-                Die();
+                _durability = 0;
             }
             else _durability = value;
         }
     }
     private int _durability;
-    public List<Effect> BattleCryEffects;
-    public List<Effect> DeathRattleEffects;
-    public bool IsPoisonous { get; set; }
-    public bool IsWindFury { get; set; }
 
     public WeaponCard(CardAsset CA) : base(CA) {
-        IsPoisonous = CA.isPoisonous;
-        IsWindFury = CA.isWindFury;
+        _attack = CA.Attack;
+        _durability = CA.Health;
     }
 
-    public override void Use() {
-        Owner.Weapon?.Die();
-        Owner.Weapon = this;
+    public override void ExtendUse() {
+        Owner.Weapon.EquipWeapon(this);
     }
 
-    private void Die() {
-        foreach (Effect e in DeathRattleEffects) {
-            e.ActivateEffect();
+    public override void ReadBuff() {
+        base.ReadBuff();
+        foreach (Buff b in BuffList) {
+            if (b.statusChange.Count == 0) break;
+            foreach (var sc in b.statusChange) {
+                switch (sc.status) {
+                    case Status.Attack:
+                        Buff.Modify(ref _attack, sc.op, sc.Num);
+                        break;
+                    case Status.Health:
+                        Buff.Modify(ref _durability, sc.op, sc.Num);
+                        break;
+                    default:
+                        break;
+                }
+            }
         }
-        EventManager.Allocate<CardEventArgs>().CreateEventArgs(CardEvent.OnWeaponDestroy, null, Owner, this);
     }
 
 }

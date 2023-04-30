@@ -1,6 +1,6 @@
 public class GiveBuff : Effect {
     public Buff BuffToGive;
-    public override string Name => "buff effect";
+    public override string Name => "givebuff effect";
     public IBuffable Target { get; set; }
     public CardBase giver;
 
@@ -11,7 +11,7 @@ public class GiveBuff : Effect {
     }
 
     public override void ActivateEffect() {
-        Target.BuffList.Add(BuffToGive);
+        Target.AddBuff(BuffToGive);
     }
 
 }

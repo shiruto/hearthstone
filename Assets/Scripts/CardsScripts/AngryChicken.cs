@@ -1,14 +1,15 @@
 using System.Collections.Generic;
 
-public class AngryChicken : MinionCard, ITriggerMinionCard {
+public class AngryChicken : MinionCard, IGrantTrigger {
     private readonly Buff _buff;
-    public List<TriggerStruct> Triggers { get; set; }
+    public List<TriggerStruct> TriggersToGrant { get; set; }
 
     public AngryChicken(CardAsset CA) : base(CA) {
-        _buff = new(0, 5) {
-            BuffName = "angrychicken"
-        };
-        Triggers = new() { new(MinionEvent.AfterMinionStatusChange, Triggered) };
+        _buff = new(
+            "angrychicken",
+            new() { new(Status.Attack, Operator.Plus, 5) }
+        );
+        TriggersToGrant = new() { new(MinionEvent.AfterMinionStatusChange, Triggered) };
     }
 
     public void Triggered(BaseEventArgs e) {

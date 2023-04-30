@@ -6,14 +6,13 @@ public class ArcaneShot : SpellCard, IDealDamage, ITarget {
         Target = null;
     }
 
-    public bool CanBeTarget(CardBase card) {
-        if (card is MinionCard or HeroCard) return true;
-        else return false;
+    public bool CanBeTarget(ICharacter card) {
+        return true;
     }
 
     public override void ExtendUse() {
         base.ExtendUse();
-        new DealDamageToTarget(false, Damage, this, ScnBattleUI.Instance.Targeting, true).ActivateEffect();
+        new DealDamageToTarget(false, Damage, this, Target, true).ActivateEffect();
     }
 
 }

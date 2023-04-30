@@ -1,15 +1,16 @@
 using System.Collections.Generic;
 using System.Linq;
 
-public class MurlocTidecaller : MinionCard, ITriggerMinionCard {
-    public List<TriggerStruct> Triggers { get; set; }
+public class MurlocTidecaller : MinionCard, IGrantTrigger {
+    public List<TriggerStruct> TriggersToGrant { get; set; }
     private readonly Buff _buff;
 
     public MurlocTidecaller(CardAsset CA) : base(CA) {
-        Triggers = new() { new(MinionEvent.AfterMinionSummon, Triggered) };
-        _buff = new(0, 1) {
-            BuffName = "MurlocTidecaller"
-        };
+        TriggersToGrant = new() { new(MinionEvent.AfterMinionSummon, Triggered) };
+        _buff = new(
+            "MurlocTidecaller",
+            new() { new(Status.Attack, Operator.Plus, 1) }
+        );
     }
 
     public void Triggered(BaseEventArgs e) {
