@@ -17,6 +17,7 @@ public abstract class CardBase : IIdentifiable, IBuffable {
     public int overloadCrystal;
     public bool costHealth = false;
     public List<TriggerStruct> Triggers { get; set; }
+    public List<Buff> Auras { get; set; }
 
     public CardBase(CardAsset CA) {
         CardID = IDFactory.GetID();
@@ -37,9 +38,10 @@ public abstract class CardBase : IIdentifiable, IBuffable {
     public virtual void ExtendUse() { }
 
     public virtual void ReadBuff() {
-        if (BuffList.Count == 0) return;
-        foreach (Buff b in BuffList) {
-            if (b.statusChange.Count != 0) {
+        ManaCost = CA.ManaCost;
+        if (BuffList.Count != 0) {
+            foreach (Buff b in BuffList) {
+                if (b.statusChange.Count == 0) break;
                 foreach (var sc in b.statusChange) {
                     switch (sc.status) {
                         case Status.ManaCost:
@@ -51,6 +53,21 @@ public abstract class CardBase : IIdentifiable, IBuffable {
                 }
             }
         }
+        if (Auras.Count != 0) {
+            foreach (Buff b in Auras) {
+                if (b.statusChange.Count == 0) break;
+                foreach (var sc in b.statusChange) {
+                    switch (sc.status) {
+                        case Status.ManaCost:
+                            Buff.Modify(ref _manaCost, sc.op, sc.Num);
+                            break;
+                        default:
+                            break;
+                    }
+                }
+            }
+        }
+        EventManager.Allocate<EmptyParaArgs>().CreateEventArgs(EmptyParaEvent.HandVisualUpdate);
     }
 
 }

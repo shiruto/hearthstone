@@ -13,7 +13,7 @@ public class DraggableMinion : Draggable {
 
     protected override void OnMouseDrag() {
         if (Minion.CanAttack) {
-            Debug.Log("Dragging");
+            ScnBattleUI.Instance.isDragging = true;
             EventManager.Allocate<VisualEventArgs>().CreateEventArgs(VisualEvent.DrawMinionLine, gameObject, transform.position, Input.mousePosition).Invoke();
         }
     }
@@ -23,10 +23,11 @@ public class DraggableMinion : Draggable {
     }
 
     protected override void OnMouseUp() {
-        if (DrawTarget(ScnBattleUI.Instance.Targeting)) {
+        if (ScnBattleUI.Instance.isDragging && DrawTarget(ScnBattleUI.Instance.Targeting)) {
             EventManager.Allocate<AttackEventArgs>().CreateEventArgs(AttackEvent.BeforeAttack, gameObject, GetComponent<MinionViewController>().ML, ScnBattleUI.Instance.Targeting).Invoke();
             GetComponent<MinionViewController>().ML.AttackAgainst(ScnBattleUI.Instance.Targeting);
         }
+        ScnBattleUI.Instance.isDragging = false;
         EventManager.Allocate<CardEventArgs>().CreateEventArgs(CardEvent.AfterCardPreview, gameObject, null, GetComponent<MinionViewController>().ML.Card).Invoke();
         EventManager.Allocate<VisualEventArgs>().CreateEventArgs(VisualEvent.DeleteLine, gameObject, Vector3.zero, Vector3.zero).Invoke();
     }

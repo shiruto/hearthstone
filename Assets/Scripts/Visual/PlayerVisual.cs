@@ -26,7 +26,7 @@ public class PlayerVisual : MonoBehaviour {
         Armor.text = Player.Armor + "";
         Armor.transform.parent.gameObject.SetActive(Armor.text != "0");
         Attack.transform.parent.gameObject.SetActive(Attack.text != "0");
-        Debug.Log("you? " + (Player == BattleControl.you) + " " + Player.Health);
+        // Debug.Log("you? " + (Player == BattleControl.you) + " " + Player.Health);
     }
 
     private void OnMouseDrag() {

@@ -17,7 +17,7 @@ public class Discover : Effect {
 
     public override void ActivateEffect() {
         _pool = new(card.GetPool());
-        EventManager.AddListener(CardEvent.OnDiscover, (BattleControl.CardUsed.Values.Last() as IDiscover).DiscoverHandler);
+        EventManager.AddListener(CardEvent.OnDiscover, card.DiscoverHandler);
         int cardNum = _pool.Count;
         for (int i = 0; i < 3; i++) {
             if (i < cardNum) {

@@ -16,7 +16,7 @@ public class HandVisual : MonoBehaviour {
     }
 
     private void VisualUpdate(BaseEventArgs e) {
-        Debug.Log("VisualUpdate");
+        // Debug.Log("Hand VisualUpdate");
         if (CardTrans.Count > Hand.Hands.Count) {
             for (int i = 0; i < CardTrans.Count; i++) {
                 if (i < Hand.Hands.Count) {
@@ -35,7 +35,7 @@ public class HandVisual : MonoBehaviour {
                     CardTrans[i].gameObject.SetActive(true);
                 }
                 else {
-                    CardTrans.Add(Instantiate(PfbBattleCard, transform).transform);
+                    CardTrans.Add(Instantiate(PfbBattleCard, transform).transform); // TODO: ?
                 }
                 CardTrans[i].GetComponent<BattleCardViewController>().Card = Hand.Hands[i];
                 CardTrans[i].GetComponent<BattleCardViewController>().ReadFromAsset();

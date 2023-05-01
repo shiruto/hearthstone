@@ -24,6 +24,19 @@ public struct StatusChange {
     }
 }
 
+public struct AuraManager {
+    public Buff Aura;
+    public Func<IBuffable, bool> range;
+    public TriggerStruct expireTrigger;
+
+    public AuraManager(Buff a, Func<IBuffable, bool> r, TriggerStruct t = default) {
+        Aura = a;
+        range = r;
+        expireTrigger = t;
+    }
+
+}
+
 public enum Status {
     Health,
     Attack,
@@ -37,10 +50,6 @@ public enum Operator {
     Time,
     Divide,
     equal
-}
-
-public struct AuraStruct { // TODO:
-    public Buff buff;
 }
 
 public enum ClassType {

@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-public class ScavengingHyena : MinionCard, IGrantTrigger {
+public class ScavengingHyena : MinionCard, ITriggerMinionCard {
     private readonly Buff _buff;
     public List<TriggerStruct> TriggersToGrant { get; set; }
 
@@ -16,7 +16,7 @@ public class ScavengingHyena : MinionCard, IGrantTrigger {
     public void Triggered(BaseEventArgs e) {
         if (Minion == null) return;
         MinionEventArgs evt = e as MinionEventArgs;
-        if (evt.minion.Card.CA.MinionType == MinionType.Beast) {
+        if (evt.minion.Owner == Owner && evt.minion.Card.CA.MinionType == MinionType.Beast) {
             new GiveBuff(_buff, this, Minion).ActivateEffect();
         }
     }

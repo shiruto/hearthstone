@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-public class SouthseaDeckhand : MinionCard, IGrantTrigger {
+public class SouthseaDeckhand : MinionCard, ITriggerMinionCard {
     public List<TriggerStruct> TriggersToGrant { get => throw new System.NotImplementedException(); set => throw new System.NotImplementedException(); }
 
     public SouthseaDeckhand(CardAsset CA) : base(CA) {

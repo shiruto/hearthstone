@@ -8,31 +8,61 @@ public class MinionCard : CardBase {
     }
 
     public override void ExtendUse() {
-        MinionLogic minionToSummon = new(this);
-        if (this is IBattleCry) (this as IBattleCry).BattleCry();
-        minionToSummon.Owner = Owner;
-        minionToSummon.BuffList = new(BuffList);
-        Owner.Field.SummonMinionAt(0, minionToSummon); // TODO: choose position
+        MinionLogic minionToSummon = new(this) {
+            Owner = Owner
+        };
+        if (BuffList != null) minionToSummon.BuffList = new(BuffList);
+        else minionToSummon.BuffList = new();
         Minion = minionToSummon;
+        if (this is IBattleCry) (this as IBattleCry).BattleCry();
+        Owner.Field.SummonMinionAt(0, minionToSummon); // TODO: choose position
+        if (this is IAuraMinionCard) {
+            minionToSummon.AuraToGive = new((this as IAuraMinionCard).AuraToGrant);
+            foreach (AuraManager a in minionToSummon.AuraToGive) {
+                BattleControl.Instance.AddAura(a);
+            }
+        }
     }
 
     public override void ReadBuff() {
         base.ReadBuff();
-        foreach (Buff b in BuffList) {
-            if (b.statusChange.Count == 0) break;
-            foreach (var sc in b.statusChange) {
-                switch (sc.status) {
-                    case Status.Attack:
-                        Buff.Modify(ref Attack, sc.op, sc.Num);
-                        break;
-                    case Status.Health:
-                        Buff.Modify(ref Health, sc.op, sc.Num);
-                        break;
-                    default:
-                        break;
+        Attack = CA.Attack;
+        Health = CA.Health;
+        if (BuffList.Count != 0) {
+            foreach (Buff b in BuffList) {
+                if (b.statusChange.Count == 0) break;
+                foreach (var sc in b.statusChange) {
+                    switch (sc.status) {
+                        case Status.Attack:
+                            Buff.Modify(ref Attack, sc.op, sc.Num);
+                            break;
+                        case Status.Health:
+                            Buff.Modify(ref Health, sc.op, sc.Num);
+                            break;
+                        default:
+                            break;
+                    }
                 }
             }
         }
+        if (Auras.Count != 0) {
+            foreach (Buff b in Auras) {
+                if (b.statusChange.Count == 0) break;
+                foreach (StatusChange sc in b.statusChange) {
+                    switch (sc.status) {
+                        case Status.Attack:
+                            Buff.Modify(ref Attack, sc.op, sc.Num);
+                            break;
+                        case Status.Health:
+                            Buff.Modify(ref Health, sc.op, sc.Num);
+                            break;
+                        default:
+                            break;
+                    }
+                }
+            }
+        }
+        EventManager.Allocate<EmptyParaArgs>().CreateEventArgs(EmptyParaEvent.HandVisualUpdate);
     }
 
 }

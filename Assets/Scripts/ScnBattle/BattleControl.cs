@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using UnityEditor;
 using UnityEngine;
 using Random = UnityEngine.Random;
@@ -39,15 +40,15 @@ public class BattleControl : MonoBehaviour {
             else return you;
         }
     }
-
+    private List<AuraManager> Auras;
     public int SpellDamage = 0;
     public CardBase CardUsing;
-    public ICharacter Targeting;
 
     private void Awake() {
         Instance = this;
         CardUsed = new();
         MinionSummoned = new();
+        Auras = new();
         EventManager.AddListener(TurnEvent.OnTurnEnd, OnTurnEndHandler);
         EventManager.AddListener(TurnEvent.OnGameOver, OnGameEnd);
     }
@@ -107,6 +108,8 @@ public class BattleControl : MonoBehaviour {
             _opts.Add(you.Deck.RemoveCardFromDeckAt(Random.Range(0, you.Deck.Deck.Count)));
         }
         ShowStarterPanel(_opts);
+        EventManager.AddListener(CardEvent.OnCardGet, OnCardGetHandler);
+        EventManager.AddListener(MinionEvent.AfterMinionSummon, AfterMinionSummonHandler);
     }
 
     private void OnTurnEndHandler(BaseEventArgs e) {
@@ -167,6 +170,82 @@ public class BattleControl : MonoBehaviour {
         List<MinionLogic> minions = new(you.Field.GetMinions());
         minions.AddRange(opponent.Field.GetMinions());
         return minions;
+    }
+
+    public List<CardBase> GetAllHands() {
+        List<CardBase> cards = new(you.Hand.Hands);
+        cards.AddRange(opponent.Hand.Hands);
+        return cards;
+    }
+
+    public List<IBuffable> GetAllBuffable() {
+        List<IBuffable> a = new();
+        a.AddRange(GetAllMinions().Cast<IBuffable>());
+        a.AddRange(GetAllHands().Cast<IBuffable>());
+        a.Add(you);
+        a.Add(opponent);
+        return a;
+    }
+
+    // private void UpdateAura(BaseEventArgs e) { // 无法删除最后一个 aura
+    //     Debug.Log($"Update Aura, now {Auras.Count} Auras exists");
+    //     if (Auras == null) return;
+    //     if (Auras.Count == 0) {
+    //         foreach (IBuffable b in GetAllBuffable()) {
+    //             if (b.Auras == null) break;
+    //             b.Auras.Clear();
+    //             b.ReadBuff();
+    //         }
+    //     }
+    //     else {
+    //         foreach (AuraManager a in Auras) {
+    //             foreach (IBuffable b in GetAllBuffable().Where(a.range)) {
+    //                 if (!b.Auras.Contains(a.Aura)) b.AddAura(a.Aura);
+    //             }
+    //         }
+    //     }
+    // }
+
+    private void OnCardGetHandler(BaseEventArgs e) {
+        if (Auras.Count <= 0) return;
+        CardEventArgs evt = e as CardEventArgs;
+        foreach (AuraManager a in Auras) {
+            if (a.range(evt.Card)) {
+                (evt.Card as IBuffable).AddAura(a.Aura);
+            }
+        }
+    }
+
+    private void AfterMinionSummonHandler(BaseEventArgs e) {
+        if (Auras.Count <= 0) return;
+        MinionEventArgs evt = e as MinionEventArgs;
+        foreach (AuraManager a in Auras) {
+            if (a.range(evt.minion)) {
+                (evt.minion as IBuffable).AddAura(a.Aura);
+            }
+        }
+    }
+
+    public void AddAura(AuraManager a) {
+        Auras.Add(a);
+        if (a.expireTrigger.eventType != null) {
+            EventManager.AddListener(a.expireTrigger.eventType, a.expireTrigger.callback);
+        }
+        foreach (IBuffable b in GetAllBuffable().Where(a.range)) {
+            if (!b.Auras.Contains(a.Aura)) b.AddAura(a.Aura);
+        }
+    }
+
+    public void RemoveAura(AuraManager a) {
+        Auras.Remove(a);
+        foreach (IBuffable b in GetAllBuffable().Where(a.range)) {
+            if (b.Auras.Contains(a.Aura)) b.RemoveAura(a.Aura);
+        }
+    }
+
+    public PlayerLogic GetAnotherPlayer(PlayerLogic p) {
+        if (p == you) return opponent;
+        else return you;
     }
 
 }

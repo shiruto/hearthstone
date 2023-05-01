@@ -1,5 +1,6 @@
-using System;
 using System.Collections.Generic;
+using Unity.VisualScripting;
+using UnityEngine;
 
 public class MinionLogic : ICharacter {
     # region minion property
@@ -10,18 +11,24 @@ public class MinionLogic : ICharacter {
     private readonly int MinionID;
     public int ID => MinionID;
 
-    public int MaxHelath;
+    public int MaxHealth;
     private int _health;
     public virtual int Health {
         get => _health;
         set {
-            if (value > MaxHelath) _health = MaxHelath;
-            else if (value <= 0) {
-                _health = value;
-                Die();
+            if (value > MaxHealth) _health = MaxHealth;
+            else if (value < _health) {
+                if (Attributes.Contains(CharacterAttribute.Immune)) {
+
+                }
+                else if (!Attributes.Remove(CharacterAttribute.DivineShield)) {
+                    _health = value;
+                    if (value <= 0) {
+                        Die();
+                    }
+                }
             }
-            else _health = value;
-            EventManager.Allocate<MinionEventArgs>().CreateEventArgs(MinionEvent.AfterMinionStatusChange, null, Owner, this);
+            EventManager.Allocate<EmptyParaArgs>().CreateEventArgs(EmptyParaEvent.FieldVisualUpdate).Invoke(); // TODO: change it
         }
     }
 
@@ -33,13 +40,13 @@ public class MinionLogic : ICharacter {
                 _attack = 0;
             }
             else _attack = value;
-            EventManager.Allocate<MinionEventArgs>().CreateEventArgs(MinionEvent.AfterMinionStatusChange, null, Owner, this);
+            EventManager.Allocate<EmptyParaArgs>().CreateEventArgs(EmptyParaEvent.FieldVisualUpdate).Invoke();
         }
     }
     private bool _canAttack = true;
     private bool _windFuryAttack;
     public bool CanAttack {
-        get => _canAttack && !Attributes.Contains(CharacterAttribute.Frozen) && BattleControl.Instance.ActivePlayer == Owner && (!NewSummoned || Attributes.Contains(CharacterAttribute.Rush) || Attributes.Contains(CharacterAttribute.Charge)) && _attack > 0;
+        get => _canAttack && !Attributes.Contains(CharacterAttribute.Frozen) && BattleControl.Instance.ActivePlayer == Owner && (!NewSummoned || (Attributes.Contains(CharacterAttribute.Rush) && BattleControl.Instance.GetAnotherPlayer(Owner).Field.Minions.Count != 0) || Attributes.Contains(CharacterAttribute.Charge)) && _attack > 0;
         set {
             if (value) {
                 _windFuryAttack = Attributes.Contains(CharacterAttribute.Windfury);
@@ -59,6 +66,8 @@ public class MinionLogic : ICharacter {
     public int SpellDamage { get => spellDamage; set => spellDamage = value; }
     private int spellDamage;
     public HashSet<CharacterAttribute> Attributes { get; set; }
+    public List<Buff> Auras { get; set; }
+    public List<AuraManager> AuraToGive;
     public List<Effect> DeathRattleEffects;
     #endregion
 
@@ -67,19 +76,20 @@ public class MinionLogic : ICharacter {
         Card = MC;
         _attack = MC.CA.Attack;
         _health = MC.CA.Health;
-        MaxHelath = _health;
+        MaxHealth = _health;
         MinionID = IDFactory.GetID();
         BattleControl.MinionSummoned.Add(ID, this);
         if (MC is IDeathRattle) DeathRattleEffects = new((MC as IDeathRattle).DeathRattleEffects);
-        DeathRattleEffects = null;
+        DeathRattleEffects = new();
         Attributes = new(MC.CA.attributes);
+        Auras = new();
         NewSummoned = true;
-        if (MC is IGrantTrigger) {
-            foreach (TriggerStruct t in (MC as IGrantTrigger).TriggersToGrant) {
+        Triggers = new();
+        if (MC is ITriggerMinionCard) {
+            foreach (TriggerStruct t in (MC as ITriggerMinionCard).TriggersToGrant) {
                 (this as IBuffable).AddTrigger(t); // TODO: test it
             }
         }
-        else Triggers = new();
         EventManager.AddListener(TurnEvent.OnTurnStart, OnTurnStartHandler);
         EventManager.AddListener(TurnEvent.OnTurnEnd, OnTurnEndHandler);
     }
@@ -106,15 +116,20 @@ public class MinionLogic : ICharacter {
 
     public void OnTurnEndHandler(BaseEventArgs e) {
         if (e.Player == Owner) {
-            RemoveAttribute(CharacterAttribute.Frozen);
+            (this as ICharacter).RemoveAttribute(CharacterAttribute.Frozen);
         }
     }
 
+    // TODO: force attack
+
     public void AttackAgainst(ICharacter target) {
+        if (!CanAttack) return;
         CanAttack = false;
         target.Health -= Attack;
         Health -= target.Attack;
+        Debug.Log($"{Card.CA.name} is Attacking {target}");
         EventManager.Allocate<AttackEventArgs>().CreateEventArgs(AttackEvent.AfterAttack, null, this, ScnBattleUI.Instance.Targeting).Invoke();
+        EventManager.Allocate<EmptyParaArgs>().CreateEventArgs(EmptyParaEvent.FieldVisualUpdate);
     }
 
     public CardBase BackToHand(PlayerLogic owner = null) {
@@ -126,50 +141,93 @@ public class MinionLogic : ICharacter {
 
     public void Die() {
         Remove();
-        foreach (Effect effect in DeathRattleEffects) {
-            effect.ActivateEffect();
+        if (DeathRattleEffects.Count > 0) {
+            foreach (Effect effect in DeathRattleEffects) {
+                effect.ActivateEffect();
+            }
         }
+        Debug.Log($"{Card.CA.name} die");
         EventManager.Allocate<MinionEventArgs>().CreateEventArgs(MinionEvent.AfterMinionDie, null, BattleControl.Instance.ActivePlayer, this).Invoke();
     }
 
     public void Remove() {
         (this as IBuffable).RemoveAllTriggers();
         Owner.Field.RemoveMinion(this);
+        if (AuraToGive != null) {
+            foreach (AuraManager a in AuraToGive) {
+                BattleControl.Instance.RemoveAura(a);
+            }
+        }
+        Owner.Field.Minions.Remove(this);
     }
 
     public void ReadBuff() {
-        if (BuffList.Count == 0) return;
-        foreach (Buff b in BuffList) {
-            if (b.statusChange.Count != 0) {
-                foreach (var sc in b.statusChange) {
-                    switch (sc.status) {
-                        case Status.Attack:
-                            Buff.Modify(ref _attack, sc.op, sc.Num);
-                            break;
-                        case Status.Health:
-                            Buff.Modify(ref _health, sc.op, sc.Num);
-                            break;
-                        case Status.SpellDamage:
-                            Buff.Modify(ref spellDamage, sc.op, sc.Num);
-                            break;
-                        default:
-                            break;
+        int orgMaxHealth = MaxHealth;
+        ResetStatus();
+        if (BuffList.Count != 0) {
+            foreach (Buff b in BuffList) {
+                if (b.statusChange != null && b.statusChange.Count != 0) {
+                    foreach (var sc in b.statusChange) {
+                        switch (sc.status) {
+                            case Status.Attack:
+                                Buff.Modify(ref _attack, sc.op, sc.Num);
+                                break;
+                            case Status.Health:
+                                Buff.Modify(ref MaxHealth, sc.op, sc.Num);
+                                break;
+                            case Status.SpellDamage:
+                                Buff.Modify(ref spellDamage, sc.op, sc.Num);
+                                break;
+                            default:
+                                break;
+                        }
                     }
                 }
-            }
-            if (b.Attributes?.Count != 0) {
+                if (b.Attributes?.Count == 0) continue;
                 foreach (var a in b.Attributes) {
                     Attributes.Add(a);
                 }
             }
         }
+        if (Auras.Count != 0) {
+            foreach (Buff b in Auras) {
+                if (b.statusChange.Count != 0) {
+                    foreach (var sc in b.statusChange) {
+                        switch (sc.status) {
+                            case Status.Attack:
+                                Buff.Modify(ref _attack, sc.op, sc.Num);
+                                break;
+                            case Status.Health:
+                                Buff.Modify(ref MaxHealth, sc.op, sc.Num);
+                                break;
+                            case Status.SpellDamage:
+                                Buff.Modify(ref spellDamage, sc.op, sc.Num);
+                                break;
+                            default:
+                                break;
+                        }
+                    }
+                }
+                if (b.Attributes == null) continue;
+                foreach (var a in b.Attributes) {
+                    Attributes.Add(a);
+                }
+            }
+        }
+        if (MaxHealth >= orgMaxHealth) {
+            _health += MaxHealth - orgMaxHealth;
+        }
+        else {
+            if (_health > MaxHealth) _health = MaxHealth;
+        }
+        Debug.Log($"{Card.CA.name} ReadBuff");
+        EventManager.Allocate<EmptyParaArgs>().CreateEventArgs(EmptyParaEvent.FieldVisualUpdate).Invoke();
     }
 
-    public void RemoveAttribute(CharacterAttribute a) {
-        Attributes.Remove(a);
-        foreach (var b in BuffList) {
-            b.Attributes.Remove(a);
-        }
+    private void ResetStatus() {
+        _attack = Card.CA.Attack;
+        _health = Card.CA.Health;
+        spellDamage = Card.CA.SpellDamage;
     }
 
 }

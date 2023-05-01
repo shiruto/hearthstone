@@ -37,7 +37,6 @@ public class HandLogic {
     }
 
     public void UseCard(BaseEventArgs e) {
-        Debug.Log("UseCardHandler in HandLogic");
         CardEventArgs evt = e as CardEventArgs;
         if (evt.Player == owner) {
             CardBase Card = evt.Card;

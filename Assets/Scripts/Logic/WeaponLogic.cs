@@ -33,6 +33,7 @@ public class WeaponLogic : IBuffable, ITakeDamage {
     public int SpellDamage { get => spellDamage; set => spellDamage = value; }
     private int spellDamage;
     public HashSet<CharacterAttribute> Attributes { get; set; }
+    public List<Buff> Auras { get; set; }
 
     public WeaponLogic() {
         Card = null;
@@ -46,8 +47,8 @@ public class WeaponLogic : IBuffable, ITakeDamage {
         Card = WC;
         _attack = Card.Attack;
         _health = Card.Health;
-        if (WC is IGrantTrigger) {
-            foreach (TriggerStruct t in (WC as IGrantTrigger).TriggersToGrant) {
+        if (WC is ITriggerMinionCard) {
+            foreach (TriggerStruct t in (WC as ITriggerMinionCard).TriggersToGrant) {
                 (this as IBuffable).AddTrigger(t); // TODO: test it
             }
         }
@@ -86,31 +87,61 @@ public class WeaponLogic : IBuffable, ITakeDamage {
     }
 
     public void ReadBuff() {
-        if (BuffList.Count == 0) return;
-        foreach (Buff b in BuffList) {
-            if (b.statusChange.Count != 0) {
-                foreach (var sc in b.statusChange) {
-                    switch (sc.status) {
-                        case Status.Attack:
-                            Buff.Modify(ref _attack, sc.op, sc.Num);
-                            break;
-                        case Status.Health:
-                            Buff.Modify(ref _health, sc.op, sc.Num);
-                            break;
-                        case Status.SpellDamage:
-                            Buff.Modify(ref spellDamage, sc.op, sc.Num);
-                            break;
-                        default:
-                            break;
+        _attack = Card.CA.Attack;
+        _health = Card.CA.Health;
+        spellDamage = Card.CA.SpellDamage;
+        if (BuffList.Count != 0) {
+            foreach (Buff b in BuffList) {
+                if (b.statusChange.Count != 0) {
+                    foreach (var sc in b.statusChange) {
+                        switch (sc.status) {
+                            case Status.Attack:
+                                Buff.Modify(ref _attack, sc.op, sc.Num);
+                                break;
+                            case Status.Health:
+                                Buff.Modify(ref _health, sc.op, sc.Num);
+                                break;
+                            case Status.SpellDamage:
+                                Buff.Modify(ref spellDamage, sc.op, sc.Num);
+                                break;
+                            default:
+                                break;
+                        }
                     }
                 }
+                if (b.Attributes?.Count == 0) continue;
+                foreach (var a in b.Attributes) {
+                    Attributes.Add(a);
+                }
+
             }
-            if (b.Attributes?.Count != 0) {
+        }
+        if (Auras.Count != 0) {
+            foreach (Buff b in Auras) {
+                if (b.statusChange.Count != 0) {
+                    foreach (var sc in b.statusChange) {
+                        switch (sc.status) {
+                            case Status.Attack:
+                                Buff.Modify(ref _attack, sc.op, sc.Num);
+                                break;
+                            case Status.Health:
+                                Buff.Modify(ref _health, sc.op, sc.Num);
+                                break;
+                            case Status.SpellDamage:
+                                Buff.Modify(ref spellDamage, sc.op, sc.Num);
+                                break;
+                            default:
+                                break;
+                        }
+                    }
+                }
+                if (b.Attributes?.Count == 0) continue;
                 foreach (var a in b.Attributes) {
                     Attributes.Add(a);
                 }
             }
         }
+        EventManager.Allocate<EmptyParaArgs>().CreateEventArgs(EmptyParaEvent.WeaponVisualUpdate);
     }
 
 }

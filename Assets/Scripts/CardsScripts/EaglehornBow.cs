@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-public class EaglehornBow : WeaponCard, IGrantTrigger {
+public class EaglehornBow : WeaponCard, ITriggerMinionCard {
     public List<TriggerStruct> TriggersToGrant { get; set; }
 
     public EaglehornBow(CardAsset CA) : base(CA) {

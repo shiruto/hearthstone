@@ -17,8 +17,8 @@ public class PlayerLogic : ICharacter {
     public ClassType HeroClass;
     public bool isEnemy;
     private readonly int playerID;
-    public int ID { get => playerID; }
-    private readonly int MaxHealth = 30;
+    public int ID => playerID;
+    private int MaxHealth = 30;
     private int _health = 30;
     public int Health {
         get => _health;
@@ -28,7 +28,7 @@ public class PlayerLogic : ICharacter {
             }
             else if (value < _health) {
                 if (DivineShield) {
-                    RemoveAttribute(CharacterAttribute.DivineShield);
+                    (this as ICharacter).RemoveAttribute(CharacterAttribute.DivineShield);
                     return;
                 }
                 int d = _health - value;
@@ -109,6 +109,7 @@ public class PlayerLogic : ICharacter {
         }
     }
     public List<Buff> BuffList { get; set; }
+    public List<Buff> Auras { get; set; }
     #endregion
 
     public PlayerLogic(ClassType classType) {
@@ -129,6 +130,7 @@ public class PlayerLogic : ICharacter {
             Owner = this
         };
         Secrets = new();
+        Attributes = new();
         //TODO: get skill and hero depending on its ClassType
         playerID = IDFactory.GetID();
     }
@@ -153,95 +155,69 @@ public class PlayerLogic : ICharacter {
     }
 
     public void OnTurnEnd() {
+        TurnCount++;
         if (TurnCount >= 45) {
             EventManager.Allocate<TurnEventArgs>().CreateEventArgs(TurnEvent.OnTurnEnd, null, this, TurnCount, GameStatus.Tie).Invoke();
         }
-        TurnCount++;
+        if (_canAttack) (this as ICharacter).RemoveAttribute(CharacterAttribute.Frozen);
         EventManager.Allocate<TurnEventArgs>().CreateEventArgs(TurnEvent.OnTurnEnd, null, this, TurnCount).Invoke();
     }
 
-    public void AddBuff(Buff buff) {
-        if (buff.Triggers?.Count != 0) {
-            foreach (TriggerStruct t in buff.Triggers) {
-                AddTrigger(t);
-            }
-        }
-        BuffList.Add(buff);
-        ReadBuff();
-    }
-
-    public void RemoveBuff(Buff buff) {
-        if (buff.Triggers != null) {
-            foreach (TriggerStruct t in buff.Triggers) {
-                RemoveTrigger(t);
-            }
-        }
-        BuffList.Remove(buff);
-        ReadBuff();
-    }
-
     public void ReadBuff() {
-        if (BuffList.Count == 0) return;
-        foreach (Buff b in BuffList) {
-            if (b.statusChange.Count != 0) {
-                foreach (var sc in b.statusChange) {
-                    switch (sc.status) {
-                        case Status.Attack:
-                            Buff.Modify(ref _attack, sc.op, sc.Num);
-                            break;
-                        case Status.Health:
-                            Buff.Modify(ref _health, sc.op, sc.Num);
-                            break;
-                        case Status.SpellDamage:
-                            Buff.Modify(ref spellDamage, sc.op, sc.Num);
-                            break;
-                        default:
-                            break;
+        _attack = 0;
+        SpellDamage = 0;
+        MaxHealth = 30;
+        if (BuffList.Count != 0) {
+            foreach (Buff b in BuffList) {
+                if (b.statusChange.Count != 0) {
+                    foreach (var sc in b.statusChange) {
+                        switch (sc.status) {
+                            case Status.Attack:
+                                Buff.Modify(ref _attack, sc.op, sc.Num);
+                                break;
+                            case Status.Health:
+                                Buff.Modify(ref _health, sc.op, sc.Num);
+                                break;
+                            case Status.SpellDamage:
+                                Buff.Modify(ref spellDamage, sc.op, sc.Num);
+                                break;
+                            default:
+                                break;
+                        }
                     }
                 }
-            }
-            if (b.Attributes?.Count != 0) {
+                if (b.Attributes?.Count == 0) continue;
                 foreach (var a in b.Attributes) {
                     Attributes.Add(a);
                 }
             }
         }
-    }
-
-    public void RemoveAllBuff() {
-        foreach (Buff b in BuffList) {
-            if (b.Triggers.Count > 0) {
-                foreach (TriggerStruct t in b.Triggers) {
-                    RemoveTrigger(t);
+        if (Auras.Count != 0) {
+            foreach (Buff b in Auras) {
+                if (b.statusChange.Count != 0) {
+                    foreach (var sc in b.statusChange) {
+                        switch (sc.status) {
+                            case Status.Attack:
+                                Buff.Modify(ref _attack, sc.op, sc.Num);
+                                break;
+                            case Status.Health:
+                                Buff.Modify(ref _health, sc.op, sc.Num);
+                                break;
+                            case Status.SpellDamage:
+                                Buff.Modify(ref spellDamage, sc.op, sc.Num);
+                                break;
+                            default:
+                                break;
+                        }
+                    }
+                }
+                if (b.Attributes?.Count == 0) continue;
+                foreach (var a in b.Attributes) {
+                    Attributes.Add(a);
                 }
             }
         }
-        BuffList.Clear();
-        ReadBuff();
-    }
-
-    public void AddTrigger(TriggerStruct trigger) {
-        Triggers.Add(trigger);
-        EventManager.AddListener(trigger.eventType, trigger.callback);
-    }
-
-    public void RemoveTrigger(TriggerStruct trigger) {
-        Triggers.Remove(trigger);
-        EventManager.DelListener(trigger.eventType, trigger.callback);
-    }
-
-    public void RemoveAllTriggers() {
-        if (Triggers.Count == 0) return;
-        foreach (var item in Triggers) {
-            EventManager.DelListener(item.eventType, item.callback);
-        }
-    }
-
-    public void RemoveAttribute(CharacterAttribute a) {
-        Attributes.Remove(a);
-        foreach (var b in BuffList) {
-            b.Attributes.Remove(a);
-        }
+        EventManager.Allocate<EmptyParaArgs>().CreateEventArgs(EmptyParaEvent.PlayerVisualUpdate);
     }
 
 }

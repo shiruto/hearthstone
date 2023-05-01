@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-public class MurlocTidecaller : MinionCard, IGrantTrigger {
+public class MurlocTidecaller : MinionCard, ITriggerMinionCard {
     public List<TriggerStruct> TriggersToGrant { get; set; }
     private readonly Buff _buff;
 

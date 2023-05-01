@@ -9,6 +9,7 @@ public class BattleCardViewController : MonoBehaviour {
     public TextMeshProUGUI DescriptionText; // 卡牌描述文本
     public TextMeshProUGUI HealthText; // 卡牌生命值文本
     public TextMeshProUGUI AttackText; // 卡牌攻击文本
+    public TextMeshProUGUI ExInfo;
     [Header("GameObject References")]
     public GameObject HealthIcon;
     public GameObject AttackIcon;
@@ -26,9 +27,21 @@ public class BattleCardViewController : MonoBehaviour {
             GetComponent<DraggableCard>().ifDrawLine = Card is ITarget;
         }
         if (Card is MinionCard) {
-            CardAsset Card = this.Card.CA;
-            AttackText.text = Card.Attack.ToString();
-            HealthText.text = Card.Health.ToString();
+            CardAsset CA = Card.CA;
+            AttackText.text = CA.Attack.ToString();
+            HealthText.text = CA.Health.ToString();
+            if (CA.MinionType != MinionType.None) {
+                ExInfo.text = CA.MinionType.ToString("G");
+            }
+            else {
+                ExInfo.transform.parent.gameObject.SetActive(false);
+            }
+        }
+        else if (Card is SpellCard && Card.CA.SpellSchool != SpellSchool.None) {
+            ExInfo.text = Card.CA.SpellSchool.ToString("G");
+        }
+        else {
+            ExInfo.transform.parent.gameObject.SetActive(false);
         }
         HealthIcon.SetActive(Card is MinionCard);
         AttackIcon.SetActive(Card is MinionCard);

@@ -13,7 +13,6 @@ public class Flare : SpellCard {
         }
         BattleControl.opponent.Attributes.Remove(CharacterAttribute.Stealth);
         new DrawCard(Owner, 1).ActivateEffect();
-        Debug.Log(Owner);
     }
 
 }

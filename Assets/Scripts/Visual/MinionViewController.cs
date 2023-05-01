@@ -12,4 +12,5 @@ public class MinionViewController : MonoBehaviour {
         TxtAttack.text = ML.Attack.ToString();
         TxtHealth.text = ML.Health.ToString();
     }
+
 }

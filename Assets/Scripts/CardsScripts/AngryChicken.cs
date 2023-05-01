@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-public class AngryChicken : MinionCard, IGrantTrigger {
+public class AngryChicken : MinionCard, ITriggerMinionCard {
     private readonly Buff _buff;
     public List<TriggerStruct> TriggersToGrant { get; set; }
 

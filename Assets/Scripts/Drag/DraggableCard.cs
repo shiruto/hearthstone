@@ -5,6 +5,7 @@ public class DraggableCard : Draggable {
     private Vector3 StartPos;
     private Vector3 Distance;
     public bool ifDrawLine;
+    // TODO: Available
 
     private void OnMouseEnter() {
         EventManager.Allocate<CardEventArgs>().CreateEventArgs(CardEvent.OnCardPreview, gameObject, null, GetComponent<BattleCardViewController>().Card).Invoke();
@@ -37,10 +38,10 @@ public class DraggableCard : Draggable {
     protected override void OnMouseUp() {
         EventManager.Allocate<VisualEventArgs>().CreateEventArgs(VisualEvent.DeleteLine, gameObject, Vector3.zero, Vector3.zero).Invoke();
         EventManager.Allocate<CardEventArgs>().CreateEventArgs(CardEvent.AfterCardPreview, gameObject, null, GetComponent<BattleCardViewController>().Card).Invoke();
-        if (Input.mousePosition.y > 300 && canDrag) {
+        if (Input.mousePosition.y > 300) {
             CardBase CardUsing = GetComponent<BattleCardViewController>().Card;
             if (ifDrawLine) {
-                if (ScnBattleUI.Instance.Targeting != null) {
+                if (ScnBattleUI.Instance.Targeting != null && (CardUsing as ITarget).CanBeTarget(ScnBattleUI.Instance.Targeting)) {
                     (CardUsing as ITarget).Target = ScnBattleUI.Instance.Targeting;
                     BattleControl.Instance.CardUsing = CardUsing;
                     EventManager.Allocate<CardEventArgs>().CreateEventArgs(CardEvent.BeforeCardUse, gameObject, CardUsing.Owner, CardUsing).Invoke();

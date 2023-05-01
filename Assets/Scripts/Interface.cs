@@ -1,8 +1,8 @@
 using System;
 using System.Collections.Generic;
-using UnityEngine.TextCore.Text;
+using UnityEngine;
 
-public interface IDiscover { // TODO: could other special effect be interface too?
+public interface IDiscover {
     public void DiscoverHandler(BaseEventArgs e);
     public List<CardBase> GetPool();
 }
@@ -20,13 +20,14 @@ public interface IDealDamage {
     public int Damage { get; }
 }
 
-public interface IGrantTrigger {
+public interface ITriggerMinionCard {
     public List<TriggerStruct> TriggersToGrant { get; set; }
     public void Triggered(BaseEventArgs e);
 }
 
 public interface IBuffable {
     public List<Buff> BuffList { get; set; }
+    public List<Buff> Auras { get; set; }
     public List<TriggerStruct> Triggers { get; set; }
 
     public void AddTrigger(TriggerStruct t) {
@@ -47,12 +48,23 @@ public interface IBuffable {
     }
 
     public void AddBuff(Buff buff) {
-        if (buff.Triggers?.Count != 0) {
+        if (buff.Triggers != null && buff.Triggers.Count != 0) {
             foreach (TriggerStruct t in buff.Triggers) {
                 AddTrigger(t);
             }
         }
         BuffList.Add(buff);
+        ReadBuff();
+    }
+
+    public void AddAura(Buff buff) {
+        if (buff.Triggers != null) {
+            foreach (TriggerStruct t in buff.Triggers) {
+                AddTrigger(t);
+            }
+        }
+        Auras.Add(buff);
+        Debug.Log("Add Aura");
         ReadBuff();
     }
 
@@ -63,6 +75,16 @@ public interface IBuffable {
             }
         }
         BuffList.Remove(buff);
+        ReadBuff();
+    }
+
+    public void RemoveAura(Buff buff) {
+        if (buff.Triggers != null) {
+            foreach (TriggerStruct t in buff.Triggers) {
+                RemoveTrigger(t);
+            }
+        }
+        Auras.Remove(buff);
         ReadBuff();
     }
 
@@ -85,7 +107,16 @@ public interface IBuffable {
 public interface ICharacter : IIdentifiable, ITakeDamage, IBuffable, IAttribute {
     int Attack { get; set; }
     int SpellDamage { get; set; }
+
     void Die();
+
+    public void RemoveAttribute(CharacterAttribute a) {
+        Attributes.Remove(a);
+        if (BuffList == null) return;
+        foreach (var b in BuffList) {
+            b.Attributes.Remove(a);
+        }
+    }
 }
 
 public interface IAttribute {
@@ -108,4 +139,8 @@ public interface IBattleCry {
 public interface IDeathRattle {
     public List<Effect> DeathRattleEffects { get; set; }
     public void DeathRattle();
+}
+
+public interface IAuraMinionCard {
+    public List<AuraManager> AuraToGrant { get; }
 }

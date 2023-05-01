@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-public abstract class StarvingBuzzard : MinionCard, IGrantTrigger {
+public abstract class StarvingBuzzard : MinionCard, ITriggerMinionCard {
     public List<TriggerStruct> TriggersToGrant { get; set; }
 
     public StarvingBuzzard(CardAsset CA) : base(CA) {

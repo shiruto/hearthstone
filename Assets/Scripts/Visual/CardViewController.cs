@@ -10,6 +10,7 @@ public class CardViewController : MonoBehaviour {
     public TextMeshProUGUI DescriptionText; // 卡牌描述文本
     public TextMeshProUGUI HealthText; // 卡牌生命值文本
     public TextMeshProUGUI AttackText; // 卡牌攻击文本
+    public TextMeshProUGUI ExInfo;
     [Header("GameObject References")]
     public GameObject HealthIcon;
     public GameObject AttackIcon;
@@ -28,6 +29,23 @@ public class CardViewController : MonoBehaviour {
         if (CA.cardType == CardType.Minion) {
             AttackText.text = CA.Attack.ToString();
             HealthText.text = CA.Health.ToString();
+            if (CA.MinionType != MinionType.None) {
+                ExInfo.text = CA.MinionType.ToString("G");
+            }
+            else {
+                ExInfo.transform.parent.gameObject.SetActive(false);
+            }
+        }
+        else if (CA.cardType == CardType.Spell) {
+            if (CA.SpellSchool != SpellSchool.None) {
+                ExInfo.text = CA.SpellSchool.ToString("G");
+            }
+            else {
+                ExInfo.transform.parent.gameObject.SetActive(false);
+            }
+        }
+        else {
+            ExInfo.transform.parent.gameObject.SetActive(false);
         }
         HealthIcon.SetActive(CA.cardType == CardType.Minion);
         AttackIcon.SetActive(CA.cardType == CardType.Minion);
