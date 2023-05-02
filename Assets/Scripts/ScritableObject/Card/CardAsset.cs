@@ -10,11 +10,11 @@ public class CardAsset : ScriptableObject {
     public Rarity rarity;
     public ClassType ClassType;
     public CardType cardType;
+    public int Overload;
     [Header("MinionSection")]
     public int Attack;
     public int Health;
     public int SpellDamage = 0;
-    public int Overload;
     public MinionType MinionType;
     public List<CharacterAttribute> attributes;
     [Header("SpellSection")]

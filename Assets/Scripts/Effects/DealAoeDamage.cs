@@ -9,7 +9,7 @@ public class DealAoeDamage : Effect {
     readonly Func<ICharacter, bool> range;
     public override string Name => "Deal AoE Damage Effect";
     public bool isMagicDamage;
-    public List<ICharacter> CharacterToDamage = new(BattleControl.Instance.GetAllMinions()) {
+    public List<ICharacter> CharacterToDamage = new(BattleControl.GetAllMinions()) {
             BattleControl.you,
             BattleControl.opponent
         };

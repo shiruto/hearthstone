@@ -1,5 +1,7 @@
+using UnityEngine;
+
 public class MinionCard : CardBase {
-    public MinionLogic Minion = null;
+    public MinionLogic Minion;
     public int Health;
     public int Attack;
 
@@ -8,17 +10,17 @@ public class MinionCard : CardBase {
     }
 
     public override void ExtendUse() {
-        MinionLogic minionToSummon = new(this) {
+        Minion = new(this) {
             Owner = Owner
         };
-        if (BuffList != null) minionToSummon.BuffList = new(BuffList);
-        else minionToSummon.BuffList = new();
-        Minion = minionToSummon;
+        Debug.Log($"summon a minion from card ID = {ID}");
+        if (BuffList != null) Minion.BuffList = new(BuffList);
+        else Minion.BuffList = new();
         if (this is IBattleCry) (this as IBattleCry).BattleCry();
-        Owner.Field.SummonMinionAt(0, minionToSummon); // TODO: choose position
+        Owner.Field.SummonMinionAt(0, Minion); // TODO: choose position
         if (this is IAuraMinionCard) {
-            minionToSummon.AuraToGive = new((this as IAuraMinionCard).AuraToGrant);
-            foreach (AuraManager a in minionToSummon.AuraToGive) {
+            Minion.AuraToGive = new((this as IAuraMinionCard).AuraToGrant);
+            foreach (AuraManager a in Minion.AuraToGive) {
                 BattleControl.Instance.AddAura(a);
             }
         }

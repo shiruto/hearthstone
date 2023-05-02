@@ -45,7 +45,7 @@ public class DraggableMinion : Draggable {
         else if (ml.Attributes.Contains(CharacterAttribute.Charge)) {
             return true;
         }
-        // 嘲讽判断
+        // 嘲讽判断 TODO: 如果嘲讽随从同时还具有免疫或潜行 则不能嘲讽
         if (BattleControl.opponent.Field.GetMinions().Exists((MinionLogic a) => a.Attributes.Contains(CharacterAttribute.Taunt)) && !(Target as MinionLogic).Attributes.Contains(CharacterAttribute.Taunt)) {
             return false;
         }

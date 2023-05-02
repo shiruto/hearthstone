@@ -1,5 +1,8 @@
+using System;
+
 public class Shadowstep : SpellCard, ITarget {
     public ICharacter Target { get; set; }
+    public Func<ICharacter, bool> Match => (ICharacter c) => c is MinionLogic && (c as MinionLogic).Owner == Owner;
     public Buff buff;
 
     public Shadowstep(CardAsset CA) : base(CA) {
@@ -7,10 +10,6 @@ public class Shadowstep : SpellCard, ITarget {
             "Shadowstep",
             new() { new(Status.ManaCost, Operator.Minus, 2) }
         );
-    }
-
-    public bool CanBeTarget(ICharacter Character) {
-        return (Character is MinionLogic) && (Character as MinionLogic).Owner == Owner;
     }
 
     public override void ExtendUse() {

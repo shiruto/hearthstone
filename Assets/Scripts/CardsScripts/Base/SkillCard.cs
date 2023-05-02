@@ -3,18 +3,19 @@ using UnityEngine;
 
 public class SkillCard : CardBase {
 
-    public List<Effect> effects;
-
     public SkillCard(CardAsset CA) : base(CA) {
 
     }
 
     public override void Use() {
         Debug.Log("Use Hero Power");
-        foreach (Effect effect in effects) {
-            effect.ActivateEffect();
-        }
-        EventManager.Allocate<CardEventArgs>().CreateEventArgs(CardEvent.OnHeroPowerUse, null, BattleControl.Instance.ActivePlayer, this).Invoke();
+        if (ManaCost > 0) EventManager.Allocate<ManaEventArgs>().CreateEventArgs(ManaEvent.OnManaSpend, null, Owner, ManaCost);
+        ExtendUse();
+        EventManager.Allocate<CardEventArgs>().CreateEventArgs(CardEvent.OnHeroPowerUse, null, Owner, this).Invoke();
+    }
+
+    public override void ExtendUse() {
+        Debug.Log("Extend Use");
     }
 
 }

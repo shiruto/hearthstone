@@ -12,6 +12,7 @@ public class SlienceEffect : Effect {
         Target.RemoveAllTriggers();
         if (Target is MinionLogic) {
             (Target as MinionLogic).DeathRattleEffects.Clear();
+            (Target as MinionLogic).RemoveAllBuffToGive();
         }
     }
 

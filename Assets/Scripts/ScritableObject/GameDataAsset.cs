@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.TextCore.Text;
 
 public struct TriggerStruct {
     public Enum eventType;
@@ -120,7 +121,8 @@ public enum CardType {
     Spell,
     Minion,
     Weapon,
-    Hero
+    Hero,
+    Skill
 }
 
 public enum EffectType {
@@ -155,15 +157,52 @@ public enum CharacterAttribute {
     LifeSteal,
     Poisonous,
     Elusive,
-    Frozen
+    Frozen,
+    Reborn,
+    CantAttack
 }
 
-public class GameDataAsset {
+public static class GameDataAsset {
     public static readonly Dictionary<ClassType, Color> SecretColor = new() {
         {ClassType.Mage, new(1, 104/255f, 248/255f, 1)},
         {ClassType.Hunter, Color.green},
         {ClassType.Rouge, Color.gray},
         {ClassType.Paladin, Color.yellow}
     };
+
+    public static readonly Dictionary<ClassType, string> HeroPower = new() {
+        {ClassType.DemonHunter, "Demon Claws"},
+        {ClassType.Druid, "Shapeshift"},
+        {ClassType.Hunter, "Steady Shot"},
+        {ClassType.Mage, "Fireblast"},
+        {ClassType.Paladin, "Reinforce"},
+        {ClassType.Priest, "Lesser Heal"},
+        {ClassType.Rouge, "Dagger Mastery"},
+        {ClassType.Shaman, "Totemic Call"},
+        {ClassType.Warloc, "Life Tap"},
+        {ClassType.Warrior, "Armor Up"},
+    };
+
+    public static Func<CardBase, ICharacter, bool> CanBeTarget = (CardBase Card, ICharacter target) => {
+        if (target.Attributes == null) return true;
+        if (target.Attributes.Contains(CharacterAttribute.Immune)) return false;
+        if (target.Attributes.Contains(CharacterAttribute.Elusive) && Card is SpellCard) return false;
+        if (target.Attributes.Contains(CharacterAttribute.Stealth) && ((target as MinionLogic).Owner != Card.Owner || (target as PlayerLogic) != Card.Owner)) return false;
+        return true;
+    };
+
+    public static Predicate<T> FuncToPredicate<T>(this Func<T, bool> func) {
+        return x => func(x);
+    }
+
+    public static Func<T, bool> PredicateToFunc<T>(this Predicate<T> predicate) {
+        return x => predicate(x);
+    }
+
+    public static bool IsTaunt(MinionLogic minion) {
+        if (minion == null || minion.Attributes == null) return false;
+        return minion.Attributes.Contains(CharacterAttribute.Taunt) && !(minion.Attributes.Contains(CharacterAttribute.Stealth) || minion.Attributes.Contains(CharacterAttribute.Immune));
+    }
+
 }
 

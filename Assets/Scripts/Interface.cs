@@ -9,7 +9,7 @@ public interface IDiscover {
 
 public interface ITarget { // with pointer
     public ICharacter Target { get; set; }
-    public bool CanBeTarget(ICharacter Character);
+    public Func<ICharacter, bool> Match { get; }
 }
 
 public interface IHeal {

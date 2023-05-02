@@ -78,12 +78,11 @@ public class DeckLogic {
     public void ReadCardsFromDeck(DeckAsset da) {
         for (int i = 0; i < da.myCardAssets.Count; i++) {
             object[] parameters = new object[] { da.myCardAssets[i] };
-            CardBase CardToAdd = Activator.CreateInstance(Type.GetType(da.myCardAssets[i].name.Replace(" ", "")), parameters) as CardBase;
-            CardToAdd.Owner = owner;
-            if (da.myCardNums[i] == 2) {
+            for (int j = 0; j < da.myCardNums[i]; j++) {
+                CardBase CardToAdd = Activator.CreateInstance(Type.GetType(da.myCardAssets[i].name.Replace(" ", "")), parameters) as CardBase;
+                CardToAdd.Owner = owner;
                 Deck.Add(CardToAdd);
             }
-            Deck.Add(CardToAdd);
         }
         Shuffle(Deck);
     }

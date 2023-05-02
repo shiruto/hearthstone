@@ -1,5 +1,10 @@
+using System;
+
 public class BestialWrath : SpellCard, ITarget {
     public ICharacter Target { get; set; }
+
+    public Func<ICharacter, bool> Match => (ICharacter c) => c is MinionLogic && (c as MinionLogic).Card.CA.MinionType == MinionType.Beast && (c as MinionLogic).Owner == Owner;
+
     private readonly Buff buff;
 
     public BestialWrath(CardAsset CA) : base(CA) {
@@ -11,10 +16,6 @@ public class BestialWrath : SpellCard, ITarget {
             }) },
             new() { CharacterAttribute.Immune }
         );
-    }
-
-    public bool CanBeTarget(ICharacter Character) {
-        return Character is MinionLogic && (Character as MinionLogic).Card.CA.MinionType == MinionType.Beast && (Character as MinionLogic).Owner == Owner;
     }
 
     public override void ExtendUse() {

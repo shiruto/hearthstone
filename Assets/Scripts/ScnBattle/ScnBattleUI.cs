@@ -42,7 +42,7 @@ public class ScnBattleUI : MonoBehaviour {
         CardPreview.SetActive(true);
         CardPreview.GetComponent<BattleCardViewController>().Card = evt.Card;
         CardPreview.GetComponent<BattleCardViewController>().ReadFromAsset();
-        CardPreview.transform.position = evt.Sender.transform.position - new Vector3(evt.Sender.GetComponent<RectTransform>().sizeDelta.x, 0, 0);
+        CardPreview.transform.position = evt.Sender.transform.position - (new Vector3(evt.Sender.GetComponent<RectTransform>().sizeDelta.x, 0, 0) + new Vector3(CardPreview.GetComponent<RectTransform>().sizeDelta.x * 2, 0, 0)) / 2;
         if (e.Sender.GetComponent<MinionViewController>()) {
             Buffs = new();
             if (e.Sender.GetComponent<MinionViewController>().ML.BuffList.Count != 0) {

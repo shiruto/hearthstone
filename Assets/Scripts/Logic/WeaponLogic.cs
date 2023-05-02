@@ -47,13 +47,21 @@ public class WeaponLogic : IBuffable, ITakeDamage {
         Card = WC;
         _attack = Card.Attack;
         _health = Card.Health;
+        if (WC is IDeathRattle) {
+            DeathRattleEffects = new((WC as IDeathRattle).DeathRattleEffects);
+        }
+        else DeathRattleEffects.Clear();
         if (WC is ITriggerMinionCard) {
             foreach (TriggerStruct t in (WC as ITriggerMinionCard).TriggersToGrant) {
                 (this as IBuffable).AddTrigger(t); // TODO: test it
             }
         }
-        EventManager.Allocate<CardEventArgs>().CreateEventArgs(CardEvent.OnWeaponEquip, null, Owner, WC);
+        EventManager.Allocate<CardEventArgs>().CreateEventArgs(CardEvent.OnWeaponEquip, null, Owner, WC).Invoke();
         EventManager.Allocate<EmptyParaArgs>().CreateEventArgs(EmptyParaEvent.WeaponVisualUpdate).Invoke();
+    }
+
+    public void AttackAgainst(ICharacter Target) {
+        Card.AttackEffect(Target);
     }
 
     private void OnTurnStartHandler(BaseEventArgs e) {
@@ -71,12 +79,14 @@ public class WeaponLogic : IBuffable, ITakeDamage {
     }
 
     public void Die() {
+        _attack = 0;
+        _health = 0;
         if (DeathRattleEffects.Count != 0) {
             foreach (Effect e in DeathRattleEffects) {
                 e.ActivateEffect();
             }
         }
-        if (Triggers.Count != 0) {
+        if (Triggers != null && Triggers.Count != 0) {
             foreach (var item in Triggers) {
                 EventManager.DelListener(item.eventType, item.callback);
             }

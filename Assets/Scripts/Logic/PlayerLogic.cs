@@ -8,7 +8,7 @@ public class PlayerLogic : ICharacter {
     public ManaLogic Mana;
     public FieldLogic Field;
     public WeaponLogic Weapon;
-    public SkillCard Skill;
+    public SkillLogic Skill;
     public SecretLogic Secrets;
     public HeroCard Card;
     #endregion
@@ -129,6 +129,9 @@ public class PlayerLogic : ICharacter {
         Weapon = new() {
             Owner = this
         };
+        Skill = new(classType) {
+            Owner = this
+        };
         Secrets = new();
         Attributes = new();
         //TODO: get skill and hero depending on its ClassType
@@ -140,11 +143,13 @@ public class PlayerLogic : ICharacter {
     }
 
     public void AttackAgainst(ICharacter target) { // TODO: attack func that won't consume attck chance
-        CanAttack = false;
-        target.Health -= Attack;
-        Health -= target.Attack;
         if (Weapon.Card != null) {
-            Weapon.Health--;
+            Weapon.AttackAgainst(target);
+        }
+        else {
+            CanAttack = false;
+            target.Health -= Attack;
+            Health -= target.Attack;
         }
     }
 
@@ -161,6 +166,7 @@ public class PlayerLogic : ICharacter {
         }
         if (_canAttack) (this as ICharacter).RemoveAttribute(CharacterAttribute.Frozen);
         EventManager.Allocate<TurnEventArgs>().CreateEventArgs(TurnEvent.OnTurnEnd, null, this, TurnCount).Invoke();
+        EventManager.Allocate<EmptyParaArgs>().CreateEventArgs(EmptyParaEvent.PlayerVisualUpdate).Invoke();
     }
 
     public void ReadBuff() {

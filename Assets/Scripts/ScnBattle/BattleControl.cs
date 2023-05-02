@@ -73,6 +73,7 @@ public class BattleControl : MonoBehaviour {
         yourWeapon.WL = you.Weapon;
         yourWeapon.gameObject.SetActive(false);
         yourSecret.sl = you.Secrets;
+        yourSkill.SL = you.Skill;
         // TODO: Create Skill Card Asset
         // object[] parameters = new object[] { AssetDatabase.LoadAllAssetsAtPath("Assets/ResourcesScriptableObject/UnCollectableCard/" + SelectedDeck.DeckClass + ".asset") as object};
         // yourSkill.InitSkill(Activator.CreateInstance(Type.GetType(SelectedDeck.DeckClass.ToString("G") + "Skill"), parameters) as SkillCard);
@@ -86,6 +87,7 @@ public class BattleControl : MonoBehaviour {
         opponentsWeapon.WL = opponent.Weapon;
         opponentsWeapon.gameObject.SetActive(false);
         opponentsSecret.sl = opponent.Secrets;
+        opponentsSkill.SL = opponent.Skill;
         opponent.Deck.UpdateCardName();
         you.Deck.UpdateCardName();
         EventManager.Allocate<EmptyParaArgs>().CreateEventArgs(EmptyParaEvent.FieldVisualUpdate).Invoke();
@@ -166,19 +168,23 @@ public class BattleControl : MonoBehaviour {
         }
     }
 
-    public List<MinionLogic> GetAllMinions() {
+    public static List<MinionLogic> GetAllMinions() {
         List<MinionLogic> minions = new(you.Field.GetMinions());
         minions.AddRange(opponent.Field.GetMinions());
         return minions;
     }
 
-    public List<CardBase> GetAllHands() {
+    public static List<ICharacter> GetAllCharacters() {
+        return new(GetAllMinions()) { you, opponent };
+    }
+
+    public static List<CardBase> GetAllHands() {
         List<CardBase> cards = new(you.Hand.Hands);
         cards.AddRange(opponent.Hand.Hands);
         return cards;
     }
 
-    public List<IBuffable> GetAllBuffable() {
+    public static List<IBuffable> GetAllBuffable() {
         List<IBuffable> a = new();
         a.AddRange(GetAllMinions().Cast<IBuffable>());
         a.AddRange(GetAllHands().Cast<IBuffable>());
@@ -186,25 +192,6 @@ public class BattleControl : MonoBehaviour {
         a.Add(opponent);
         return a;
     }
-
-    // private void UpdateAura(BaseEventArgs e) { // 无法删除最后一个 aura
-    //     Debug.Log($"Update Aura, now {Auras.Count} Auras exists");
-    //     if (Auras == null) return;
-    //     if (Auras.Count == 0) {
-    //         foreach (IBuffable b in GetAllBuffable()) {
-    //             if (b.Auras == null) break;
-    //             b.Auras.Clear();
-    //             b.ReadBuff();
-    //         }
-    //     }
-    //     else {
-    //         foreach (AuraManager a in Auras) {
-    //             foreach (IBuffable b in GetAllBuffable().Where(a.range)) {
-    //                 if (!b.Auras.Contains(a.Aura)) b.AddAura(a.Aura);
-    //             }
-    //         }
-    //     }
-    // }
 
     private void OnCardGetHandler(BaseEventArgs e) {
         if (Auras.Count <= 0) return;
@@ -243,7 +230,7 @@ public class BattleControl : MonoBehaviour {
         }
     }
 
-    public PlayerLogic GetAnotherPlayer(PlayerLogic p) {
+    public static PlayerLogic GetAnotherPlayer(PlayerLogic p) {
         if (p == you) return opponent;
         else return you;
     }

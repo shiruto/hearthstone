@@ -12,6 +12,7 @@ public class PlayerVisual : MonoBehaviour {
 
     private void Awake() {
         EventManager.AddListener(EmptyParaEvent.PlayerVisualUpdate, PlayerVisualUpdateHandler);
+        EventManager.AddListener(EmptyParaEvent.WeaponVisualUpdate, PlayerVisualUpdateHandler);
     }
 
     public void ReadFromLogic() {
@@ -31,12 +32,14 @@ public class PlayerVisual : MonoBehaviour {
 
     private void OnMouseDrag() {
         if (Player.CanAttack) {
+            ScnBattleUI.Instance.isDragging = true;
             EventManager.Allocate<VisualEventArgs>().CreateEventArgs(VisualEvent.DrawMinionLine, gameObject, transform.position, Input.mousePosition).Invoke();
         }
     }
 
     private void OnMouseUp() {
-        if (DrawTarget(ScnBattleUI.Instance.Targeting)) {
+        ScnBattleUI.Instance.isDragging = false;
+        if (Player.CanAttack && DrawTarget(ScnBattleUI.Instance.Targeting)) {
             EventManager.Allocate<AttackEventArgs>().CreateEventArgs(AttackEvent.BeforeAttack, gameObject, Player, ScnBattleUI.Instance.Targeting).Invoke();
             Player.AttackAgainst(ScnBattleUI.Instance.Targeting);
         }

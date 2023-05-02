@@ -5,7 +5,6 @@ public class DraggableCard : Draggable {
     private Vector3 StartPos;
     private Vector3 Distance;
     public bool ifDrawLine;
-    // TODO: Available
 
     private void OnMouseEnter() {
         EventManager.Allocate<CardEventArgs>().CreateEventArgs(CardEvent.OnCardPreview, gameObject, null, GetComponent<BattleCardViewController>().Card).Invoke();
@@ -16,13 +15,15 @@ public class DraggableCard : Draggable {
     }
 
     private void OnMouseDown() {
+        // TODO: if not valid target exist, can't use it(SpellCard) or use it without effect(minion)
+        CardBase Card = GetComponent<BattleCardViewController>().Card;
         StartPos = transform.position;
         Distance = Input.mousePosition - transform.position;
         GetComponent<BoxCollider>().center = new(0, 0, -20);
         transform.localScale *= 2;
         transform.SetAsLastSibling();
         ScnBattleUI.Instance.isDragging = true;
-        EventManager.Allocate<CardEventArgs>().CreateEventArgs(CardEvent.AfterCardPreview, gameObject, null, GetComponent<BattleCardViewController>().Card).Invoke();
+        EventManager.Allocate<CardEventArgs>().CreateEventArgs(CardEvent.AfterCardPreview, gameObject, null, Card).Invoke();
     }
 
     protected override void OnMouseDrag() {
@@ -41,7 +42,7 @@ public class DraggableCard : Draggable {
         if (Input.mousePosition.y > 300) {
             CardBase CardUsing = GetComponent<BattleCardViewController>().Card;
             if (ifDrawLine) {
-                if (ScnBattleUI.Instance.Targeting != null && (CardUsing as ITarget).CanBeTarget(ScnBattleUI.Instance.Targeting)) {
+                if (ScnBattleUI.Instance.Targeting != null && (CardUsing as ITarget).Match(ScnBattleUI.Instance.Targeting)) {
                     (CardUsing as ITarget).Target = ScnBattleUI.Instance.Targeting;
                     BattleControl.Instance.CardUsing = CardUsing;
                     EventManager.Allocate<CardEventArgs>().CreateEventArgs(CardEvent.BeforeCardUse, gameObject, CardUsing.Owner, CardUsing).Invoke();
@@ -54,7 +55,6 @@ public class DraggableCard : Draggable {
                 EventManager.Allocate<CardEventArgs>().CreateEventArgs(CardEvent.BeforeCardUse, gameObject, CardUsing.Owner, CardUsing).Invoke();
                 BattleControl.Instance.CardUsing?.Use();
             }
-            // TODO: Card Used in BattleControl, not here. So can manage the Counter trigger.
         }
         else {
             StartCoroutine(MoveTo(StartPos));

@@ -20,18 +20,17 @@ public class LineDrawer : MonoBehaviour {
 
     private void DrawCardLineHandler(BaseEventArgs e) {
         VisualEventArgs evt = e as VisualEventArgs;
-        HideCard(evt.Sender, true);
+        Debug.Log("Drawing Line");
+        evt.Sender.GetComponent<CanvasGroup>().alpha = 0;
         DrawLine(evt.StartPos, evt.Destination);
     }
 
     private void DrawMinionLineHandler(BaseEventArgs e) {
         VisualEventArgs evt = e as VisualEventArgs;
-        HideCard(evt.Sender, false);
         DrawLine(evt.StartPos, evt.Destination);
     }
 
     private void DrawLine(Vector3 StartPos, Vector3 EndPos) {
-
         LineTrans.gameObject.SetActive(true);
         Target.gameObject.SetActive(false); // TODO: Draw Target
         Arrow.position = EndPos;
@@ -43,14 +42,10 @@ public class LineDrawer : MonoBehaviour {
     }
 
     private void DeleteLineHandler(BaseEventArgs e) {
-        HideCard(e.Sender, false);
-        PfbLine.SetActive(false);
-    }
-
-    private void HideCard(GameObject CardObj, bool hide) {
-        foreach (Transform child in CardObj.transform) {
-            child.gameObject.SetActive(!hide);
+        if (e.Sender.GetComponent<CanvasGroup>()) {
+            e.Sender.GetComponent<CanvasGroup>().alpha = 1;
         }
+        PfbLine.SetActive(false);
     }
 
     public bool ifDrawTarget() { // TODO:

@@ -14,23 +14,28 @@ public class BattleCardViewController : MonoBehaviour {
     public GameObject HealthIcon;
     public GameObject AttackIcon;
     [Header("Image References")]
-    public Image CardGraphicImage; // 卡牌图像
-    public Image CardFaceGlowImage; // 卡牌正面光效
+    public Image CardGraphicImage;
+    public GameObject Light;
     public CardBase Card;
+
+    private void Start() {
+        if (GetComponent<DraggableCard>()) {
+            EventManager.AddListener(EmptyParaEvent.ManaVisualUpdate, DraggableCardAvailabilityCheck);
+            EventManager.AddListener(EmptyParaEvent.FieldVisualUpdate, DraggableCardAvailabilityCheck);
+        }
+    }
 
     public void ReadFromAsset() {
         NameText.text = Card.CA.name; // 添加卡牌名字
         ManaCostText.text = Card.CA.ManaCost.ToString(); // 添加卡牌消耗
         DescriptionText.text = Card.CA.Description; // 添加描述
         //TODO: CardGraphicImage.sprite = Card.CA.CardImage;
-        if (GetComponent<DraggableCard>()) {
-            GetComponent<DraggableCard>().ifDrawLine = Card is ITarget;
-        }
-        if (Card is MinionCard) {
+        if (Card is MinionCard or WeaponCard) {
             CardAsset CA = Card.CA;
             AttackText.text = CA.Attack.ToString();
             HealthText.text = CA.Health.ToString();
             if (CA.MinionType != MinionType.None) {
+                ExInfo.transform.parent.gameObject.SetActive(true);
                 ExInfo.text = CA.MinionType.ToString("G");
             }
             else {
@@ -38,13 +43,22 @@ public class BattleCardViewController : MonoBehaviour {
             }
         }
         else if (Card is SpellCard && Card.CA.SpellSchool != SpellSchool.None) {
+            ExInfo.transform.parent.gameObject.SetActive(true);
             ExInfo.text = Card.CA.SpellSchool.ToString("G");
         }
         else {
             ExInfo.transform.parent.gameObject.SetActive(false);
         }
-        HealthIcon.SetActive(Card is MinionCard);
-        AttackIcon.SetActive(Card is MinionCard);
+        HealthIcon.SetActive(Card is MinionCard or WeaponCard);
+        AttackIcon.SetActive(Card is MinionCard or WeaponCard);
+        if (GetComponent<DraggableCard>()) {
+            DraggableCardAvailabilityCheck(null);
+        }
+    }
+
+    private void DraggableCardAvailabilityCheck(BaseEventArgs e) {
+        Light.SetActive(Card.CanBePlayed);
+        GetComponent<DraggableCard>().ifDrawLine = Card is ITarget && (Card is not MinionCard || Card.TargetExist);
     }
 
 }

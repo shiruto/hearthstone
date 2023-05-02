@@ -19,7 +19,7 @@ public class Misdirection : SecretCard {
         if (evt.target == Owner) {
             isTriggered = true;
             List<ICharacter> AvailableTargets = new();
-            AvailableTargets.AddRange(BattleControl.Instance.GetAllMinions());
+            AvailableTargets.AddRange(BattleControl.GetAllMinions());
             AvailableTargets.Add(BattleControl.opponent);
             ScnBattleUI.Instance.Targeting = AvailableTargets[Random.Range(0, AvailableTargets.Count)];
         }

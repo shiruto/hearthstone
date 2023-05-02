@@ -1,8 +1,11 @@
+using System;
 using System.Collections.Generic;
 
 public class ArgentProtector : MinionCard, ITarget, IBattleCry {
     public ICharacter Target { get; set; }
     public List<Effect> BattleCryEffects { get; set; }
+    public Func<ICharacter, bool> Match => (ICharacter c) => c is MinionLogic && (c as MinionLogic).Owner == Owner;
+
     private readonly Buff buff;
 
     public ArgentProtector(CardAsset CA) : base(CA) {
@@ -12,10 +15,6 @@ public class ArgentProtector : MinionCard, ITarget, IBattleCry {
             null,
             new() { CharacterAttribute.DivineShield }
         );
-    }
-
-    public bool CanBeTarget(ICharacter Character) {
-        return Character is MinionLogic && (Character as MinionLogic).Owner == Owner;
     }
 
     public void BattleCry() {

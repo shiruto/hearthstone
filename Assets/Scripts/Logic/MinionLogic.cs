@@ -1,5 +1,5 @@
 using System.Collections.Generic;
-using Unity.VisualScripting;
+using System.Linq;
 using UnityEngine;
 
 public class MinionLogic : ICharacter {
@@ -28,7 +28,7 @@ public class MinionLogic : ICharacter {
                     }
                 }
             }
-            EventManager.Allocate<EmptyParaArgs>().CreateEventArgs(EmptyParaEvent.FieldVisualUpdate).Invoke(); // TODO: change it
+            EventManager.Allocate<MinionEventArgs>().CreateEventArgs(MinionEvent.AfterMinionStatusChange, null, Owner, this).Invoke(); // TODO: change it
         }
     }
 
@@ -40,13 +40,18 @@ public class MinionLogic : ICharacter {
                 _attack = 0;
             }
             else _attack = value;
-            EventManager.Allocate<EmptyParaArgs>().CreateEventArgs(EmptyParaEvent.FieldVisualUpdate).Invoke();
+            EventManager.Allocate<MinionEventArgs>().CreateEventArgs(MinionEvent.AfterMinionStatusChange, null, Owner, this).Invoke();
         }
     }
     private bool _canAttack = true;
     private bool _windFuryAttack;
     public bool CanAttack {
-        get => _canAttack && !Attributes.Contains(CharacterAttribute.Frozen) && BattleControl.Instance.ActivePlayer == Owner && (!NewSummoned || (Attributes.Contains(CharacterAttribute.Rush) && BattleControl.Instance.GetAnotherPlayer(Owner).Field.Minions.Count != 0) || Attributes.Contains(CharacterAttribute.Charge)) && _attack > 0;
+        get => _canAttack &&
+                !Attributes.Contains(CharacterAttribute.Frozen) &&
+                !Attributes.Contains(CharacterAttribute.CantAttack) &&
+                BattleControl.Instance.ActivePlayer == Owner &&
+                HaveTarget() &&
+                _attack > 0;
         set {
             if (value) {
                 _windFuryAttack = Attributes.Contains(CharacterAttribute.Windfury);
@@ -141,6 +146,13 @@ public class MinionLogic : ICharacter {
 
     public void Die() {
         Remove();
+        if (Attributes.Contains(CharacterAttribute.Reborn)) {
+            MinionLogic Reborn = new(Card) {
+                Health = 1
+            };
+            Reborn.Attributes.Remove(CharacterAttribute.Reborn);
+            Owner.Field.SummonMinionAt(-1, Reborn); // TODO: position
+        }
         if (DeathRattleEffects.Count > 0) {
             foreach (Effect effect in DeathRattleEffects) {
                 effect.ActivateEffect();
@@ -153,12 +165,15 @@ public class MinionLogic : ICharacter {
     public void Remove() {
         (this as IBuffable).RemoveAllTriggers();
         Owner.Field.RemoveMinion(this);
-        if (AuraToGive != null) {
+        RemoveAllBuffToGive();
+    }
+
+    public void RemoveAllBuffToGive() {
+        if (AuraToGive != null && AuraToGive.Count != 0) {
             foreach (AuraManager a in AuraToGive) {
                 BattleControl.Instance.RemoveAura(a);
             }
         }
-        Owner.Field.Minions.Remove(this);
     }
 
     public void ReadBuff() {
@@ -183,7 +198,7 @@ public class MinionLogic : ICharacter {
                         }
                     }
                 }
-                if (b.Attributes?.Count == 0) continue;
+                if (b.Attributes == null || b.Attributes.Count == 0) continue;
                 foreach (var a in b.Attributes) {
                     Attributes.Add(a);
                 }
@@ -220,14 +235,27 @@ public class MinionLogic : ICharacter {
         else {
             if (_health > MaxHealth) _health = MaxHealth;
         }
-        Debug.Log($"{Card.CA.name} ReadBuff");
+        // Debug.Log($"{Card.CA.name} ReadBuff it's health = {_health}");
         EventManager.Allocate<EmptyParaArgs>().CreateEventArgs(EmptyParaEvent.FieldVisualUpdate).Invoke();
     }
 
     private void ResetStatus() {
         _attack = Card.CA.Attack;
-        _health = Card.CA.Health;
+        MaxHealth = Card.CA.Health;
         spellDamage = Card.CA.SpellDamage;
+    }
+
+    public bool HaveTarget() {
+        List<ICharacter> enemy = new(BattleControl.GetAnotherPlayer(Owner).Field.Minions) {
+            BattleControl.GetAnotherPlayer(Owner)
+        };
+        enemy.RemoveAll((ICharacter c) => c.Attributes.Contains(CharacterAttribute.Immune) || c.Attributes.Contains(CharacterAttribute.Stealth));
+        List<ICharacter> temp = enemy.Where((ICharacter a) => GameDataAsset.IsTaunt(a as MinionLogic)).ToList();
+        if (temp.Count != 0) {
+            enemy = temp;
+        }
+        if (NewSummoned && Attributes.Contains(CharacterAttribute.Rush)) enemy.Remove(BattleControl.GetAnotherPlayer(Owner));
+        return enemy.Count != 0;
     }
 
 }

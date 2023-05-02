@@ -29,6 +29,13 @@ public abstract class WeaponCard : CardBase {
         Owner.Weapon.EquipWeapon(this);
     }
 
+    public virtual void AttackEffect(ICharacter Target) {
+        Owner.CanAttack = false;
+        Target.Health -= Owner.Attack;
+        Owner.Health -= Target.Attack;
+        Owner.Weapon.Health -= 1;
+    }
+
     public override void ReadBuff() {
         base.ReadBuff();
         _attack = CA.Attack;
