@@ -16,8 +16,7 @@ public enum CardEvent {
 }
 
 public enum VisualEvent {
-    DrawCardLine,
-    DrawMinionLine,
+    DrawLine,
     DeleteLine,
     OnCardReturn
 }
@@ -70,6 +69,9 @@ public enum EmptyParaEvent {
 
 public enum AttackEvent {
     BeforeAttack,
-    AfterAttack,
-    MagicAttack
+    AfterAttack
+}
+
+public enum DamageEvent {
+    TakeDamage
 }

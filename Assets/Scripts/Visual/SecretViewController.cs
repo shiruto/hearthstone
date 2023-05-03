@@ -14,7 +14,7 @@ public class SecretViewController : MonoBehaviour {
     }
 
     public void UpdateSecretColor() {
-        GameDataAsset.SecretColor.TryGetValue(Secret.CA.ClassType, out Color secretColor);
+        GameData.SecretColor.TryGetValue(Secret.CA.ClassType, out Color secretColor);
         if (secretColor != null) {
             SecretBG.color = secretColor;
         }

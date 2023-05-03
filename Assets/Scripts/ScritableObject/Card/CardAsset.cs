@@ -18,7 +18,6 @@ public class CardAsset : ScriptableObject {
     public MinionType MinionType;
     public List<CharacterAttribute> attributes;
     [Header("SpellSection")]
-    public bool isSecret;
     public SpellSchool SpellSchool;
 
 }

@@ -10,7 +10,7 @@ public class Slience : SpellCard, ITarget {
 
     public override void ExtendUse() {
         base.ExtendUse();
-        new SlienceEffect(Target).ActivateEffect();
+        new SilenceEffect(Target).ActivateEffect();
     }
 
 }

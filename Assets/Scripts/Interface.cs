@@ -107,8 +107,10 @@ public interface IBuffable {
 public interface ICharacter : IIdentifiable, ITakeDamage, IBuffable, IAttribute {
     int Attack { get; set; }
     int SpellDamage { get; set; }
+    ICharacter AttackTarget { get; set; }
 
     void Die();
+    void AttackAgainst(ICharacter target);
 
     public void RemoveAttribute(CharacterAttribute a) {
         Attributes.Remove(a);
@@ -129,18 +131,21 @@ public interface IIdentifiable {
 
 public interface ITakeDamage {
     int Health { get; set; }
+    void TakeDamage(int value, IBuffable source) {
+        Health -= value;
+        EventManager.Allocate<DamageEventArgs>().CreateEventArgs(DamageEvent.TakeDamage, this, source, value);
+    }
 }
 
 public interface IBattleCry {
-    public List<Effect> BattleCryEffects { get; set; }
     public void BattleCry();
 }
 
 public interface IDeathRattle {
     public List<Effect> DeathRattleEffects { get; set; }
-    public void DeathRattle();
 }
 
 public interface IAuraMinionCard {
     public List<AuraManager> AuraToGrant { get; }
 }
+

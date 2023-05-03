@@ -5,7 +5,7 @@ using UnityEngine;
 using Random = UnityEngine.Random;
 
 public class BattleControl : MonoBehaviour {
-    public static Dictionary<int, CardBase> CardUsed;
+    public static List<UsedCardStruct> CardUsed;
     public static Dictionary<int, MinionLogic> MinionSummoned;
 
     #region view stuff
@@ -74,9 +74,6 @@ public class BattleControl : MonoBehaviour {
         yourWeapon.gameObject.SetActive(false);
         yourSecret.sl = you.Secrets;
         yourSkill.SL = you.Skill;
-        // TODO: Create Skill Card Asset
-        // object[] parameters = new object[] { AssetDatabase.LoadAllAssetsAtPath("Assets/ResourcesScriptableObject/UnCollectableCard/" + SelectedDeck.DeckClass + ".asset") as object};
-        // yourSkill.InitSkill(Activator.CreateInstance(Type.GetType(SelectedDeck.DeckClass.ToString("G") + "Skill"), parameters) as SkillCard);
         opponent.Deck.ReadCardsFromDeck(SelectedDeck); // TODO: change opponent's deck
         opponentVisual.Player = opponent;
         opponentVisual.ReadFromLogic();
@@ -230,9 +227,13 @@ public class BattleControl : MonoBehaviour {
         }
     }
 
-    public static PlayerLogic GetAnotherPlayer(PlayerLogic p) {
+    public static PlayerLogic GetEnemy(PlayerLogic p) {
         if (p == you) return opponent;
         else return you;
+    }
+
+    public static bool IsCombo() {
+        return CardUsed.Exists((UsedCardStruct u) => u.TurnCount == Instance.ActivePlayer.TurnCount);
     }
 
 }

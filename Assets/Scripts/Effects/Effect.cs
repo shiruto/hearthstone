@@ -33,4 +33,17 @@ public abstract class Effect {
         return Card;
     }
 
+    public static List<T> GetMultiRandomObject<T>(List<T> pool, int Num, Predicate<T> matchToDel = null) {
+        matchToDel ??= (T a) => false;
+        List<T> Objects = new();
+        pool.RemoveAll(matchToDel);
+        for (int i = 0; i < Num; i++) {
+            if (pool.Count == 0) break;
+            T t = pool[Random.Range(0, pool.Count)];
+            pool.Remove(t);
+            Objects.Add(t);
+        }
+        return Objects;
+    }
+
 }

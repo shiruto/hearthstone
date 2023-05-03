@@ -1,55 +1,68 @@
+using System.Collections;
 using UnityEngine;
 
 public class LineDrawer : MonoBehaviour {
     private LineRenderer LR;
     private Transform Target;
     private Transform Arrow;
-    private Transform LineTrans;
-    public GameObject PfbLine;
+    [SerializeField]
+    private GameObject PfbLine;
+    [HideInInspector]
+    public static LineDrawer Instance;
+    public bool isDrawing = false;
+    private GameObject DrawingObj;
 
     private void Awake() {
-        LineTrans = PfbLine.transform;
-        Target = LineTrans.GetChild(2);
-        LR = LineTrans.GetChild(0).GetComponent<LineRenderer>();
-        Arrow = LineTrans.GetChild(1);
-        LineTrans.gameObject.SetActive(false);
-        EventManager.AddListener(VisualEvent.DrawCardLine, DrawCardLineHandler);
-        EventManager.AddListener(VisualEvent.DrawMinionLine, DrawMinionLineHandler);
+        Instance = this;
+        Target = PfbLine.transform.GetChild(2);
+        LR = PfbLine.transform.GetChild(0).GetComponent<LineRenderer>();
+        Arrow = PfbLine.transform.GetChild(1);
+        PfbLine.SetActive(false);
+        EventManager.AddListener(VisualEvent.DrawLine, DrawLineHandler);
         EventManager.AddListener(VisualEvent.DeleteLine, DeleteLineHandler);
     }
 
-    private void DrawCardLineHandler(BaseEventArgs e) {
+    private void DrawLineHandler(BaseEventArgs e) {
         VisualEventArgs evt = e as VisualEventArgs;
+        DrawingObj = evt.Sender;
+        StartCoroutine(DrawLineCoroutine(evt.StartPos));
+    }
+
+    private IEnumerator DrawLineCoroutine(Vector3 StartPos) {
         Debug.Log("Drawing Line");
-        evt.Sender.GetComponent<CanvasGroup>().alpha = 0;
-        DrawLine(evt.StartPos, evt.Destination);
-    }
-
-    private void DrawMinionLineHandler(BaseEventArgs e) {
-        VisualEventArgs evt = e as VisualEventArgs;
-        DrawLine(evt.StartPos, evt.Destination);
-    }
-
-    private void DrawLine(Vector3 StartPos, Vector3 EndPos) {
-        LineTrans.gameObject.SetActive(true);
-        Target.gameObject.SetActive(false); // TODO: Draw Target
-        Arrow.position = EndPos;
+        isDrawing = true;
+        PfbLine.SetActive(true);
+        DrawTarget();
         LR.SetPosition(0, StartPos);
-        LR.SetPosition(1, EndPos);
-        float angle = Mathf.Atan2(EndPos.x - StartPos.x, EndPos.y - StartPos.y);
-        angle *= Mathf.Rad2Deg;
-        Arrow.eulerAngles = new(0, 0, -angle);
-    }
-
-    private void DeleteLineHandler(BaseEventArgs e) {
-        if (e.Sender.GetComponent<CanvasGroup>()) {
-            e.Sender.GetComponent<CanvasGroup>().alpha = 1;
+        while (isDrawing) {
+            Vector3 EndPos = Input.mousePosition;
+            Arrow.position = EndPos;
+            Target.position = EndPos;
+            LR.SetPosition(1, EndPos);
+            Arrow.eulerAngles = new(0, 0, -Mathf.Atan2(EndPos.x - StartPos.x, EndPos.y - StartPos.y) * Mathf.Rad2Deg);
+            yield return null;
         }
         PfbLine.SetActive(false);
     }
 
-    public bool ifDrawTarget() { // TODO:
-        return false;
+    private void DeleteLineHandler(BaseEventArgs e) {
+        isDrawing = false;
+    }
+
+    public void DrawTarget() {
+        if (DrawingObj.GetComponent<BattleCardViewController>()) {
+            CardBase DrawingCard = DrawingObj.GetComponent<BattleCardViewController>().Card;
+            Target.gameObject.SetActive((DrawingCard as ITarget).Match(ScnBattleUI.Instance.TargetCharacter) && DrawingCard.CanBeTarget(ScnBattleUI.Instance.TargetCharacter));
+        }
+        else if (DrawingObj.GetComponent<MinionViewController>()) {
+            Target.gameObject.SetActive(DrawingObj.GetComponent<MinionViewController>().ML.ValidTarget(ScnBattleUI.Instance.TargetCharacter));
+        }
+        else if (DrawingObj.GetComponent<PlayerVisual>()) {
+            Target.gameObject.SetActive(DrawingObj.GetComponent<PlayerVisual>().ValidTarget(ScnBattleUI.Instance.TargetCharacter));
+        }
+        else {
+            Debug.LogWarning("Wrong Dragging GameObject");
+        }
     }
 
 }

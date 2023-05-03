@@ -1,22 +1,14 @@
 public class Counterspell : SecretCard {
+
     public Counterspell(CardAsset CA) : base(CA) {
+        trigger = new(CardEvent.BeforeCardUse, Triggered);
     }
 
-    public override void AddTrigger() {
-        EventManager.AddListener(CardEvent.BeforeCardUse, Triggered);
-    }
-
-    public override void DelTrigger() {
-        EventManager.DelListener(CardEvent.BeforeCardUse, Triggered);
-    }
-
-    public override void SecretImplement(BaseEventArgs e, out bool isTriggered) {
+    public override bool SecretImplementation(BaseEventArgs e) {
         CardEventArgs evt = e as CardEventArgs;
-        if (evt.Player != Owner) {
-            BattleControl.Instance.CardUsing = null;
-            isTriggered = true;
-        }
-        else isTriggered = false;
+        if (evt.Card is not SpellCard) return false;
+        BattleControl.Instance.CardUsing = null;
+        return true;
     }
 
 }

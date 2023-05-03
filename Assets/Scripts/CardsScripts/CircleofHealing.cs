@@ -7,7 +7,7 @@ public class CircleofHealing : SpellCard, IHeal {
 
     public override void ExtendUse() {
         base.ExtendUse();
-        new DealAoeDamage(4, (ICharacter a) => a is MinionLogic) {
+        new DealAoeDamage(4, this, (ICharacter a) => a is MinionLogic) {
             isHeal = true
         }.ActivateEffect();
     }

@@ -9,7 +9,7 @@ public class SkillLogic {
     public PlayerLogic Owner;
 
     public SkillLogic(ClassType classType) {
-        GameDataAsset.HeroPower.TryGetValue(classType, out string HeroPowerName);
+        GameData.HeroPower.TryGetValue(classType, out string HeroPowerName);
         object[] parameters = new object[] { Resources.Load<CardAsset>("ScriptableObject/UnCollectableCard/Skill/" + HeroPowerName) };
         Skill = Activator.CreateInstance(Type.GetType(HeroPowerName.Replace(" ", "")), parameters) as SkillCard;
         ManaCost = Skill.ManaCost;

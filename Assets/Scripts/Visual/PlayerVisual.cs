@@ -6,6 +6,12 @@ public class PlayerVisual : MonoBehaviour {
     public PlayerLogic Player;
     public Image PlayerImage; // TODO: img
     // TODO: windfury stealth... effect image
+    public GameObject Windfury;
+    public GameObject Frozen;
+    public GameObject Stealth;
+    public GameObject DivineShield;
+    public GameObject Immune;
+    public GameObject Elusive;
     public TextMeshProUGUI Health;
     public TextMeshProUGUI Armor;
     public TextMeshProUGUI Attack;
@@ -27,37 +33,47 @@ public class PlayerVisual : MonoBehaviour {
         Armor.text = Player.Armor + "";
         Armor.transform.parent.gameObject.SetActive(Armor.text != "0");
         Attack.transform.parent.gameObject.SetActive(Attack.text != "0");
+        Frozen.SetActive(Player.Attributes.Contains(CharacterAttribute.Frozen));
+        Windfury.SetActive(Player.Attributes.Contains(CharacterAttribute.Windfury));
+        Elusive.SetActive(Player.Attributes.Contains(CharacterAttribute.Elusive));
+        DivineShield.SetActive(Player.Attributes.Contains(CharacterAttribute.DivineShield));
+        Immune.SetActive(Player.Attributes.Contains(CharacterAttribute.Immune));
+        Stealth.SetActive(Player.Attributes.Contains(CharacterAttribute.Stealth));
         // Debug.Log("you? " + (Player == BattleControl.you) + " " + Player.Health);
     }
 
-    private void OnMouseDrag() {
-        if (Player.CanAttack) {
-            ScnBattleUI.Instance.isDragging = true;
-            EventManager.Allocate<VisualEventArgs>().CreateEventArgs(VisualEvent.DrawMinionLine, gameObject, transform.position, Input.mousePosition).Invoke();
-        }
-    }
-
     private void OnMouseUp() {
-        ScnBattleUI.Instance.isDragging = false;
-        if (Player.CanAttack && DrawTarget(ScnBattleUI.Instance.Targeting)) {
-            EventManager.Allocate<AttackEventArgs>().CreateEventArgs(AttackEvent.BeforeAttack, gameObject, Player, ScnBattleUI.Instance.Targeting).Invoke();
-            Player.AttackAgainst(ScnBattleUI.Instance.Targeting);
+        if (ScnBattleUI.Instance.isDragging && Player.CanAttack && ValidTarget(ScnBattleUI.Instance.TargetCharacter)) {
+            EventManager.Allocate<AttackEventArgs>().CreateEventArgs(AttackEvent.BeforeAttack, gameObject, Player, ScnBattleUI.Instance.TargetCharacter).Invoke();
+            Player.AttackAgainst(ScnBattleUI.Instance.TargetCharacter);
+            Player.CanAttack = false;
         }
-        EventManager.Allocate<VisualEventArgs>().CreateEventArgs(VisualEvent.DeleteLine, gameObject, Vector3.zero, Vector3.zero).Invoke();
+        ScnBattleUI.Instance.isDragging = false;
+        EventManager.Allocate<VisualEventArgs>().CreateEventArgs(VisualEvent.DeleteLine, gameObject).Invoke();
     }
 
-    public bool DrawTarget(ICharacter Target) {
-        if (Target == null) return false;
-        if (Target == Player) return false;
-        if (Target is MinionCard) return (Target as MinionCard).Owner != Player;
-        // 嘲讽判断
-        if (BattleControl.opponent.Field.GetMinions().Exists((MinionLogic a) => a.Attributes.Contains(CharacterAttribute.Taunt)) && !(Target as MinionLogic).Attributes.Contains(CharacterAttribute.Taunt)) {
-            return false;
+    private void OnMouseDown() {
+        EventManager.Allocate<CardEventArgs>().CreateEventArgs(CardEvent.AfterCardPreview, gameObject).Invoke();
+        if (Player.CanAttack) {
+            EventManager.Allocate<VisualEventArgs>().CreateEventArgs(VisualEvent.DrawLine, gameObject, transform.position).Invoke();
+            ScnBattleUI.Instance.isDragging = true;
         }
-        // 潛行,免疫判断
-        if (Target.Attributes.Contains(CharacterAttribute.Immune) || Target.Attributes.Contains(CharacterAttribute.Stealth)) return false;
-        if (Target is MinionLogic or PlayerLogic) return true;
-        return false;
+    }
+
+    public bool ValidTarget(ICharacter Target) {
+        if (Target == null)
+            return false;
+        if (!Logic.IsEnemy(Player, Target))
+            return false;
+        if (Target.Attributes != null) {
+            if (Target.Attributes.Contains(CharacterAttribute.Immune))
+                return false;
+            if (Target.Attributes.Contains(CharacterAttribute.Stealth))
+                return false;
+            if (BattleControl.GetEnemy(Player).Field.HaveTaunt && !Logic.CanTaunt(Target as MinionLogic))
+                return false;
+        }
+        return true;
     }
 
 }

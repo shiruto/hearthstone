@@ -11,7 +11,10 @@ public class AbusiveSergeant : MinionCard, ITarget, IBattleCry {
         _buff = new(
             "abusiveSergeant",
             new() { new(Status.Attack, Operator.Plus, 2) },
-            new() { new(TurnEvent.OnTurnEnd, (BaseEventArgs e) => Target.RemoveBuff(_buff)) }
+            new() { new(TurnEvent.OnTurnEnd, (BaseEventArgs e) => {
+                if(e.Player == Owner)
+                    Target.RemoveBuff(_buff);
+                })}
         );
     }
 

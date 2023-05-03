@@ -60,8 +60,8 @@ public class WeaponLogic : IBuffable, ITakeDamage {
         EventManager.Allocate<EmptyParaArgs>().CreateEventArgs(EmptyParaEvent.WeaponVisualUpdate).Invoke();
     }
 
-    public void AttackAgainst(ICharacter Target) {
-        Card.AttackEffect(Target);
+    public void AttackAgainst() {
+        Card.AttackEffect(Owner.AttackTarget);
     }
 
     private void OnTurnStartHandler(BaseEventArgs e) {

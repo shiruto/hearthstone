@@ -8,7 +8,6 @@ public abstract class SpellCard : CardBase {
 
     public override void ExtendUse() {
         Debug.Log("Cast a Spell");
-        BattleControl.CardUsed.Add(ID, this);
     }
 
 }

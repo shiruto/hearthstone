@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -7,9 +8,10 @@ public class MinionLogic : ICharacter {
     public PlayerLogic Owner { get; set; }
     public MinionCard Card;
     public List<TriggerStruct> Triggers { get; set; }
-
+    public bool isAlive;
     private readonly int MinionID;
     public int ID => MinionID;
+    public ICharacter AttackTarget { get; set; }
 
     public int MaxHealth;
     private int _health;
@@ -90,9 +92,17 @@ public class MinionLogic : ICharacter {
         Auras = new();
         NewSummoned = true;
         Triggers = new();
+        isAlive = true;
+        AttackTarget = null;
         if (MC is ITriggerMinionCard) {
             foreach (TriggerStruct t in (MC as ITriggerMinionCard).TriggersToGrant) {
                 (this as IBuffable).AddTrigger(t); // TODO: test it
+            }
+        }
+        if (MC is IAuraMinionCard) {
+            AuraToGive = new((MC as IAuraMinionCard).AuraToGrant);
+            foreach (AuraManager a in AuraToGive) {
+                BattleControl.Instance.AddAura(a);
             }
         }
         EventManager.AddListener(TurnEvent.OnTurnStart, OnTurnStartHandler);
@@ -128,13 +138,14 @@ public class MinionLogic : ICharacter {
     // TODO: force attack
 
     public void AttackAgainst(ICharacter target) {
-        if (!CanAttack) return;
-        CanAttack = false;
-        target.Health -= Attack;
-        Health -= target.Attack;
-        Debug.Log($"{Card.CA.name} is Attacking {target}");
-        EventManager.Allocate<AttackEventArgs>().CreateEventArgs(AttackEvent.AfterAttack, null, this, ScnBattleUI.Instance.Targeting).Invoke();
-        EventManager.Allocate<EmptyParaArgs>().CreateEventArgs(EmptyParaEvent.FieldVisualUpdate);
+        AttackTarget = target;
+        EventManager.Allocate<AttackEventArgs>().CreateEventArgs(AttackEvent.BeforeAttack, null, this, AttackTarget).Invoke();
+        if (!CanAttack || !isAlive) return;
+        AttackTarget.TakeDamage(Attack, this);
+        (this as ITakeDamage).TakeDamage(AttackTarget.Attack, target);
+        (this as ICharacter).RemoveAttribute(CharacterAttribute.Stealth);
+        Debug.Log($"{Card.CA.name} is Attacking {AttackTarget}");
+        EventManager.Allocate<AttackEventArgs>().CreateEventArgs(AttackEvent.AfterAttack, null, this, AttackTarget).Invoke();
     }
 
     public CardBase BackToHand(PlayerLogic owner = null) {
@@ -165,6 +176,7 @@ public class MinionLogic : ICharacter {
     public void Remove() {
         (this as IBuffable).RemoveAllTriggers();
         Owner.Field.RemoveMinion(this);
+        isAlive = false;
         RemoveAllBuffToGive();
     }
 
@@ -246,16 +258,33 @@ public class MinionLogic : ICharacter {
     }
 
     public bool HaveTarget() {
-        List<ICharacter> enemy = new(BattleControl.GetAnotherPlayer(Owner).Field.Minions) {
-            BattleControl.GetAnotherPlayer(Owner)
+        List<ICharacter> enemy = new(BattleControl.GetEnemy(Owner).Field.Minions) {
+            BattleControl.GetEnemy(Owner)
         };
-        enemy.RemoveAll((ICharacter c) => c.Attributes.Contains(CharacterAttribute.Immune) || c.Attributes.Contains(CharacterAttribute.Stealth));
-        List<ICharacter> temp = enemy.Where((ICharacter a) => GameDataAsset.IsTaunt(a as MinionLogic)).ToList();
-        if (temp.Count != 0) {
-            enemy = temp;
+        return enemy.Where(ValidTarget).ToList().Count != 0;
+    }
+
+    public bool ValidTarget(ICharacter Target) {
+        if (Target == null)
+            return false;
+        if (!Logic.IsEnemy(Owner, Target))
+            return false;
+
+        if (Target.Attributes != null) {
+            if (Target.Attributes.Contains(CharacterAttribute.Immune))
+                return false;
+            if (Target.Attributes.Contains(CharacterAttribute.Stealth))
+                return false;
+            if (BattleControl.GetEnemy(Owner).Field.HaveTaunt && !Logic.CanTaunt(Target as MinionLogic))
+                return false;
         }
-        if (NewSummoned && Attributes.Contains(CharacterAttribute.Rush)) enemy.Remove(BattleControl.GetAnotherPlayer(Owner));
-        return enemy.Count != 0;
+        if (NewSummoned) {
+            if (!Attributes.Contains(CharacterAttribute.Rush) && !Attributes.Contains(CharacterAttribute.Rush))
+                return false;
+            else if (!Attributes.Contains(CharacterAttribute.Rush) && Target == BattleControl.GetEnemy(Owner))
+                return false;
+        }
+        return true;
     }
 
 }

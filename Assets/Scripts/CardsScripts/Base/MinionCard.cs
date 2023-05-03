@@ -18,12 +18,6 @@ public class MinionCard : CardBase {
         else Minion.BuffList = new();
         if (this is IBattleCry) (this as IBattleCry).BattleCry();
         Owner.Field.SummonMinionAt(0, Minion); // TODO: choose position
-        if (this is IAuraMinionCard) {
-            Minion.AuraToGive = new((this as IAuraMinionCard).AuraToGrant);
-            foreach (AuraManager a in Minion.AuraToGive) {
-                BattleControl.Instance.AddAura(a);
-            }
-        }
     }
 
     public override void ReadBuff() {

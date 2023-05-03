@@ -19,9 +19,11 @@ public class MinionViewController : MonoBehaviour {
     public GameObject Elusive;
     public GameObject Light;
 
-    private void Start() {
+    private void OnEnable() {
+        CanAttackCheck(null);
         EventManager.AddListener(MinionEvent.AfterMinionStatusChange, UpdateStatus);
-        EventManager.AddListener(EmptyParaEvent.FieldVisualUpdate, CanAttackCheck);
+        EventManager.AddListener(TurnEvent.OnTurnStart, CanAttackCheck);
+        EventManager.AddListener(TurnEvent.OnTurnEnd, CanAttackCheck);
     }
 
     public void ReadFromMinionLogic() {
@@ -29,16 +31,18 @@ public class MinionViewController : MonoBehaviour {
         TxtAttack.text = ML.Attack.ToString();
         TxtHealth.text = ML.Health.ToString();
         Frozen.SetActive(ML.Attributes.Contains(CharacterAttribute.Frozen));
-        Reborn.SetActive(ML.Attributes.Contains(CharacterAttribute.Reborn));
+        Windfury.SetActive(ML.Attributes.Contains(CharacterAttribute.Windfury));
+        Elusive.SetActive(ML.Attributes.Contains(CharacterAttribute.Elusive));
         DivineShield.SetActive(ML.Attributes.Contains(CharacterAttribute.DivineShield));
         Immune.SetActive(ML.Attributes.Contains(CharacterAttribute.Immune));
+        Reborn.SetActive(ML.Attributes.Contains(CharacterAttribute.Reborn));
         Trigger.SetActive(ML.Triggers != null && ML.Triggers.Count != 0);
         DeathRattle.SetActive(ML.DeathRattleEffects.Count != 0);
-        Windfury.SetActive(ML.Attributes.Contains(CharacterAttribute.Windfury));
         LifeSteal.SetActive(ML.Attributes.Contains(CharacterAttribute.LifeSteal));
-        Taunt.SetActive(ML.Attributes.Contains(CharacterAttribute.Taunt));
         Poisonous.SetActive(ML.Attributes.Contains(CharacterAttribute.Poisonous));
-        Elusive.SetActive(ML.Attributes.Contains(CharacterAttribute.Elusive));
+        Taunt.SetActive(ML.Attributes.Contains(CharacterAttribute.Taunt));
+        Stealth.SetActive(ML.Attributes.Contains(CharacterAttribute.Stealth));
+        CanAttackCheck(null);
     }
 
     private void UpdateStatus(BaseEventArgs e) {
@@ -46,11 +50,16 @@ public class MinionViewController : MonoBehaviour {
         if (evt.minion == ML) {
             ReadFromMinionLogic();
         }
-        CanAttackCheck(null);
     }
 
     private void CanAttackCheck(BaseEventArgs e) {
-        Light.SetActive(ML.CanAttack);
+        Light.SetActive(ML != null && ML.CanAttack);
+    }
+
+    private void OnDisable() {
+        EventManager.DelListener(MinionEvent.AfterMinionStatusChange, UpdateStatus);
+        EventManager.DelListener(TurnEvent.OnTurnStart, CanAttackCheck);
+        EventManager.DelListener(TurnEvent.OnTurnEnd, CanAttackCheck);
     }
 
 }

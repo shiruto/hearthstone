@@ -15,7 +15,6 @@ public class PlayerLogic : ICharacter {
 
     #region player property
     public ClassType HeroClass;
-    public bool isEnemy;
     private readonly int playerID;
     public int ID => playerID;
     private int MaxHealth = 30;
@@ -108,6 +107,7 @@ public class PlayerLogic : ICharacter {
             }
         }
     }
+    public ICharacter AttackTarget { get; set; }
     public List<Buff> BuffList { get; set; }
     public List<Buff> Auras { get; set; }
     #endregion
@@ -132,7 +132,9 @@ public class PlayerLogic : ICharacter {
         Skill = new(classType) {
             Owner = this
         };
-        Secrets = new();
+        Secrets = new() {
+            Owner = this
+        };
         Attributes = new();
         //TODO: get skill and hero depending on its ClassType
         playerID = IDFactory.GetID();
@@ -143,14 +145,21 @@ public class PlayerLogic : ICharacter {
     }
 
     public void AttackAgainst(ICharacter target) { // TODO: attack func that won't consume attck chance
+        AttackTarget = target;
+        EventManager.Allocate<AttackEventArgs>().CreateEventArgs(AttackEvent.BeforeAttack, null, this, AttackTarget);
         if (Weapon.Card != null) {
-            Weapon.AttackAgainst(target);
+            Weapon.AttackAgainst();
         }
         else {
-            CanAttack = false;
-            target.Health -= Attack;
-            Health -= target.Attack;
+            DefaultAttackAgainst();
         }
+        EventManager.Allocate<AttackEventArgs>().CreateEventArgs(AttackEvent.AfterAttack, null, this, AttackTarget);
+    }
+
+    public void DefaultAttackAgainst() {
+        AttackTarget.TakeDamage(Attack, this);
+        (this as ITakeDamage).TakeDamage(AttackTarget.Attack, AttackTarget);
+        (this as ICharacter).RemoveAttribute(CharacterAttribute.Stealth);
     }
 
     public void OnTurnStart() {

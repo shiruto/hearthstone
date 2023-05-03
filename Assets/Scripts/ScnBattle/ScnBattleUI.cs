@@ -6,11 +6,13 @@ public class ScnBattleUI : MonoBehaviour {
     private Ray ray;
     public static ScnBattleUI Instance;
     public GameObject CardPreview;
-    public ICharacter Targeting = null;
+    [HideInInspector]
     public bool isDragging;
     public GameObject BuffList;
     public GameObject Buff;
     public List<Buff> Buffs;
+    private Transform TargetTrans = null;
+    public ICharacter TargetCharacter = null;
 
     private void Awake() {
         Instance = this;
@@ -24,14 +26,21 @@ public class ScnBattleUI : MonoBehaviour {
         ray = Camera.main.ScreenPointToRay(Input.mousePosition);
         Debug.DrawLine(Camera.main.transform.position, Input.mousePosition, Color.yellow);
         if (Physics.Raycast(ray, out RaycastHit hitInfo, Mathf.Infinity, LayerMask.GetMask("UI"))) {
-            Transform TargetTrans = hitInfo.collider.transform;
-            if (TargetTrans.GetComponent<MinionViewController>()) {
-                Targeting = TargetTrans.GetComponent<MinionViewController>().ML;
+            Transform TempTrans = hitInfo.collider.transform;
+            if (TempTrans != TargetTrans) {
+                TargetTrans = TempTrans;
+                if (TargetTrans.GetComponent<MinionViewController>()) {
+                    TargetCharacter = TargetTrans.GetComponent<MinionViewController>().ML;
+                }
+                else if (TargetTrans.GetComponent<PlayerVisual>()) {
+                    TargetCharacter = TargetTrans.GetComponent<PlayerVisual>().Player;
+                }
+                else TargetCharacter = null;
+
+                if (LineDrawer.Instance.isDrawing) { // 若目标变化 检测是否需要渲染 Target
+                    LineDrawer.Instance.DrawTarget();
+                }
             }
-            else if (TargetTrans.GetComponent<PlayerVisual>()) {
-                Targeting = TargetTrans.GetComponent<PlayerVisual>().Player;
-            }
-            else Targeting = null;
             // Debug.Log(TargetTrans.name + " ICharacter = " + Targeting);
         }
     }
@@ -43,7 +52,7 @@ public class ScnBattleUI : MonoBehaviour {
         CardPreview.GetComponent<BattleCardViewController>().Card = evt.Card;
         CardPreview.GetComponent<BattleCardViewController>().ReadFromAsset();
         CardPreview.transform.position = evt.Sender.transform.position - (new Vector3(evt.Sender.GetComponent<RectTransform>().sizeDelta.x, 0, 0) + new Vector3(CardPreview.GetComponent<RectTransform>().sizeDelta.x * 2, 0, 0)) / 2;
-        if (e.Sender.GetComponent<MinionViewController>()) {
+        if (e.Sender.GetComponent<MinionViewController>()) { // TODO: weapon
             Buffs = new();
             if (e.Sender.GetComponent<MinionViewController>().ML.BuffList.Count != 0) {
                 Buffs.AddRange(e.Sender.GetComponent<MinionViewController>().ML.BuffList);

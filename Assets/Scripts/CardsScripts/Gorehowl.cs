@@ -5,7 +5,6 @@ public class Gorehowl : WeaponCard {
     }
 
     public override void AttackEffect(ICharacter Target) {
-        Owner.CanAttack = false;
         Target.Health -= Owner.Attack;
         Owner.Health -= Target.Attack;
         if (Target is MinionLogic) {

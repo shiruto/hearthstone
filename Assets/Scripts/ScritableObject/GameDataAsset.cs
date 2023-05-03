@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.TextCore.Text;
 
 public struct TriggerStruct {
     public Enum eventType;
@@ -35,7 +34,18 @@ public struct AuraManager {
         range = r;
         expireTrigger = t;
     }
+}
 
+public struct UsedCardStruct {
+    public CardBase Card;
+    public int CardID;
+    public int TurnCount;
+
+    public UsedCardStruct(CardBase Card, int CardID, int TurnCount) {
+        this.Card = Card;
+        this.CardID = CardID;
+        this.TurnCount = TurnCount;
+    }
 }
 
 public enum Status {
@@ -162,7 +172,11 @@ public enum CharacterAttribute {
     CantAttack
 }
 
-public static class GameDataAsset {
+public enum DeckStatus { Empty, LastOne, Less, Medium, Alot, Full }
+
+public static class GameData {
+    public static readonly string Path = "ScriptableObject/Card/";
+
     public static readonly Dictionary<ClassType, Color> SecretColor = new() {
         {ClassType.Mage, new(1, 104/255f, 248/255f, 1)},
         {ClassType.Hunter, Color.green},
@@ -191,6 +205,23 @@ public static class GameDataAsset {
         return true;
     };
 
+}
+
+public static class Logic {
+    public static bool CanTaunt(MinionLogic minion) {
+        if (minion == null || minion.Attributes == null) return false;
+        return minion.Attributes.Contains(CharacterAttribute.Taunt) && !(minion.Attributes.Contains(CharacterAttribute.Stealth) || minion.Attributes.Contains(CharacterAttribute.Immune));
+    }
+
+    public static bool IsEnemy(ICharacter a, ICharacter b) {
+        PlayerLogic p1 = (a is MinionLogic) ? (a as MinionLogic).Owner : (a as PlayerLogic);
+        PlayerLogic p2 = (b is MinionLogic) ? (b as MinionLogic).Owner : (b as PlayerLogic);
+        return p1 == p2;
+    }
+
+}
+
+public static class Util {
     public static Predicate<T> FuncToPredicate<T>(this Func<T, bool> func) {
         return x => func(x);
     }
@@ -198,11 +229,4 @@ public static class GameDataAsset {
     public static Func<T, bool> PredicateToFunc<T>(this Predicate<T> predicate) {
         return x => predicate(x);
     }
-
-    public static bool IsTaunt(MinionLogic minion) {
-        if (minion == null || minion.Attributes == null) return false;
-        return minion.Attributes.Contains(CharacterAttribute.Taunt) && !(minion.Attributes.Contains(CharacterAttribute.Stealth) || minion.Attributes.Contains(CharacterAttribute.Immune));
-    }
-
 }
-

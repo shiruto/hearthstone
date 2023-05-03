@@ -11,7 +11,7 @@ public class GiveBuff : Effect {
     }
 
     public override void ActivateEffect() {
-        Target.AddBuff(BuffToGive);
+        Target?.AddBuff(BuffToGive);
     }
 
 }

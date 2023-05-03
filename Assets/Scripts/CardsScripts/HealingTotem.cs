@@ -11,6 +11,6 @@ public class HealingTotem : MinionCard, ITriggerMinionCard, IHeal {
 
     public void Triggered(BaseEventArgs e) {
         if (e.Player != Owner) return;
-        new DealAoeDamage(Heal, (ICharacter c) => c is MinionLogic && (c as MinionLogic).Owner == Owner).ActivateEffect();
+        new DealAoeDamage(-Heal, Minion, (ICharacter c) => c is MinionLogic && (c as MinionLogic).Owner == Owner).ActivateEffect();
     }
 }

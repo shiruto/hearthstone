@@ -8,10 +8,10 @@ public class Flare : SpellCard {
 
     public override void ExtendUse() {
         base.ExtendUse();
-        foreach (MinionLogic minion in BattleControl.opponent.Field.GetMinions()) {
+        foreach (MinionLogic minion in BattleControl.GetAllMinions()) {
             minion.Attributes.Remove(CharacterAttribute.Stealth);
         }
-        BattleControl.opponent.Attributes.Remove(CharacterAttribute.Stealth);
+        BattleControl.GetEnemy(Owner).Secrets.RemoveAllSecret();
         new DrawCard(Owner, 1).ActivateEffect();
     }
 

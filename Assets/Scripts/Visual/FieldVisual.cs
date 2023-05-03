@@ -8,7 +8,7 @@ public class FieldVisual : MonoBehaviour {
 
     private void Awake() {
         EventManager.AddListener(EmptyParaEvent.FieldVisualUpdate, FieldVisualUpdateHandler);
-        MinionTrans = transform.Cast<Transform>().ToList(); // this really work?? yes it worked perfectly
+        MinionTrans = transform.Cast<Transform>().ToList();
     }
 
     public void FieldVisualUpdateHandler(BaseEventArgs e) {

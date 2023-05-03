@@ -1,13 +1,11 @@
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using Random = UnityEngine.Random;
+using UnityEngine;
 
 public class Discover : Effect {
     public override string Name => "Discover Effect";
     private readonly List<CardBase> _opts;
     private List<CardBase> _pool;
-    IDiscover card;
+    readonly IDiscover card;
 
     public Discover(IDiscover disCard) {
         effectType = EffectType.Discover;

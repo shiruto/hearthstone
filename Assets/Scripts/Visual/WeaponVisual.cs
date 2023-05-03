@@ -10,6 +10,11 @@ public class WeaponVisual : MonoBehaviour {
     public Image WeaponPic;
     public WeaponLogic WL;
     public GameObject Weapon;
+    public GameObject Trigger;
+    public GameObject Poisonous;
+    public GameObject DeathRattle;
+    public GameObject Immune;
+    public GameObject LifeSteal;
 
     private void Awake() {
         EventManager.AddListener(EmptyParaEvent.WeaponVisualUpdate, VisualUpdate);
@@ -18,6 +23,11 @@ public class WeaponVisual : MonoBehaviour {
     public void ReadFromCard() {
         TxtAttack.text = WL.Attack + "";
         TxtDurability.text = WL.Health + "";
+        Immune.SetActive(WL.Attributes.Contains(CharacterAttribute.Immune));
+        Trigger.SetActive(WL.Triggers != null && WL.Triggers.Count != 0);
+        DeathRattle.SetActive(WL.DeathRattleEffects.Count != 0);
+        LifeSteal.SetActive(WL.Attributes.Contains(CharacterAttribute.LifeSteal));
+        Poisonous.SetActive(WL.Attributes.Contains(CharacterAttribute.Poisonous));
     }
 
     private void VisualUpdate(BaseEventArgs e) {

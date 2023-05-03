@@ -6,30 +6,31 @@ using UnityEngine;
 public class DealAoeDamage : Effect {
     public bool isHeal;
     public int damage;
-    readonly Func<ICharacter, bool> range;
+    private Func<ICharacter, bool> range;
     public override string Name => "Deal AoE Damage Effect";
     public bool isMagicDamage;
-    public List<ICharacter> CharacterToDamage = new(BattleControl.GetAllMinions()) {
-            BattleControl.you,
-            BattleControl.opponent
-        };
+    public IBuffable Attacker;
 
-    public DealAoeDamage(int damage) {
+    public DealAoeDamage(int damage, IBuffable Attacker) {
         this.damage = damage;
+        this.Attacker = Attacker;
         range = (ICharacter a) => true;
     }
 
-    public DealAoeDamage(int damage, Func<ICharacter, bool> range, bool isMagicDamage = false) {
+    public DealAoeDamage(int damage, IBuffable Attacker, Func<ICharacter, bool> range = null, bool isMagicDamage = false) {
         this.damage = damage;
+        this.Attacker = Attacker;
         this.range = range;
         this.isMagicDamage = isMagicDamage;
     }
 
     public override void ActivateEffect() {
-        CharacterToDamage = new(CharacterToDamage.Where(range));
+        range ??= (ICharacter c) => true;
+        List<ICharacter> CharacterToDamage = new(BattleControl.GetAllCharacters().Where(range));
         if (isMagicDamage) damage += BattleControl.Instance.SpellDamage;
         foreach (ICharacter c in CharacterToDamage) {
-            c.Health -= damage;
+            c.TakeDamage(damage, Attacker);
         }
     }
+
 }

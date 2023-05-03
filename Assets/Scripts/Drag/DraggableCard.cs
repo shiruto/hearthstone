@@ -4,6 +4,8 @@ using UnityEngine;
 public class DraggableCard : Draggable {
     private Vector3 StartPos;
     private Vector3 Distance;
+    private readonly Vector3 SpellTargetCardStartPos = new(960, 300, 0);
+    [HideInInspector]
     public bool ifDrawLine;
 
     private void OnMouseEnter() {
@@ -11,39 +13,40 @@ public class DraggableCard : Draggable {
     }
 
     private void OnMouseExit() {
-        EventManager.Allocate<CardEventArgs>().CreateEventArgs(CardEvent.AfterCardPreview, gameObject, null, GetComponent<BattleCardViewController>().Card).Invoke();
+        EventManager.Allocate<CardEventArgs>().CreateEventArgs(CardEvent.AfterCardPreview, gameObject).Invoke();
     }
 
     private void OnMouseDown() {
-        // TODO: if not valid target exist, can't use it(SpellCard) or use it without effect(minion)
-        CardBase Card = GetComponent<BattleCardViewController>().Card;
+        ScnBattleUI.Instance.isDragging = true;
         StartPos = transform.position;
         Distance = Input.mousePosition - transform.position;
         GetComponent<BoxCollider>().center = new(0, 0, -20);
         transform.localScale *= 2;
         transform.SetAsLastSibling();
-        ScnBattleUI.Instance.isDragging = true;
-        EventManager.Allocate<CardEventArgs>().CreateEventArgs(CardEvent.AfterCardPreview, gameObject, null, Card).Invoke();
+        EventManager.Allocate<CardEventArgs>().CreateEventArgs(CardEvent.AfterCardPreview, gameObject).Invoke();
     }
 
     protected override void OnMouseDrag() {
         if (ifDrawLine && Input.mousePosition.y > 300) {
-            EventManager.Allocate<VisualEventArgs>().CreateEventArgs(VisualEvent.DrawCardLine, gameObject, new(960, 300, 0), Input.mousePosition).Invoke();
+            if (!LineDrawer.Instance.isDrawing)
+                EventManager.Allocate<VisualEventArgs>().CreateEventArgs(VisualEvent.DrawLine, gameObject, SpellTargetCardStartPos).Invoke();
+            GetComponent<CanvasGroup>().alpha = 0;
         }
         else {
-            EventManager.Allocate<VisualEventArgs>().CreateEventArgs(VisualEvent.DeleteLine, gameObject, Vector3.zero, Vector3.zero).Invoke();
+            GetComponent<CanvasGroup>().alpha = 1;
+            EventManager.Allocate<VisualEventArgs>().CreateEventArgs(VisualEvent.DeleteLine, gameObject).Invoke();
             transform.position = Input.mousePosition - Distance;
         }
     }
 
     protected override void OnMouseUp() {
-        EventManager.Allocate<VisualEventArgs>().CreateEventArgs(VisualEvent.DeleteLine, gameObject, Vector3.zero, Vector3.zero).Invoke();
-        EventManager.Allocate<CardEventArgs>().CreateEventArgs(CardEvent.AfterCardPreview, gameObject, null, GetComponent<BattleCardViewController>().Card).Invoke();
-        if (Input.mousePosition.y > 300) {
+        EventManager.Allocate<VisualEventArgs>().CreateEventArgs(VisualEvent.DeleteLine, gameObject).Invoke();
+        EventManager.Allocate<CardEventArgs>().CreateEventArgs(CardEvent.AfterCardPreview, gameObject).Invoke();
+        if (Input.mousePosition.y > 300 && ScnBattleUI.Instance.isDragging) { // TODO: check the CanBePalyed before using
             CardBase CardUsing = GetComponent<BattleCardViewController>().Card;
             if (ifDrawLine) {
-                if (ScnBattleUI.Instance.Targeting != null && (CardUsing as ITarget).Match(ScnBattleUI.Instance.Targeting)) {
-                    (CardUsing as ITarget).Target = ScnBattleUI.Instance.Targeting;
+                if (ScnBattleUI.Instance.TargetCharacter != null && (CardUsing as ITarget).Match(ScnBattleUI.Instance.TargetCharacter)) {
+                    (CardUsing as ITarget).Target = ScnBattleUI.Instance.TargetCharacter;
                     BattleControl.Instance.CardUsing = CardUsing;
                     EventManager.Allocate<CardEventArgs>().CreateEventArgs(CardEvent.BeforeCardUse, gameObject, CardUsing.Owner, CardUsing).Invoke();
                     BattleControl.Instance.CardUsing?.Use();
@@ -57,6 +60,7 @@ public class DraggableCard : Draggable {
             }
         }
         else {
+            // TODO: show the "cant use" warning
             StartCoroutine(MoveTo(StartPos));
         }
         ScnBattleUI.Instance.isDragging = false;
@@ -66,9 +70,11 @@ public class DraggableCard : Draggable {
         EventManager.Allocate<EmptyParaArgs>().CreateEventArgs(EmptyParaEvent.HandVisualUpdate);
     }
 
-    public IEnumerator MoveTo(Vector3 destination) { // TODO: wrong coroutine
-        while ((transform.position - destination).magnitude > destination.magnitude * Time.deltaTime) {
-            transform.Translate(destination * Time.deltaTime);
+    private IEnumerator MoveTo(Vector3 destination) {
+        float elapsedTime = 0;
+        while (elapsedTime < 1f) {
+            transform.position = Vector3.Lerp(transform.position, destination, elapsedTime);
+            elapsedTime += Time.deltaTime;
             yield return null;
         }
         transform.position = destination;

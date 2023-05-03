@@ -1,8 +1,8 @@
-public class SlienceEffect : Effect {
+public class SilenceEffect : Effect {
     public override string Name => "Slience";
     public ICharacter Target;
 
-    public SlienceEffect(ICharacter Target) {
+    public SilenceEffect(ICharacter Target) {
         this.Target = Target;
     }
 

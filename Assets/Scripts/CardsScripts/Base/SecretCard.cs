@@ -1,6 +1,10 @@
 using UnityEngine;
 
 public abstract class SecretCard : SpellCard {
+    public TriggerStruct trigger;
+    public override bool CanBePlayed {
+        get => base.CanBePlayed && Owner.Secrets.secrets.Count < 5 && Owner.Secrets.secrets.Contains(this);
+    }
 
     protected SecretCard(CardAsset CA) : base(CA) {
 
@@ -11,20 +15,13 @@ public abstract class SecretCard : SpellCard {
         Owner.Secrets.AddSecret(this);
     }
 
-    public abstract void AddTrigger();
-
-    public abstract void DelTrigger();
-
-    public abstract void SecretImplement(BaseEventArgs e, out bool isTriggered);
+    public abstract bool SecretImplementation(BaseEventArgs e);
 
     public virtual void Triggered(BaseEventArgs e) {
-        if (Owner != BattleControl.Instance.ActivePlayer) {
-            SecretImplement(e, out bool isTriggered);
-            if (isTriggered) {
-                EventManager.Allocate<CardEventArgs>().CreateEventArgs(CardEvent.OnSecretReveal, null, Owner, this).Invoke();
-                DelTrigger();
-                Owner.Secrets.RemoveSecret(this);
-            }
+        if (BattleControl.Instance.ActivePlayer == Owner) return;
+        if (SecretImplementation(e)) {
+            Owner.Secrets.RemoveSecret(this);
+            EventManager.Allocate<CardEventArgs>().CreateEventArgs(CardEvent.OnSecretReveal, null, Owner, this);
         }
     }
 

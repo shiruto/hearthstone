@@ -18,10 +18,13 @@ public class BattleCardViewController : MonoBehaviour {
     public GameObject Light;
     public CardBase Card;
 
-    private void Start() {
+    private void OnEnable() {
         if (GetComponent<DraggableCard>()) {
+            DraggableCardAvailabilityCheck(null);
             EventManager.AddListener(EmptyParaEvent.ManaVisualUpdate, DraggableCardAvailabilityCheck);
             EventManager.AddListener(EmptyParaEvent.FieldVisualUpdate, DraggableCardAvailabilityCheck);
+            EventManager.AddListener(TurnEvent.OnTurnStart, DraggableCardAvailabilityCheck);
+            EventManager.AddListener(TurnEvent.OnTurnEnd, DraggableCardAvailabilityCheck);
         }
     }
 
@@ -57,8 +60,17 @@ public class BattleCardViewController : MonoBehaviour {
     }
 
     private void DraggableCardAvailabilityCheck(BaseEventArgs e) {
-        Light.SetActive(Card.CanBePlayed);
+        Light.SetActive(Card != null && Card.CanBePlayed);
         GetComponent<DraggableCard>().ifDrawLine = Card is ITarget && (Card is not MinionCard || Card.TargetExist);
+    }
+
+    private void OnDisable() {
+        if (GetComponent<DraggableCard>()) {
+            EventManager.DelListener(EmptyParaEvent.ManaVisualUpdate, DraggableCardAvailabilityCheck);
+            EventManager.DelListener(EmptyParaEvent.FieldVisualUpdate, DraggableCardAvailabilityCheck);
+            EventManager.DelListener(TurnEvent.OnTurnStart, DraggableCardAvailabilityCheck);
+            EventManager.DelListener(TurnEvent.OnTurnEnd, DraggableCardAvailabilityCheck);
+        }
     }
 
 }

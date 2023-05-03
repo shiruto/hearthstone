@@ -4,55 +4,34 @@ public class DraggableMinion : Draggable {
     public MinionLogic Minion;
 
     private void OnMouseEnter() {
-        EventManager.Allocate<CardEventArgs>().CreateEventArgs(CardEvent.OnCardPreview, gameObject, null, GetComponent<MinionViewController>().ML.Card).Invoke();
+        EventManager.Allocate<CardEventArgs>().CreateEventArgs(CardEvent.OnCardPreview, gameObject, null, Minion.Card).Invoke();
     }
 
     private void OnMouseExit() {
-        EventManager.Allocate<CardEventArgs>().CreateEventArgs(CardEvent.AfterCardPreview, gameObject, null, GetComponent<MinionViewController>().ML.Card).Invoke();
-    }
-
-    protected override void OnMouseDrag() {
-        if (Minion.CanAttack) {
-            ScnBattleUI.Instance.isDragging = true;
-            EventManager.Allocate<VisualEventArgs>().CreateEventArgs(VisualEvent.DrawMinionLine, gameObject, transform.position, Input.mousePosition).Invoke();
-        }
+        EventManager.Allocate<CardEventArgs>().CreateEventArgs(CardEvent.AfterCardPreview, gameObject, null, Minion.Card).Invoke();
     }
 
     private void OnMouseDown() {
-        EventManager.Allocate<CardEventArgs>().CreateEventArgs(CardEvent.AfterCardPreview, gameObject, null, GetComponent<MinionViewController>().ML.Card).Invoke();
+        EventManager.Allocate<CardEventArgs>().CreateEventArgs(CardEvent.AfterCardPreview, gameObject).Invoke();
+        if (Minion.CanAttack) {
+            EventManager.Allocate<VisualEventArgs>().CreateEventArgs(VisualEvent.DrawLine, gameObject, transform.position).Invoke();
+            ScnBattleUI.Instance.isDragging = true;
+        }
     }
 
     protected override void OnMouseUp() {
-        if (ScnBattleUI.Instance.isDragging && DrawTarget(ScnBattleUI.Instance.Targeting)) {
-            EventManager.Allocate<AttackEventArgs>().CreateEventArgs(AttackEvent.BeforeAttack, gameObject, GetComponent<MinionViewController>().ML, ScnBattleUI.Instance.Targeting).Invoke();
-            GetComponent<MinionViewController>().ML.AttackAgainst(ScnBattleUI.Instance.Targeting);
+        if (ScnBattleUI.Instance.isDragging && Minion.ValidTarget(ScnBattleUI.Instance.TargetCharacter)) {
+            Minion.AttackAgainst(ScnBattleUI.Instance.TargetCharacter);
+            Minion.CanAttack = false;
+            EventManager.Allocate<EmptyParaArgs>().CreateEventArgs(EmptyParaEvent.FieldVisualUpdate);
         }
         ScnBattleUI.Instance.isDragging = false;
-        EventManager.Allocate<CardEventArgs>().CreateEventArgs(CardEvent.AfterCardPreview, gameObject, null, GetComponent<MinionViewController>().ML.Card).Invoke();
-        EventManager.Allocate<VisualEventArgs>().CreateEventArgs(VisualEvent.DeleteLine, gameObject, Vector3.zero, Vector3.zero).Invoke();
+        EventManager.Allocate<CardEventArgs>().CreateEventArgs(CardEvent.AfterCardPreview, gameObject).Invoke();
+        EventManager.Allocate<VisualEventArgs>().CreateEventArgs(VisualEvent.DeleteLine, gameObject).Invoke();
     }
 
-    public bool DrawTarget(ICharacter Target) {
-        if (Target == null) return false;
-        MinionLogic ml = GetComponent<MinionViewController>().ML;
-        // 召唤随从的第一回合 非冲锋随从无法攻击英雄 非突袭随从无法攻击
-        if (ml.NewSummoned && (!ml.Attributes.Contains(CharacterAttribute.Rush) || !ml.Attributes.Contains(CharacterAttribute.Charge))) {
-            return false;
-        }
-        else if (ml.Attributes.Contains(CharacterAttribute.Rush)) {
-            return Target is MinionLogic;
-        }
-        else if (ml.Attributes.Contains(CharacterAttribute.Charge)) {
-            return true;
-        }
-        // 嘲讽判断 TODO: 如果嘲讽随从同时还具有免疫或潜行 则不能嘲讽
-        if (BattleControl.opponent.Field.GetMinions().Exists((MinionLogic a) => a.Attributes.Contains(CharacterAttribute.Taunt)) && !(Target as MinionLogic).Attributes.Contains(CharacterAttribute.Taunt)) {
-            return false;
-        }
-        // 潛行,免疫判断
-        if (Target.Attributes.Contains(CharacterAttribute.Immune) || Target.Attributes.Contains(CharacterAttribute.Stealth)) return false;
-        if (Target is MinionLogic or PlayerLogic) return true;
-        return false;
+    protected override void OnMouseDrag() {
+
     }
 
 }

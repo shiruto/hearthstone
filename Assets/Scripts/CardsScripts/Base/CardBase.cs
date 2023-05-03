@@ -13,8 +13,8 @@ public abstract class CardBase : IIdentifiable, IBuffable {
     public bool TargetExist => this is not ITarget || (BattleControl.GetAllCharacters().Where((this as ITarget).Match).Where(CanBeTarget).ToList().Count != 0);
     public virtual bool CanBePlayed {
         get {
-            if (costHealth) return ManaCost < Owner.Health && CanUse && (this is MinionCard || TargetExist);
-            else return ManaCost <= Owner.Mana.Manas && CanUse && (this is MinionCard || TargetExist);
+            if (costHealth) return BattleControl.Instance.ActivePlayer == Owner && ManaCost < Owner.Health && CanUse && (this is MinionCard || TargetExist);
+            else return BattleControl.Instance.ActivePlayer == Owner && ManaCost <= Owner.Mana.Manas && CanUse && (this is MinionCard || TargetExist);
         }
     }
     public List<Buff> BuffList { get; set; }
@@ -35,6 +35,8 @@ public abstract class CardBase : IIdentifiable, IBuffable {
         if (overloadCrystal > 0) EventManager.Allocate<ManaEventArgs>().CreateEventArgs(ManaEvent.OnCrystalOverload, null, Owner, overloadCrystal).Invoke();
         if (costHealth) Owner.Health -= ManaCost;
         else if (ManaCost > 0) Owner.Mana.Manas -= ManaCost;
+        if (overloadCrystal > 0) EventManager.Allocate<ManaEventArgs>().CreateEventArgs(ManaEvent.OnCrystalOverload, null, Owner, overloadCrystal).Invoke();
+        BattleControl.CardUsed.Add(new(this, ID, Owner.TurnCount));
         ExtendUse();
         EventManager.Allocate<CardEventArgs>().CreateEventArgs(CardEvent.OnCardUse, null, Owner, this); // TODO: check it
     }

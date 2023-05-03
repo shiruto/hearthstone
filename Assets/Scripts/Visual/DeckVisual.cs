@@ -1,16 +1,19 @@
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
 public class DeckVisual : MonoBehaviour {
     public DeckLogic Deck;
     public List<string> decks;
-    public Image DeckStatus;
-    private enum Sum { Empty, LastOne, Less, Medium, Alot, Full }
-    private Sum CardLeft;
+    // private Image ImgDeckStatus;
+    public GameObject DeckInfo;
+    public TextMeshProUGUI TxtCardSum;
+    private DeckStatus CardLeft;
 
     private void Awake() {
         EventManager.AddListener(EmptyParaEvent.DeckVisualUpdate, UpdateDeckStatus);
+        DeckInfo.SetActive(false);
     }
 
     public void UpdateDeckStatus(BaseEventArgs e) {
@@ -18,22 +21,22 @@ public class DeckVisual : MonoBehaviour {
         if (e.Player == Deck.owner)
             switch (Deck.Deck.Count) {
                 case >= 60:
-                    CardLeft = Sum.Full;
+                    CardLeft = DeckStatus.Full;
                     break;
                 case > 30:
-                    CardLeft = Sum.Alot;
+                    CardLeft = DeckStatus.Alot;
                     break;
                 case > 10:
-                    CardLeft = Sum.Medium;
+                    CardLeft = DeckStatus.Medium;
                     break;
                 case > 1:
-                    CardLeft = Sum.Less;
+                    CardLeft = DeckStatus.Less;
                     break;
                 case 1:
-                    CardLeft = Sum.LastOne;
+                    CardLeft = DeckStatus.LastOne;
                     break;
                 case 0:
-                    CardLeft = Sum.Empty;
+                    CardLeft = DeckStatus.Empty;
                     break;
                 default:
                     Debug.Log("Wrong Sum of Cards in the Deck, have " + Deck.Deck.Count + " cards");
@@ -41,4 +44,14 @@ public class DeckVisual : MonoBehaviour {
             }
         // TODO: asscociate img with Deck.Sum
     }
+
+    private void OnMouseEnter() {
+        DeckInfo.SetActive(true);
+        TxtCardSum.text = "" + Deck.Deck.Count;
+    }
+
+    private void OnMouseExit() {
+        DeckInfo.SetActive(false);
+    }
+
 }

@@ -13,7 +13,7 @@ public class ElvenArcher : MinionCard, IBattleCry, IDealDamage, ITarget {
     }
 
     public void BattleCry() {
-        new DealDamageToTarget(false, Damage, this, ScnBattleUI.Instance.Targeting).ActivateEffect();
+        new DealDamageToTarget(false, Damage, this, ScnBattleUI.Instance.TargetCharacter).ActivateEffect();
     }
 
 }

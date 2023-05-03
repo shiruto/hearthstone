@@ -31,7 +31,7 @@ public class DealDamageToTarget : Effect {
 
     public override void ActivateEffect() {
         if (isMagicDamage) damage += BattleControl.Instance.SpellDamage;
-        Target.Health -= damage;
+        Target?.TakeDamage(damage, Attacker);
     }
 
 }

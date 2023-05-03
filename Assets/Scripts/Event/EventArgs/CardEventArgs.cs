@@ -7,8 +7,8 @@ public class CardEventArgs : BaseEventArgs {
     public CardBase Card;
     public List<Buff> buffs;
 
-    public CardEventArgs CreateEventArgs(CardEvent eventType, GameObject sender, PlayerLogic player, CardBase card, int position = 0, List<Buff> buffs = null) {
-        CreateEventArgs(eventType, sender, player);
+    public CardEventArgs CreateEventArgs(CardEvent eventType, GameObject sender, PlayerLogic player = null, CardBase card = null, int position = 0, List<Buff> buffs = null) {
+        base.CreateEventArgs(eventType, sender, player);
         this.position = position;
         Card = card;
         this.buffs = buffs;
