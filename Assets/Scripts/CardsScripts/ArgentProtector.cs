@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-public class ArgentProtector : MinionCard, ITarget, IBattleCry {
+public class ArgentProtector : MinionCard, ITarget, IBattlecryCard {
     public ICharacter Target { get; set; }
     public List<Effect> BattleCryEffects { get; set; }
     public Func<ICharacter, bool> Match => (ICharacter c) => c is MinionLogic && (c as MinionLogic).Owner == Owner;

@@ -16,8 +16,8 @@ public class MinionCard : CardBase {
         Debug.Log($"summon a minion from card ID = {ID}");
         if (BuffList != null) Minion.BuffList = new(BuffList);
         else Minion.BuffList = new();
-        if (this is IBattleCry) (this as IBattleCry).BattleCry();
         Owner.Field.SummonMinionAt(0, Minion); // TODO: choose position
+        if (this is IBattlecryCard) (this as IBattlecryCard).BattleCry();
     }
 
     public override void ReadBuff() {

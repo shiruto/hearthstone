@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-public class YoggSaronHopesEnd : MinionCard, IBattleCry {
+public class YoggSaronHopesEnd : MinionCard, IBattlecryCard {
     public List<Effect> BattleCryEffects { get; set; }
     public int SpellCast;
 

@@ -1,12 +1,16 @@
+using System;
 using System.Collections.Generic;
 
 public class WeaponLogic : IBuffable, ITakeDamage {
     public PlayerLogic Owner;
-    public List<Effect> DeathRattleEffects;
+    public List<Action<MinionLogic>> Deathrattle { get; set; }
     public List<Buff> BuffList { get; set; }
     public List<TriggerStruct> Triggers { get; set; }
     public WeaponCard Card;
+    public bool HaveWeapon => Card != null;
     public bool isClosed = false;
+    private int _maxHealth;
+    public int MaxHealth { get => _maxHealth; set => _maxHealth = value; }
     private int _health;
     public virtual int Health {
         get => _health;
@@ -37,7 +41,8 @@ public class WeaponLogic : IBuffable, ITakeDamage {
 
     public WeaponLogic() {
         Card = null;
-        DeathRattleEffects = new();
+        Deathrattle = new();
+        Attributes = new();
         EventManager.AddListener(TurnEvent.OnTurnStart, OnTurnStartHandler);
         EventManager.AddListener(TurnEvent.OnTurnEnd, OnTurnEndHandler);
     }
@@ -47,10 +52,8 @@ public class WeaponLogic : IBuffable, ITakeDamage {
         Card = WC;
         _attack = Card.Attack;
         _health = Card.Health;
-        if (WC is IDeathRattle) {
-            DeathRattleEffects = new((WC as IDeathRattle).DeathRattleEffects);
-        }
-        else DeathRattleEffects.Clear();
+        if (WC is IDeathrattleCard) Deathrattle = new() { (WC as IDeathrattleCard).Deathrattle };
+        else Deathrattle.Clear();
         if (WC is ITriggerMinionCard) {
             foreach (TriggerStruct t in (WC as ITriggerMinionCard).TriggersToGrant) {
                 (this as IBuffable).AddTrigger(t); // TODO: test it
@@ -81,9 +84,9 @@ public class WeaponLogic : IBuffable, ITakeDamage {
     public void Die() {
         _attack = 0;
         _health = 0;
-        if (DeathRattleEffects.Count != 0) {
-            foreach (Effect e in DeathRattleEffects) {
-                e.ActivateEffect();
+        if (Deathrattle.Count != 0) {
+            foreach (Action<IBuffable> e in Deathrattle) {
+                e.Invoke(this);
             }
         }
         if (Triggers != null && Triggers.Count != 0) {
@@ -98,8 +101,9 @@ public class WeaponLogic : IBuffable, ITakeDamage {
 
     public void ReadBuff() {
         _attack = Card.CA.Attack;
-        _health = Card.CA.Health;
+        _maxHealth = Card.CA.Health;
         spellDamage = Card.CA.SpellDamage;
+        Attributes.Clear();
         if (BuffList.Count != 0) {
             foreach (Buff b in BuffList) {
                 if (b.statusChange.Count != 0) {
@@ -109,7 +113,7 @@ public class WeaponLogic : IBuffable, ITakeDamage {
                                 Buff.Modify(ref _attack, sc.op, sc.Num);
                                 break;
                             case Status.Health:
-                                Buff.Modify(ref _health, sc.op, sc.Num);
+                                Buff.Modify(ref _maxHealth, sc.op, sc.Num);
                                 break;
                             case Status.SpellDamage:
                                 Buff.Modify(ref spellDamage, sc.op, sc.Num);
@@ -135,7 +139,7 @@ public class WeaponLogic : IBuffable, ITakeDamage {
                                 Buff.Modify(ref _attack, sc.op, sc.Num);
                                 break;
                             case Status.Health:
-                                Buff.Modify(ref _health, sc.op, sc.Num);
+                                Buff.Modify(ref _maxHealth, sc.op, sc.Num);
                                 break;
                             case Status.SpellDamage:
                                 Buff.Modify(ref spellDamage, sc.op, sc.Num);

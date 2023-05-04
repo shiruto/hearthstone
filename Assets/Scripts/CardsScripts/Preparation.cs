@@ -7,18 +7,17 @@ public class Preparation : SpellCard {
             "Preparation",
             new() { new(Status.ManaCost, Operator.Minus, 2) }
         );
-        aura = new(buff, (IBuffable a) => a is SpellCard && (a as SpellCard).Owner == Owner, new(CardEvent.OnCardUse, Expire));
+        aura = new(
+            buff,
+            (IBuffable a) => a is SpellCard && (a as SpellCard).Owner == Owner,
+            CardEvent.OnCardUse,
+            (BaseEventArgs e) => e.Player == Owner && (e as CardEventArgs).Card is SpellCard
+        );
     }
 
     public override void ExtendUse() {
         base.ExtendUse();
         BattleControl.Instance.AddAura(aura);
-    }
-
-    private void Expire(BaseEventArgs e) {
-        CardEventArgs evt = e as CardEventArgs;
-        if (evt.Player != Owner || evt.Card is not SpellCard) return;
-        BattleControl.Instance.RemoveAura(aura);
     }
 
 }

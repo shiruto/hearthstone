@@ -15,24 +15,13 @@ MonoBehaviour:
   Description: 
   CardImage: {fileID: 0}
   ManaCost: 2
-  rarity: 0
+  rarity: 3
   ClassType: 6
-  isTriggered: 0
   cardType: 1
+  Overload: 0
   Attack: 1
   Health: 2
   SpellDamage: 0
-  isWindFury: 0
-  isTaunt: 0
-  isCharge: 0
-  isRush: 0
-  isDivineShield: 0
-  isStealth: 0
-  isImmune: 0
-  isFrozen: 0
-  isPoisonous: 1
-  Overload: 0
   MinionType: 0
-  isSecret: 0
-  TargetsType: 0
+  attributes: 0500000008000000
   SpellSchool: 0

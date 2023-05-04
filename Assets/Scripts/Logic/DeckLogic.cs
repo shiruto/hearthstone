@@ -79,7 +79,7 @@ public class DeckLogic {
         for (int i = 0; i < da.myCardAssets.Count; i++) {
             object[] parameters = new object[] { da.myCardAssets[i] };
             for (int j = 0; j < da.myCardNums[i]; j++) {
-                CardBase CardToAdd = Activator.CreateInstance(Type.GetType(da.myCardAssets[i].name.Replace(" ", "")), parameters) as CardBase;
+                CardBase CardToAdd = Activator.CreateInstance(Type.GetType(da.myCardAssets[i].name.FormatString()), parameters) as CardBase;
                 CardToAdd.Owner = owner;
                 Deck.Add(CardToAdd);
             }

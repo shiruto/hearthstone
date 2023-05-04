@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-public class AbusiveSergeant : MinionCard, ITarget, IBattleCry {
+public class AbusiveSergeant : MinionCard, ITarget, IBattlecryCard {
     private readonly Buff _buff;
     public ICharacter Target { get; set; }
     public List<Effect> BattleCryEffects { get; set; }

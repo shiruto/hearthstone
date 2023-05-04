@@ -6,7 +6,7 @@ public class Coin : SpellCard {
 
     public override void ExtendUse() {
         base.ExtendUse();
-        new CrystalChange(true, 1).ActivateEffect();
+        new CrystalChange(1, Owner, false, true).ActivateEffect();
     }
 
 }

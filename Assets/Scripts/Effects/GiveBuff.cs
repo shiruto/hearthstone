@@ -2,9 +2,9 @@ public class GiveBuff : Effect {
     public Buff BuffToGive;
     public override string Name => "givebuff effect";
     public IBuffable Target { get; set; }
-    public CardBase giver;
+    public IBuffable giver;
 
-    public GiveBuff(Buff buff, CardBase giver, IBuffable Target = null) {
+    public GiveBuff(Buff buff, IBuffable giver, IBuffable Target = null) {
         BuffToGive = buff;
         this.giver = giver;
         this.Target = Target;

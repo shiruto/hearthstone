@@ -14,13 +14,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Description: Has Charge while you have a weapon equipped.
   CardImage: {fileID: 0}
-  ManaCost: 3
-  rarity: 0
+  ManaCost: 1
+  rarity: 1
   ClassType: 10
   cardType: 1
   Overload: 0
-  Attack: 3
-  Health: 3
+  Attack: 2
+  Health: 1
   SpellDamage: 0
   MinionType: 9
   attributes: 

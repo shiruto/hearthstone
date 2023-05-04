@@ -7,7 +7,7 @@ public class BloodsailCorsair : MinionCard {
     public override void ExtendUse() {
         base.ExtendUse();
         if (BattleControl.opponent.Weapon != null) {
-            new DealDamageToTarget(false, 1, this, BattleControl.opponent.Weapon).ActivateEffect();
+            new DealDamageToTarget(1, this, BattleControl.opponent.Weapon).ActivateEffect();
         }
     }
 

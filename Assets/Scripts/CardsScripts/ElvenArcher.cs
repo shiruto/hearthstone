@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-public class ElvenArcher : MinionCard, IBattleCry, IDealDamage, ITarget {
+public class ElvenArcher : MinionCard, IBattlecryCard, IDealDamage, ITarget {
     public int Damage => 1;
     public List<Effect> BattleCryEffects { get; set; }
     public ICharacter Target { get; set; }
@@ -13,7 +13,7 @@ public class ElvenArcher : MinionCard, IBattleCry, IDealDamage, ITarget {
     }
 
     public void BattleCry() {
-        new DealDamageToTarget(false, Damage, this, ScnBattleUI.Instance.TargetCharacter).ActivateEffect();
+        new DealDamageToTarget(Damage, this, ScnBattleUI.Instance.TargetCharacter).ActivateEffect();
     }
 
 }

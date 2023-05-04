@@ -6,24 +6,17 @@ public class CrystalChange : Effect {
     public bool isTemp = false;
     public override string Name => "Crystal Change Effect";
 
-    public CrystalChange(int Crystals) {
+    public CrystalChange(int Crystals, PlayerLogic Owner, bool isEmpty = false, bool isTemp = false) {
         this.Crystals = Crystals;
-    }
-
-    public CrystalChange(bool isTemp, int Crystals) {
-        this.isTemp = isTemp;
-        this.Crystals = Crystals;
-    }
-
-    public CrystalChange(PlayerLogic owner, int Crystals, bool isEmpty) {
-        this.owner = owner;
-        this.Crystals = Crystals;
+        owner = Owner;
         this.isEmpty = isEmpty;
+        this.isTemp = isTemp;
     }
 
-    public override void ActivateEffect() { // TODO: no temp empty crystal
+    public override void ActivateEffect() { // TODO: no temp empty crystal   fix it
         if (isEmpty) EventManager.Allocate<ManaEventArgs>().CreateEventArgs(ManaEvent.OnEmptyCrystalGet, null, owner, Crystals).Invoke();
         else if (isTemp) EventManager.Allocate<ManaEventArgs>().CreateEventArgs(ManaEvent.OnTemporaryCrystalGet, null, owner, Crystals).Invoke();
         else EventManager.Allocate<ManaEventArgs>().CreateEventArgs(ManaEvent.OnPermanentCrystalGet, null, owner, Crystals).Invoke();
     }
+
 }

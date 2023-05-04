@@ -10,7 +10,7 @@ public class Snipe : SecretCard, IDealDamage {
     public override bool SecretImplementation(BaseEventArgs e) {
         MinionEventArgs evt = e as MinionEventArgs;
         if (evt.minion.Owner == Owner) return false;
-        new DealDamageToTarget(false, Damage, this, evt.minion, true).ActivateEffect();
+        new DealDamageToTarget(Damage, this, evt.minion, false, true).ActivateEffect();
         return true;
     }
 

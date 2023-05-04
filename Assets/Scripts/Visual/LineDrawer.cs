@@ -54,6 +54,10 @@ public class LineDrawer : MonoBehaviour {
             CardBase DrawingCard = DrawingObj.GetComponent<BattleCardViewController>().Card;
             Target.gameObject.SetActive((DrawingCard as ITarget).Match(ScnBattleUI.Instance.TargetCharacter) && DrawingCard.CanBeTarget(ScnBattleUI.Instance.TargetCharacter));
         }
+        else if (DrawingObj.GetComponent<SkillVisual>()) {
+            CardBase DrawingCard = DrawingObj.GetComponent<SkillVisual>().SL.Skill;
+            Target.gameObject.SetActive((DrawingCard as ITarget).Match(ScnBattleUI.Instance.TargetCharacter) && DrawingCard.CanBeTarget(ScnBattleUI.Instance.TargetCharacter));
+        }
         else if (DrawingObj.GetComponent<MinionViewController>()) {
             Target.gameObject.SetActive(DrawingObj.GetComponent<MinionViewController>().ML.ValidTarget(ScnBattleUI.Instance.TargetCharacter));
         }

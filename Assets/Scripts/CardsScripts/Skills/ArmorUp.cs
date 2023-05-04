@@ -6,7 +6,7 @@ public class ArmorUp : SkillCard {
 
     public override void ExtendUse() {
         base.ExtendUse();
-        Owner.Armor += 2;
+        Effect.GetArmorEffect(2, Owner, this);
     }
 
 }

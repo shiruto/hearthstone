@@ -38,4 +38,20 @@ public class FieldLogic {
         return Minions.IndexOf(minion);
     }
 
+    public MinionLogic MinionAt(int pos) {
+        if (pos >= Minions.Count) return null;
+        if (pos < 0) return null;
+        return Minions[pos];
+    }
+
+    public List<MinionLogic> GetAdjacentMinions(MinionLogic minion) {
+        int pos = GetPosition(minion);
+        List<MinionLogic> ans = new();
+        if (MinionAt(pos - 1) != null)
+            ans.Add(MinionAt(pos - 1));
+        if (MinionAt(pos + 1) != null)
+            ans.Add(MinionAt(pos + 1));
+        return ans;
+    }
+
 }

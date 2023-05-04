@@ -12,8 +12,9 @@ public class MinionLogic : ICharacter {
     private readonly int MinionID;
     public int ID => MinionID;
     public ICharacter AttackTarget { get; set; }
-
-    public int MaxHealth;
+    public bool isSilenced = false;
+    private int _maxHealth;
+    public int MaxHealth { get => _maxHealth; set => _maxHealth = value; }
     private int _health;
     public virtual int Health {
         get => _health;
@@ -33,7 +34,6 @@ public class MinionLogic : ICharacter {
             EventManager.Allocate<MinionEventArgs>().CreateEventArgs(MinionEvent.AfterMinionStatusChange, null, Owner, this).Invoke(); // TODO: change it
         }
     }
-
     private int _attack;
     public int Attack {
         get => _attack;
@@ -75,10 +75,10 @@ public class MinionLogic : ICharacter {
     public HashSet<CharacterAttribute> Attributes { get; set; }
     public List<Buff> Auras { get; set; }
     public List<AuraManager> AuraToGive;
-    public List<Effect> DeathRattleEffects;
+    public List<Action<MinionLogic>> Deathrattle { get; set; }
     #endregion
 
-    # region constructor
+    #region constructor
     public MinionLogic(MinionCard MC) {
         Card = MC;
         _attack = MC.CA.Attack;
@@ -86,8 +86,8 @@ public class MinionLogic : ICharacter {
         MaxHealth = _health;
         MinionID = IDFactory.GetID();
         BattleControl.MinionSummoned.Add(ID, this);
-        if (MC is IDeathRattle) DeathRattleEffects = new((MC as IDeathRattle).DeathRattleEffects);
-        DeathRattleEffects = new();
+        if (MC is IDeathrattleCard) Deathrattle = new() { (MC as IDeathrattleCard).Deathrattle };
+        else Deathrattle = new();
         Attributes = new(MC.CA.attributes);
         Auras = new();
         NewSummoned = true;
@@ -164,9 +164,9 @@ public class MinionLogic : ICharacter {
             Reborn.Attributes.Remove(CharacterAttribute.Reborn);
             Owner.Field.SummonMinionAt(-1, Reborn); // TODO: position
         }
-        if (DeathRattleEffects.Count > 0) {
-            foreach (Effect effect in DeathRattleEffects) {
-                effect.ActivateEffect();
+        if (Deathrattle.Count > 0) {
+            foreach (Action<IBuffable> a in Deathrattle) {
+                a.Invoke(this);
             }
         }
         Debug.Log($"{Card.CA.name} die");
@@ -200,7 +200,7 @@ public class MinionLogic : ICharacter {
                                 Buff.Modify(ref _attack, sc.op, sc.Num);
                                 break;
                             case Status.Health:
-                                Buff.Modify(ref MaxHealth, sc.op, sc.Num);
+                                Buff.Modify(ref _maxHealth, sc.op, sc.Num);
                                 break;
                             case Status.SpellDamage:
                                 Buff.Modify(ref spellDamage, sc.op, sc.Num);
@@ -225,7 +225,7 @@ public class MinionLogic : ICharacter {
                                 Buff.Modify(ref _attack, sc.op, sc.Num);
                                 break;
                             case Status.Health:
-                                Buff.Modify(ref MaxHealth, sc.op, sc.Num);
+                                Buff.Modify(ref _maxHealth, sc.op, sc.Num);
                                 break;
                             case Status.SpellDamage:
                                 Buff.Modify(ref spellDamage, sc.op, sc.Num);
@@ -247,7 +247,6 @@ public class MinionLogic : ICharacter {
         else {
             if (_health > MaxHealth) _health = MaxHealth;
         }
-        // Debug.Log($"{Card.CA.name} ReadBuff it's health = {_health}");
         EventManager.Allocate<EmptyParaArgs>().CreateEventArgs(EmptyParaEvent.FieldVisualUpdate).Invoke();
     }
 
@@ -255,12 +254,13 @@ public class MinionLogic : ICharacter {
         _attack = Card.CA.Attack;
         MaxHealth = Card.CA.Health;
         spellDamage = Card.CA.SpellDamage;
+        if (isSilenced)
+            Attributes.Clear();
+        else Attributes = new(Card.CA.attributes);
     }
 
     public bool HaveTarget() {
-        List<ICharacter> enemy = new(BattleControl.GetEnemy(Owner).Field.Minions) {
-            BattleControl.GetEnemy(Owner)
-        };
+        List<ICharacter> enemy = new(BattleControl.GetAllCharacters());
         return enemy.Where(ValidTarget).ToList().Count != 0;
     }
 
@@ -269,7 +269,6 @@ public class MinionLogic : ICharacter {
             return false;
         if (!Logic.IsEnemy(Owner, Target))
             return false;
-
         if (Target.Attributes != null) {
             if (Target.Attributes.Contains(CharacterAttribute.Immune))
                 return false;

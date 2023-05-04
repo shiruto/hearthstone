@@ -7,7 +7,7 @@ public class LifeTap : SkillCard, IDealDamage {
 
     public override void ExtendUse() {
         base.ExtendUse();
-        new DealDamageToTarget(false, Damage, this, Owner, true).ActivateEffect();
+        new DealDamageToTarget(Damage, this, Owner).ActivateEffect();
         Owner.Deck.DrawCards(1);
     }
 

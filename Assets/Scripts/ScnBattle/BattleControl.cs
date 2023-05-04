@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEditor;
@@ -212,8 +213,8 @@ public class BattleControl : MonoBehaviour {
 
     public void AddAura(AuraManager a) {
         Auras.Add(a);
-        if (a.expireTrigger.eventType != null) {
-            EventManager.AddListener(a.expireTrigger.eventType, a.expireTrigger.callback);
+        if (a.eventType != null) {
+            EventManager.AddListener(a.eventType, a.Expire);
         }
         foreach (IBuffable b in GetAllBuffable().Where(a.range)) {
             if (!b.Auras.Contains(a.Aura)) b.AddAura(a.Aura);
@@ -232,8 +233,18 @@ public class BattleControl : MonoBehaviour {
         else return you;
     }
 
-    public static bool IsCombo() {
-        return CardUsed.Exists((UsedCardStruct u) => u.TurnCount == Instance.ActivePlayer.TurnCount);
+    public static bool IfUsedThisTurn(Type cardType = null) {
+        if (cardType == null) cardType = typeof(CardBase);
+        return CardUsed.Exists((UsedCardStruct u) => u.TurnCount == Instance.ActivePlayer.TurnCount && u.Card.GetType() == cardType); // test it
+    }
+
+    public static List<ITakeDamage> GetAllDestroyable() {
+        List<ITakeDamage> ans = new();
+        ans.AddRange(GetAllCharacters());
+        ans.Add(you.Weapon);
+        ans.Add(opponent.Weapon);
+        // TODO: Location Card
+        return ans;
     }
 
 }

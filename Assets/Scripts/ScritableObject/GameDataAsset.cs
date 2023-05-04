@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Reflection;
 using UnityEngine;
 
 public struct TriggerStruct {
@@ -27,13 +28,22 @@ public struct StatusChange {
 public struct AuraManager {
     public Buff Aura;
     public Func<IBuffable, bool> range;
-    public TriggerStruct expireTrigger;
+    public Func<BaseEventArgs, bool> ExpireCheck;
+    public Enum eventType;
 
-    public AuraManager(Buff a, Func<IBuffable, bool> r, TriggerStruct t = default) {
-        Aura = a;
-        range = r;
-        expireTrigger = t;
+    public AuraManager(Buff AuraBuff, Func<IBuffable, bool> match, Enum eventType = null, Func<BaseEventArgs, bool> expireCheck = null) {
+        Aura = AuraBuff;
+        range = match;
+        ExpireCheck = expireCheck;
+        this.eventType = eventType;
+        if (eventType != null) EventManager.AddListener(eventType, Expire);
     }
+
+    public void Expire(BaseEventArgs e) {
+        if (!ExpireCheck(e)) return;
+        BattleControl.Instance.RemoveAura(this);
+    }
+
 }
 
 public struct UsedCardStruct {
@@ -174,6 +184,12 @@ public enum CharacterAttribute {
 
 public enum DeckStatus { Empty, LastOne, Less, Medium, Alot, Full }
 
+public enum DamageType {
+    None,
+    Spell,
+    HeroPower
+}
+
 public static class GameData {
     public static readonly string Path = "ScriptableObject/Card/";
 
@@ -216,7 +232,11 @@ public static class Logic {
     public static bool IsEnemy(ICharacter a, ICharacter b) {
         PlayerLogic p1 = (a is MinionLogic) ? (a as MinionLogic).Owner : (a as PlayerLogic);
         PlayerLogic p2 = (b is MinionLogic) ? (b as MinionLogic).Owner : (b as PlayerLogic);
-        return p1 == p2;
+        return p1 != p2;
+    }
+
+    public static string FormatString(this string text) {
+        return text.Replace(" ", "").Replace("-", "");
     }
 
 }
@@ -228,5 +248,22 @@ public static class Util {
 
     public static Func<T, bool> PredicateToFunc<T>(this Predicate<T> predicate) {
         return x => predicate(x);
+    }
+
+    public static T DeepCopy<T>(T obj) { // TODO: will it work?
+        if (obj == null) {
+            return obj;
+        }
+        var type = obj.GetType();
+        if (obj is string || type.IsValueType) {
+            return obj;
+        }
+
+        var result = Activator.CreateInstance(type);
+        var fields = type.GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Instance);
+        foreach (var field in fields) {
+            field.SetValue(result, field.GetValue(obj));
+        }
+        return (T)result;
     }
 }

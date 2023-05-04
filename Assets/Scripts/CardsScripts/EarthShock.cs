@@ -12,7 +12,7 @@ public class EarthShock : SpellCard, ITarget, IDealDamage {
     public override void ExtendUse() {
         base.ExtendUse();
         new SilenceEffect(Target).ActivateEffect();
-        new DealDamageToTarget(false, Damage, this, Target, true).ActivateEffect();
+        new DealDamageToTarget(Damage, this, Target, false, true).ActivateEffect();
     }
 
 }

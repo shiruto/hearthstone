@@ -1,11 +1,15 @@
+using System;
 using System.Collections.Generic;
 
-public class LeperGnome : MinionCard, IDeathRattle, IDealDamage {
-    public List<Effect> DeathRattleEffects { get; set; }
+public class LeperGnome : MinionCard, IDeathrattleCard, IDealDamage {
     public int Damage => 2;
 
     public LeperGnome(CardAsset CA) : base(CA) {
-        DeathRattleEffects = new() { new DealDamageToTarget(false, Damage, this, BattleControl.GetEnemy(Owner)) };
+
+    }
+
+    public void Deathrattle(MinionLogic caller) {
+        Effect.DealDamage(Damage, caller, BattleControl.GetEnemy(caller.Owner));
     }
 
 }

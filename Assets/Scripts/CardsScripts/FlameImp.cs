@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-public class FlameImp : MinionCard, IBattleCry, IDealDamage {
+public class FlameImp : MinionCard, IBattlecryCard, IDealDamage {
     public List<Effect> BattleCryEffects { get; set; }
     public int Damage => 3;
 
@@ -9,7 +9,7 @@ public class FlameImp : MinionCard, IBattleCry, IDealDamage {
     }
 
     public void BattleCry() {
-        new DealDamageToTarget(false, Damage, this, Owner).ActivateEffect();
+        new DealDamageToTarget(Damage, this, Owner).ActivateEffect();
     }
 
 }

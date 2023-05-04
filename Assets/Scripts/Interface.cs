@@ -4,7 +4,7 @@ using UnityEngine;
 
 public interface IDiscover {
     public void DiscoverHandler(BaseEventArgs e);
-    public List<CardBase> GetPool();
+    public List<CardBase> Pool { get; }
 }
 
 public interface ITarget { // with pointer
@@ -109,7 +109,6 @@ public interface ICharacter : IIdentifiable, ITakeDamage, IBuffable, IAttribute 
     int SpellDamage { get; set; }
     ICharacter AttackTarget { get; set; }
 
-    void Die();
     void AttackAgainst(ICharacter target);
 
     public void RemoveAttribute(CharacterAttribute a) {
@@ -131,18 +130,31 @@ public interface IIdentifiable {
 
 public interface ITakeDamage {
     int Health { get; set; }
+    int MaxHealth { get; set; }
+    List<Action<MinionLogic>> Deathrattle { get; set; }
+
+    void Die();
+
     void TakeDamage(int value, IBuffable source) {
+        EventManager.Allocate<DamageEventArgs>().CreateEventArgs(DamageEvent.BeforeTakeDamage, this, source, ref value).Invoke();
         Health -= value;
-        EventManager.Allocate<DamageEventArgs>().CreateEventArgs(DamageEvent.TakeDamage, this, source, value);
+        EventManager.Allocate<DamageEventArgs>().CreateEventArgs(DamageEvent.TakeDamage, this, source, ref value).Invoke();
     }
+
+    void Healing(int value, IBuffable source) {
+        EventManager.Allocate<DamageEventArgs>().CreateEventArgs(DamageEvent.BeforeHealing, this, source, ref value).Invoke();
+        Health += value;
+        EventManager.Allocate<DamageEventArgs>().CreateEventArgs(DamageEvent.Healing, this, source, ref value).Invoke();
+    }
+
 }
 
-public interface IBattleCry {
+public interface IBattlecryCard {
     public void BattleCry();
 }
 
-public interface IDeathRattle {
-    public List<Effect> DeathRattleEffects { get; set; }
+public interface IDeathrattleCard {
+    void Deathrattle(MinionLogic caller);
 }
 
 public interface IAuraMinionCard {

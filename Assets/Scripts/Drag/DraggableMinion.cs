@@ -28,6 +28,7 @@ public class DraggableMinion : Draggable {
         ScnBattleUI.Instance.isDragging = false;
         EventManager.Allocate<CardEventArgs>().CreateEventArgs(CardEvent.AfterCardPreview, gameObject).Invoke();
         EventManager.Allocate<VisualEventArgs>().CreateEventArgs(VisualEvent.DeleteLine, gameObject).Invoke();
+        GetComponent<MinionViewController>().ReadFromMinionLogic();
     }
 
     protected override void OnMouseDrag() {

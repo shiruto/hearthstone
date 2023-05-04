@@ -22,6 +22,7 @@ public abstract class CardBase : IIdentifiable, IBuffable {
     public bool costHealth = false;
     public List<TriggerStruct> Triggers { get; set; }
     public List<Buff> Auras { get; set; }
+    public virtual bool IsTriggered => false;
 
     public CardBase(CardAsset CA) {
         CardID = IDFactory.GetID();
@@ -79,7 +80,7 @@ public abstract class CardBase : IIdentifiable, IBuffable {
     public bool CanBeTarget(ICharacter target) {
         if (target.Attributes == null) return true;
         if (target.Attributes.Contains(CharacterAttribute.Immune)) return false;
-        if (target.Attributes.Contains(CharacterAttribute.Elusive) && (this is SpellCard)) return false;
+        if (target.Attributes.Contains(CharacterAttribute.Elusive) && (this is SpellCard or SkillCard)) return false;
         if (target.Attributes.Contains(CharacterAttribute.Stealth) && ((target as MinionLogic).Owner != Owner || (target as PlayerLogic) != Owner)) return false;
         return true;
     }

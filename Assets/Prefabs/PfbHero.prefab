@@ -986,6 +986,7 @@ GameObject:
   - component: {fileID: 8534421748123648598}
   - component: {fileID: 8534421748123648597}
   - component: {fileID: 8534421748123648599}
+  - component: {fileID: -7206112085490150425}
   m_Layer: 5
   m_Name: PfbHero
   m_TagString: Untagged
@@ -1082,6 +1083,19 @@ MonoBehaviour:
   Health: {fileID: 8534421747387654138}
   Armor: {fileID: 8534421748510300994}
   Attack: {fileID: 8534421747386570178}
+--- !u!65 &-7206112085490150425
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8534421748123648602}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 100, y: 100, z: 1}
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &8534421748510300992
 GameObject:
   m_ObjectHideFlags: 0

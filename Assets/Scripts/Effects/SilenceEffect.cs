@@ -11,8 +11,9 @@ public class SilenceEffect : Effect {
         Target.RemoveAllBuff();
         Target.RemoveAllTriggers();
         if (Target is MinionLogic) {
-            (Target as MinionLogic).DeathRattleEffects.Clear();
+            (Target as MinionLogic).Deathrattle.Clear();
             (Target as MinionLogic).RemoveAllBuffToGive();
+            (Target as MinionLogic).isSilenced = true;
         }
     }
 

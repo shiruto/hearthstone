@@ -18,7 +18,7 @@ public class IceLance : SpellCard, IDealDamage, ITarget {
     public override void ExtendUse() {
         base.ExtendUse();
         if (Target.Attributes.Contains(CharacterAttribute.Frozen)) {
-            new DealDamageToTarget(false, Damage, this, Target, true).ActivateEffect();
+            new DealDamageToTarget(Damage, this, Target, false, true).ActivateEffect();
         }
         else new GiveBuff(buff, this, Target).ActivateEffect();
     }

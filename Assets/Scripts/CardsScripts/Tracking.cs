@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 
 public class Tracking : SpellCard, IDiscover {
+    public List<CardBase> Pool => Owner.Deck.Deck;
 
     public Tracking(CardAsset CA) : base(CA) {
 
@@ -10,10 +11,6 @@ public class Tracking : SpellCard, IDiscover {
         CardEventArgs evt = e as CardEventArgs;
         Owner.Deck.DrawSpecificCard(evt.Card);
         EventManager.DelListener(CardEvent.OnDiscover, DiscoverHandler);
-    }
-
-    public List<CardBase> GetPool() {
-        return Owner.Deck.Deck;
     }
 
     public override void ExtendUse() {

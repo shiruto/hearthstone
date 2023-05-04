@@ -12,7 +12,7 @@ public class LesserHeal : SkillCard, IHeal, ITarget {
 
     public override void ExtendUse() {
         base.ExtendUse();
-        new DealDamageToTarget(true, Heal, this, Target).ActivateEffect();
+        new DealDamageToTarget(Heal, this, Target, true).ActivateEffect();
     }
 
 }

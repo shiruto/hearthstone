@@ -9,8 +9,7 @@ public class SteadyShot : SkillCard, IDealDamage {
 
     public override void ExtendUse() {
         base.ExtendUse();
-        Debug.Log("Steady Shot Effect");
-        new DealDamageToTarget(false, Damage, this, BattleControl.opponent).ActivateEffect();
+        new DealDamageToTarget(Damage, this, BattleControl.opponent).ActivateEffect();
     }
 
 }

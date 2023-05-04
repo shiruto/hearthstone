@@ -11,7 +11,7 @@ public class Fireblast : SkillCard, ITarget, IDealDamage {
 
     public override void ExtendUse() {
         base.ExtendUse();
-        new DealDamageToTarget(false, Damage, this, Target);
+        new DealDamageToTarget(Damage, this, Target).ActivateEffect();
     }
 
 }

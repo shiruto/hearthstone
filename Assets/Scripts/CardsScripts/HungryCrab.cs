@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-public class HungryCrab : MinionCard, IBattleCry, ITarget {
+public class HungryCrab : MinionCard, IBattlecryCard, ITarget {
     public ICharacter Target { get; set; }
     public Func<ICharacter, bool> Match => (ICharacter c) => c is MinionLogic && (c as MinionLogic).Card.CA.MinionType == MinionType.Murloc;
     private readonly Buff buff;

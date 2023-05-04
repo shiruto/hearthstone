@@ -25,7 +25,7 @@ public class WeaponVisual : MonoBehaviour {
         TxtDurability.text = WL.Health + "";
         Immune.SetActive(WL.Attributes.Contains(CharacterAttribute.Immune));
         Trigger.SetActive(WL.Triggers != null && WL.Triggers.Count != 0);
-        DeathRattle.SetActive(WL.DeathRattleEffects.Count != 0);
+        DeathRattle.SetActive(WL.Deathrattle.Count != 0);
         LifeSteal.SetActive(WL.Attributes.Contains(CharacterAttribute.LifeSteal));
         Poisonous.SetActive(WL.Attributes.Contains(CharacterAttribute.Poisonous));
     }

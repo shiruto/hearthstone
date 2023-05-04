@@ -73,5 +73,10 @@ public enum AttackEvent {
 }
 
 public enum DamageEvent {
-    TakeDamage
+    BeforeTakeDamage,
+    TakeDamage,
+    BeforeHealing,
+    Healing,
+    BeforeGetArmor,
+    GetArmor
 }

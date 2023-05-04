@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -17,7 +18,8 @@ public class PlayerLogic : ICharacter {
     public ClassType HeroClass;
     private readonly int playerID;
     public int ID => playerID;
-    private int MaxHealth = 30;
+    private int _maxHealth = 30;
+    public int MaxHealth { get => _maxHealth; set => _maxHealth = value; }
     private int _health = 30;
     public int Health {
         get => _health;
@@ -110,6 +112,7 @@ public class PlayerLogic : ICharacter {
     public ICharacter AttackTarget { get; set; }
     public List<Buff> BuffList { get; set; }
     public List<Buff> Auras { get; set; }
+    public List<Action<MinionLogic>> Deathrattle { get; set; }
     #endregion
 
     public PlayerLogic(ClassType classType) {
@@ -162,6 +165,10 @@ public class PlayerLogic : ICharacter {
         (this as ICharacter).RemoveAttribute(CharacterAttribute.Stealth);
     }
 
+    public void GetArmor(int value) {
+        Armor += value;
+    }
+
     public void OnTurnStart() {
         EventManager.Allocate<TurnEventArgs>().CreateEventArgs(TurnEvent.OnTurnStart, null, this, TurnCount).Invoke();
         CanAttack = true;
@@ -182,6 +189,7 @@ public class PlayerLogic : ICharacter {
         _attack = 0;
         SpellDamage = 0;
         MaxHealth = 30;
+        Attributes.Clear();
         if (BuffList.Count != 0) {
             foreach (Buff b in BuffList) {
                 if (b.statusChange.Count != 0) {
@@ -191,7 +199,7 @@ public class PlayerLogic : ICharacter {
                                 Buff.Modify(ref _attack, sc.op, sc.Num);
                                 break;
                             case Status.Health:
-                                Buff.Modify(ref _health, sc.op, sc.Num);
+                                Buff.Modify(ref _maxHealth, sc.op, sc.Num);
                                 break;
                             case Status.SpellDamage:
                                 Buff.Modify(ref spellDamage, sc.op, sc.Num);
@@ -216,7 +224,7 @@ public class PlayerLogic : ICharacter {
                                 Buff.Modify(ref _attack, sc.op, sc.Num);
                                 break;
                             case Status.Health:
-                                Buff.Modify(ref _health, sc.op, sc.Num);
+                                Buff.Modify(ref _maxHealth, sc.op, sc.Num);
                                 break;
                             case Status.SpellDamage:
                                 Buff.Modify(ref spellDamage, sc.op, sc.Num);

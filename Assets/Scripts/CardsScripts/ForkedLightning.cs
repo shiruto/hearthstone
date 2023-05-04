@@ -8,7 +8,7 @@ public class ForkedLighting : SpellCard, IDealDamage {
     public override void ExtendUse() {
         base.ExtendUse();
         foreach (MinionLogic m in Effect.GetMultiRandomObject(BattleControl.GetAllMinions(), 2, (MinionLogic m) => m.Owner == Owner)) {
-            new DealDamageToTarget(false, Damage, this, m, true).ActivateEffect();
+            new DealDamageToTarget(Damage, this, m, false, true).ActivateEffect();
         }
     }
 

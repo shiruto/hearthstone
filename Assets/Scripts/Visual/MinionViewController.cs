@@ -37,7 +37,7 @@ public class MinionViewController : MonoBehaviour {
         Immune.SetActive(ML.Attributes.Contains(CharacterAttribute.Immune));
         Reborn.SetActive(ML.Attributes.Contains(CharacterAttribute.Reborn));
         Trigger.SetActive(ML.Triggers != null && ML.Triggers.Count != 0);
-        DeathRattle.SetActive(ML.DeathRattleEffects.Count != 0);
+        DeathRattle.SetActive(ML.Deathrattle.Count != 0);
         LifeSteal.SetActive(ML.Attributes.Contains(CharacterAttribute.LifeSteal));
         Poisonous.SetActive(ML.Attributes.Contains(CharacterAttribute.Poisonous));
         Taunt.SetActive(ML.Attributes.Contains(CharacterAttribute.Taunt));

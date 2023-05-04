@@ -64,6 +64,7 @@ public class DraggableCard : Draggable {
             StartCoroutine(MoveTo(StartPos));
         }
         ScnBattleUI.Instance.isDragging = false;
+        GetComponent<CanvasGroup>().alpha = 1;
         GetComponent<BoxCollider>().center = new(0, 0, -(gameObject.name[^1] - '0' - 1));
         transform.localScale *= 0.5f;
         transform.SetSiblingIndex(gameObject.name[^1] - '0' - 1);

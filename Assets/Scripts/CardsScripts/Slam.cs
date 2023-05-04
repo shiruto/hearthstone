@@ -11,10 +11,10 @@ public class Slam : SpellCard, ITarget, IDealDamage {
 
     public override void ExtendUse() {
         base.ExtendUse();
-        new DealDamageToTarget(false, Damage, this, Target, true).ActivateEffect();
-        if ((Target as MinionLogic).isAlive) {
-            Owner.Deck.DrawCards(1);
-        }
+        new DealDamageToTarget(Damage, this, Target, false, true).ActivateEffect();
+        if (!(Target as MinionLogic).isAlive) return;
+        Owner.Deck.DrawCards(1);
+
     }
 
 }

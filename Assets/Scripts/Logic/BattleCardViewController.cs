@@ -15,6 +15,8 @@ public class BattleCardViewController : MonoBehaviour {
     public GameObject AttackIcon;
     [Header("Image References")]
     public Image CardGraphicImage;
+    public bool IsTriggered;
+    public GameObject TriggeredLight;
     public GameObject Light;
     public CardBase Card;
 

@@ -18,7 +18,7 @@ public class ExplosiveTrap : SecretCard {
                 return (a as PlayerLogic) != Owner;
             }
             else return false;
-        }, true).ActivateEffect();
+        }, false, true).ActivateEffect();
         return true;
     }
 

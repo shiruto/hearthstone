@@ -19,7 +19,7 @@ public class ColdBlood : SpellCard, ITarget {
 
     public override void ExtendUse() {
         base.ExtendUse();
-        if (BattleControl.IsCombo()) {
+        if (BattleControl.IfUsedThisTurn()) {
             new GiveBuff(ComboBuff, this, Target).ActivateEffect();
         }
         else new GiveBuff(buff, this, Target).ActivateEffect();
